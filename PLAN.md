@@ -8,8 +8,8 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 
 - Active milestone: **v1.0 — Favorites MVP**
 - Implementation status: **In progress**
-- Current phase: **Repository bootstrap**
-- Next task: **Create the public GitHub repository and configure `origin`**
+- Current phase: **Application scaffolding**
+- Next task: **Scaffold a TypeScript Cloudflare Workers project using Hono**
 
 ## Core principles
 
@@ -62,7 +62,7 @@ Planned stack:
 
 - [ ] Initialize the application toolchain.
   - [x] Initialize the local Git repository when explicitly requested.
-  - [ ] Create the public GitHub repository and configure `origin` when explicitly requested.
+  - [x] Create the public GitHub repository and configure `origin` when explicitly requested.
   - [ ] Scaffold a TypeScript Cloudflare Workers project using Hono.
   - [ ] Configure npm scripts for local development, typechecking, testing, building, and deployment.
   - [ ] Configure Wrangler without committing account-specific production identifiers.
@@ -410,6 +410,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-14 — Local repository:** Initialize Git on the `main` branch and make a documentation-first initial commit before publishing or scaffolding the application.
 - **2026-08-14 — Plan tracking:** Keep atomic implementation tasks, new subtasks, decisions, deferred ideas, and blockers in this file.
 - **2026-08-14 — Custom icons:** Plan to use R2 in v1.0 because uploaded image blobs must not be stored in D1.
+- **2026-08-15 — Public repository:** Publish the project at `https://github.com/cmirza/webvista` with `origin` using SSH.
 
 ## Deferred ideas
 
