@@ -8,6 +8,7 @@ coverage/
 .vite/
 *.tsbuildinfo
 *.log
+worker-configuration.d.ts
 
 # Local Cloudflare and application secrets
 .dev.vars

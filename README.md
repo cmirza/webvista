@@ -24,8 +24,27 @@ The first release has one job: determine whether Dad will actually use it. It wi
 - SortableJS for admin ordering
 - A single password-protected admin session
 
+## Local development
+
+Use Node.js 22.12 or newer.
+
+```sh
+npm install
+npm run dev
+```
+
+Useful checks:
+
+```sh
+npm run typecheck
+npm test
+npm run build
+```
+
+`wrangler types` generates Worker runtime and binding types from `wrangler.jsonc`; `npm run typecheck` refreshes them automatically.
+
 ## Project status
 
-Planning is complete; implementation has not started. See [PLAN.md](PLAN.md) for the active checklist, roadmap, decisions, and definition of done.
+The Cloudflare Workers and Hono foundation is in progress. See [PLAN.md](PLAN.md) for the active checklist, roadmap, decisions, and definition of done.
 
 Contributors and coding agents must read [AGENTS.md](AGENTS.md) before changing the project.
