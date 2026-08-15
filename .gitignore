@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Build, test, and tool output
+dist/
+coverage/
+.wrangler/
+.vite/
+*.tsbuildinfo
+*.log
+
+# Local Cloudflare and application secrets
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+.env
+.env.*
+!.env.example
+
+# Local data and uploaded test assets
+.local/
+tmp/
+
+# Editors and operating systems
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
