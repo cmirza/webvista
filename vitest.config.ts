@@ -17,6 +17,7 @@ export default defineConfig(async () => {
     ],
     test: {
       provide: { migrations },
+      setupFiles: ['./test/setup.ts'],
     },
   }
 })

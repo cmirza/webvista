@@ -1,10 +1,5 @@
 import { env } from 'cloudflare:workers'
-import { applyD1Migrations } from 'cloudflare:test'
-import { beforeEach, describe, expect, inject, it } from 'vitest'
-
-beforeEach(async () => {
-  await applyD1Migrations(env.DB, inject('migrations'))
-})
+import { describe, expect, it } from 'vitest'
 
 describe('favorites database migration', () => {
   it('creates the favorites schema and ordering index', async () => {
@@ -29,6 +24,9 @@ describe('favorites database migration', () => {
     ])
     expect(indexes.results.map(({ name }) => name)).toContain(
       'favorites_enabled_position_idx',
+    )
+    expect(indexes.results.map(({ name }) => name)).toContain(
+      'favorites_url_idx',
     )
   })
 

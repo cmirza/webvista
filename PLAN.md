@@ -8,8 +8,8 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 
 - Active milestone: **v1.0 — Favorites MVP**
 - Implementation status: **In progress**
-- Current phase: **D1 favorites persistence**
-- Next task: **Implement the favorites data service**
+- Current phase: **Public favorites rendering**
+- Next task: **Render stored enabled favorites on the portal**
 
 ## Core principles
 
@@ -74,7 +74,8 @@ Planned stack:
   - [x] Add portal, admin, and authentication route modules.
   - [x] Add the shared layout and initial portal/admin views.
   - [ ] Add favorite, favorite-form, and admin-row partial views with their features.
-  - [ ] Add favorites and icon service modules.
+  - [x] Add the favorites service module.
+  - [ ] Add the icon service module.
   - [ ] Add authentication middleware.
   - [x] Add the main stylesheet and asset pipeline.
 - [x] Add a minimal automated test harness suitable for Hono Worker routes.
@@ -115,11 +116,13 @@ migrations/
   - [x] Add a `favorites` table with `id`, `title`, `url`, `position`, icon fields, `enabled`, and timestamps.
   - [x] Restrict stored `icon_mode` values to `auto`, `upload`, or `fallback` with a database constraint.
   - [x] Add an index supporting enabled/position queries.
-- [ ] Implement favorite list, lookup, create, update, delete, and reorder operations.
-  - [ ] Restrict `icon_mode` to `auto`, `upload`, or `fallback` at the application boundary.
-- [ ] Use stable text IDs and UTC ISO-8601 timestamps.
-- [ ] Assign default positions in increments of 10 and normalize positions after a complete reorder.
-- [ ] Verify migrations and persistence against a local D1 database.
+- [x] Implement favorite list, lookup, create, update, delete, and reorder operations.
+  - [x] Restrict `icon_mode` to `auto`, `upload`, or `fallback` at the application boundary.
+  - [x] Normalize HTTP/HTTPS URLs and reject duplicate favorite URLs.
+  - [x] Require a complete, duplicate-free ID set before persisting a reorder.
+- [x] Use stable text IDs and UTC ISO-8601 timestamps.
+- [x] Assign default positions in increments of 10 and normalize positions after a complete reorder.
+- [x] Verify migrations and persistence against a local D1 database.
 
 Initial schema shape:
 
@@ -422,6 +425,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-16 — Route boundary:** Keep all admin paths closed behind a temporary redirect/unavailable boundary until real password and signed-session authentication replaces it.
 - **2026-08-16 — Testing checkpoints:** After every runnable implementation increment, complete a local smoke test and give the user explicit startup instructions and a focused manual test list before continuing.
 - **2026-08-16 — Local D1:** Bind a Wrangler-local `webvista` D1 database, apply pending migrations automatically before local development, and retain a non-production database ID placeholder until the deployment milestone.
+- **2026-08-16 — Favorite data boundary:** Normalize favorite URLs before storage, enforce unique stored URLs, assign UUIDs and UTC timestamps in the service, and accept reorders only when they contain the complete stored ID set.
 
 ## Deferred ideas
 

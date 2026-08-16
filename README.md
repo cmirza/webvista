@@ -54,6 +54,6 @@ The asset build compiles `src/styles/app.css` with Tailwind CSS and daisyUI, the
 
 ## Project status
 
-The first server-rendered portal checkpoint is runnable locally, with Google search, a deliberately closed admin boundary, and the initial favorites schema in local D1. Favorite operations and authentication are not implemented yet. See [PLAN.md](PLAN.md) for the active checklist, roadmap, decisions, and definition of done.
+The server-rendered portal is runnable locally with Google search and a deliberately closed admin boundary. Its D1-backed favorites service now supports validated create, read, update, delete, and reorder operations; rendering stored favorites and authentication are the next implementation phases. See [PLAN.md](PLAN.md) for the active checklist, roadmap, decisions, and definition of done.
 
 Contributors and coding agents must read [AGENTS.md](AGENTS.md) before changing the project.
