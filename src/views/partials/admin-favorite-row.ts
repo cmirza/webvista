@@ -50,14 +50,15 @@ export async function renderAdminFavoriteRow(
         >
           Edit
         </a>
-        <button
+        <a
           class="btn btn-ghost btn-sm rounded-lg text-error"
-          type="button"
-          disabled
-          title="Deletion will be available in a later step"
+          href="/admin/favorites/${favorite.id}/delete"
+          hx-get="/admin/favorites/${favorite.id}/delete"
+          hx-target="#admin-workspace"
+          hx-swap="innerHTML show:#admin-workspace:top"
         >
           Remove
-        </button>
+        </a>
       </div>
     </li>
   `

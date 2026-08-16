@@ -183,3 +183,22 @@ export async function renderAdminEditPage(
     title: 'Edit Site · WebVista',
   })
 }
+
+export async function renderAdminDeletePage(
+  confirmation: HtmlEscapedString,
+): Promise<HtmlEscapedString> {
+  const content = await html`
+    <main class="mx-auto min-h-screen w-full max-w-3xl px-4 py-6 sm:px-8 sm:py-10">
+      ${await renderAdminHeader()}
+      <div class="mt-6">${confirmation}</div>
+    </main>
+  `
+
+  return renderLayout({
+    children: content,
+    description: 'Remove a WebVista favorite',
+    robots: 'noindex,nofollow',
+    scripts: ['/assets/admin.js'],
+    title: 'Remove Site · WebVista',
+  })
+}

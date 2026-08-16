@@ -1,10 +1,12 @@
-import { Hono } from 'hono'
+import { Hono, type Context } from 'hono'
 import {
   requireAdmin,
   requireSameOriginForWrites,
 } from '../middleware/auth'
 import {
   createFavorite,
+  deleteFavorite,
+  type Favorite,
   FavoriteValidationError,
   getFavorite,
   listFavorites,
@@ -22,6 +24,7 @@ import { discoverSiteMetadata } from '../services/icons'
 import {
   renderAdminAddPage,
   renderAdminDashboard,
+  renderAdminDeletePage,
   renderAdminEditPage,
 } from '../views/admin'
 import {
@@ -30,6 +33,10 @@ import {
   renderEditFavoriteForm,
   renderEditFavoriteSuccess,
 } from '../views/partials/favorite-edit-form'
+import {
+  renderDeleteFavoriteConfirmation,
+  renderDeleteFavoriteSuccess,
+} from '../views/partials/favorite-delete'
 import {
   type AddFavoriteFormValues,
   renderAddFavoriteForm,
@@ -433,6 +440,101 @@ adminRoutes.post('/favorites/:id', async (context) => {
 
     return renderError(error.fieldErrors)
   }
+})
+
+type AdminContext = Context<{ Bindings: CloudflareBindings }>
+
+const deleteFavoriteAndRespond = async (
+  context: AdminContext,
+  favorite: Favorite,
+  enhanced: boolean,
+) => {
+  const deleted = await deleteFavorite(context.env.DB, favorite.id)
+
+  if (!deleted) {
+    return context.notFound()
+  }
+
+  let cleanupFailed = false
+
+  try {
+    await deleteCustomIcon(context.env.ICONS, favorite.iconStorageKey)
+  } catch {
+    cleanupFailed = true
+  }
+
+  const total = (await listFavorites(context.env.DB)).length
+  const result = await renderDeleteFavoriteSuccess(
+    favorite,
+    total,
+    cleanupFailed,
+  )
+
+  if (enhanced) {
+    return context.html(result)
+  }
+
+  if (cleanupFailed) {
+    return context.html(await renderAdminDeletePage(result))
+  }
+
+  return context.redirect('/admin', 303)
+}
+
+adminRoutes.get('/favorites/:id/delete', async (context) => {
+  const favorite = await getFavorite(context.env.DB, context.req.param('id'))
+
+  if (!favorite) {
+    return context.notFound()
+  }
+
+  const enhanced = isHtmxRequest(context.req)
+  const confirmation = await renderDeleteFavoriteConfirmation(
+    favorite,
+    enhanced,
+  )
+
+  if (enhanced) {
+    return context.html(confirmation)
+  }
+
+  return context.html(await renderAdminDeletePage(confirmation))
+})
+
+adminRoutes.post('/favorites/:id/delete', async (context) => {
+  const body = await context.req.parseBody()
+
+  if (bodyString(body, 'confirmed') !== 'yes') {
+    return context.text('Confirmation required.', 400)
+  }
+
+  const favorite = await getFavorite(context.env.DB, context.req.param('id'))
+
+  if (!favorite) {
+    return context.notFound()
+  }
+
+  return deleteFavoriteAndRespond(context, favorite, false)
+})
+
+adminRoutes.delete('/favorites/:id', async (context) => {
+  const body = await context.req.parseBody()
+
+  if (bodyString(body, 'confirmed') !== 'yes') {
+    return context.text('Confirmation required.', 400)
+  }
+
+  const favorite = await getFavorite(context.env.DB, context.req.param('id'))
+
+  if (!favorite) {
+    return context.notFound()
+  }
+
+  return deleteFavoriteAndRespond(
+    context,
+    favorite,
+    isHtmxRequest(context.req),
+  )
 })
 
 adminRoutes.all('*', (context) => context.notFound())

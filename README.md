@@ -58,6 +58,6 @@ The asset build compiles `src/styles/app.css` with Tailwind CSS and daisyUI, the
 
 ## Project status
 
-The server-rendered portal is runnable locally with Google search, a responsive D1-backed favorites grid, and a single-password authenticated admin area. The admin can add and edit validated favorites through normal HTML or an HTMX-enhanced dashboard flow, including automatic metadata/icon discovery, generated fallbacks, enabled/hidden state, and custom icon uploads backed by R2. Favorite deletion is the next implementation phase. See [PLAN.md](PLAN.md) for the active checklist, roadmap, decisions, and definition of done.
+The server-rendered portal is runnable locally with Google search, a responsive D1-backed favorites grid, and a single-password authenticated admin area. The admin can add, edit, and remove validated favorites through normal HTML or an HTMX-enhanced dashboard flow, including automatic metadata/icon discovery, generated fallbacks, enabled/hidden state, and custom icon uploads backed by R2. Drag-and-drop ordering is the next implementation phase. See [PLAN.md](PLAN.md) for the active checklist, roadmap, decisions, and definition of done.
 
 Contributors and coding agents must read [AGENTS.md](AGENTS.md) before changing the project.

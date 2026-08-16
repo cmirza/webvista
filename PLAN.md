@@ -8,8 +8,8 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 
 - Active milestone: **v1.0 — Favorites MVP**
 - Implementation status: **In progress**
-- Current phase: **Edit favorite**
-- Next task: **User-test favorite editing in the local admin**
+- Current phase: **Delete favorite**
+- Next task: **User-test confirmed favorite deletion in the local admin**
 
 ## Core principles
 
@@ -245,13 +245,13 @@ CREATE TABLE favorites (
   - [x] Clear a stale upload-validation message when a corrected file is selected.
 - [x] Add a Refresh automatic icon action.
 - [x] Preserve the previous icon when an edit or replacement upload fails.
-- [ ] Remove unreferenced uploaded objects after successful replacement or favorite deletion.
+- [x] Remove unreferenced uploaded objects after successful replacement or favorite deletion.
   - [x] Remove the previous object after a successful replacement or icon-mode change.
-  - [ ] Remove the associated object after favorite deletion.
-- [ ] Test invalid types, oversized uploads, missing R2 objects, replacement, and cleanup behavior.
+  - [x] Remove the associated object after favorite deletion.
+- [x] Test invalid types, oversized uploads, missing R2 objects, replacement, and cleanup behavior.
   - [x] Cover invalid types, spoofed contents, oversized uploads, missing objects, and failed-create cleanup.
   - [x] Cover replacement cleanup with the edit workflow.
-  - [ ] Cover deletion cleanup with the delete workflow.
+  - [x] Cover deletion cleanup with the delete workflow.
 
 ### 11. Edit favorite
 
@@ -269,12 +269,13 @@ CREATE TABLE favorites (
 
 ### 12. Delete favorite
 
-- [ ] Implement a small confirmation dialog naming the favorite.
-- [ ] Implement authenticated `DELETE /admin/favorites/:id`.
-- [ ] Remove the row through HTMX after successful deletion.
-- [ ] Provide an accessible non-JavaScript deletion path using a confirmed POST action if needed.
-- [ ] Delete associated uploaded icon objects only after the database mutation succeeds.
-- [ ] Handle missing records and deletion failures without leaving a misleading UI state.
+- [x] Implement a small confirmation dialog naming the favorite.
+  - [x] Use a server-rendered confirmation page/fragment so deletion remains usable without JavaScript.
+- [x] Implement authenticated `DELETE /admin/favorites/:id`.
+- [x] Remove the row through HTMX after successful deletion.
+- [x] Provide an accessible non-JavaScript deletion path using a confirmed POST action if needed.
+- [x] Delete associated uploaded icon objects only after the database mutation succeeds.
+- [x] Handle missing records and deletion failures without leaving a misleading UI state.
 
 ### 13. Drag-and-drop ordering
 
@@ -338,7 +339,7 @@ GET    /admin/favorites/icon-preview
 - [ ] Custom icons can replace bad automatic icons.
 - [ ] Admin can add a favorite.
 - [x] Admin can edit a favorite.
-- [ ] Admin can delete a favorite.
+- [x] Admin can delete a favorite.
 - [ ] Admin can drag favorites into a new order.
 - [ ] Portal reflects that order.
 - [ ] Layout reflows cleanly in a split-screen browser window.
@@ -453,6 +454,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-16 — Add favorite flow:** Keep icon previews advisory and re-run bounded discovery on save instead of trusting browser-supplied icon URLs; enhance the normal form with HTMX fragments and out-of-band dashboard updates while preserving full-page validation and redirects without JavaScript.
 - **2026-08-16 — Custom icon storage:** Bind R2 without a committed production bucket name, accept only signature-validated PNG/JPEG/WebP files up to 2 MB, store UUID-based object keys in D1, and serve objects through a constrained immutable `/icons/:fileName` route.
 - **2026-08-16 — Favorite editing:** Keep an existing automatic icon unless refresh is explicitly selected, validate and store replacement uploads before changing D1, delete a failed replacement object when D1 rejects the update, and remove the previous upload only after a successful update.
+- **2026-08-16 — Favorite deletion:** Require an explicit server-validated confirmation, use `DELETE` for the HTMX flow and confirmed `POST` as the no-JavaScript fallback, remove D1 data before its R2 object, and report an R2 cleanup failure without implying that the favorite still exists.
 
 ## Deferred ideas
 
