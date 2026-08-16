@@ -154,6 +154,7 @@ CREATE TABLE favorites (
 - [x] Add prominent Google search above Favorites.
   - [x] Submit with `GET https://www.google.com/search` and a `q` field.
   - [x] Provide a large search input, clear focus state, and visible submit button.
+  - [x] Add an accessible multicolor visual prompt that disappears during entry.
   - [x] Verify Enter submits and search works without JavaScript.
 - [ ] Render enabled favorites ordered by stored position.
 - [ ] Make the entire icon/name region a same-tab external link.

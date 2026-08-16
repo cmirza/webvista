@@ -20,16 +20,28 @@ export async function renderPortal(): Promise<HtmlEscapedString> {
           method="get"
           class="flex flex-col gap-3 sm:flex-row"
         >
-          <label class="sr-only" for="google-search">Search Google</label>
-          <input
-            id="google-search"
-            class="input input-lg h-16 w-full rounded-2xl border-base-300 bg-base-100 px-6 text-lg shadow-sm outline-none focus:border-primary focus:ring-4 focus:ring-primary/15"
-            type="search"
-            name="q"
-            placeholder="Search Google..."
-            autocomplete="off"
-            autofocus
-          />
+          <div class="relative w-full">
+            <label class="sr-only" for="google-search">Search Google</label>
+            <input
+              id="google-search"
+              class="peer input input-lg h-16 w-full rounded-2xl border-base-300 bg-base-100 px-6 text-lg shadow-sm outline-none placeholder:text-transparent focus:border-primary focus:ring-4 focus:ring-primary/15"
+              type="search"
+              name="q"
+              placeholder="Search Google..."
+              autocomplete="off"
+            />
+            <div
+              aria-hidden="true"
+              data-search-prompt
+              class="pointer-events-none absolute inset-y-0 left-6 flex items-center text-lg transition-opacity duration-150 peer-focus:opacity-0 peer-[:not(:placeholder-shown)]:opacity-0"
+            >
+              <span class="text-base-content/45">Search&nbsp;</span>
+              <span class="font-semibold tracking-tight">
+                <span class="text-[#4285f4]">G</span><span class="text-[#ea4335]">o</span><span class="text-[#fbbc05]">o</span><span class="text-[#4285f4]">g</span><span class="text-[#34a853]">l</span><span class="text-[#ea4335]">e</span>
+              </span>
+              <span class="text-base-content/45">...</span>
+            </div>
+          </div>
           <button class="btn btn-primary h-16 rounded-2xl px-8 text-lg shadow-sm" type="submit">
             Search
           </button>

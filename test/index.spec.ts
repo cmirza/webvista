@@ -11,6 +11,8 @@ describe('WebVista Worker', () => {
     expect(body).toContain('<title>WebVista</title>')
     expect(body).toContain('action="https://www.google.com/search"')
     expect(body).toContain('name="q"')
+    expect(body).toContain('placeholder="Search Google..."')
+    expect(body).toContain('data-search-prompt')
     expect(body).toContain('href="/assets/app.css"')
     expect(body).toContain('src="/assets/htmx.min.js"')
     expect(body).not.toContain('/admin')
