@@ -50,3 +50,4 @@ These instructions apply to the entire repository.
 - Check the portal at wide, half-screen, and narrow widths when UI behavior changes.
 - Run the applicable typecheck, tests, and build before marking work complete.
 - If a verification step cannot run, leave the task open and document the reason in `PLAN.md`.
+- Treat every runnable implementation increment as a user testing checkpoint: smoke-test it locally, then tell the user exactly how to start it and what changed before beginning the next increment.

@@ -8,8 +8,8 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 
 - Active milestone: **v1.0 — Favorites MVP**
 - Implementation status: **In progress**
-- Current phase: **Application scaffolding**
-- Next task: **Add portal, admin, and authentication route modules**
+- Current phase: **D1 favorites persistence**
+- Next task: **Create the initial D1 favorites migration**
 
 ## Core principles
 
@@ -71,8 +71,9 @@ Planned stack:
   - [x] Add `.gitignore` entries for dependencies, generated output, local D1/Wrangler state, secrets, and editor/OS files.
 - [ ] Establish the simple source layout.
   - [x] Add the Worker entry point and typed Cloudflare bindings.
-  - [ ] Add portal, admin, and authentication route modules.
-  - [ ] Add shared layout, portal, admin, and partial view modules.
+  - [x] Add portal, admin, and authentication route modules.
+  - [x] Add the shared layout and initial portal/admin views.
+  - [ ] Add favorite, favorite-form, and admin-row partial views with their features.
   - [ ] Add favorites and icon service modules.
   - [ ] Add authentication middleware.
   - [x] Add the main stylesheet and asset pipeline.
@@ -138,7 +139,7 @@ CREATE TABLE favorites (
 
 ### 3. Shared UI and Nord Light theme
 
-- [ ] Build the base HTML document with responsive metadata and shared assets.
+- [x] Build the base HTML document with responsive metadata and shared assets.
 - [ ] Configure daisyUI's Nord theme and customize it into a light macOS-like start page.
 - [ ] Express colors, radii, shadows, spacing, and typography through theme variables or design tokens.
 - [ ] Use a cool-gray page background, light surfaces, Nord blue accents, charcoal text, soft shadows, and minimal borders.
@@ -148,16 +149,16 @@ CREATE TABLE favorites (
 
 ### 4. Public portal
 
-- [ ] Implement `GET /` as server-rendered HTML.
+- [x] Implement `GET /` as server-rendered HTML.
 - [ ] Add a friendly, time-appropriate greeting.
-- [ ] Add prominent Google search above Favorites.
-  - [ ] Submit with `GET https://www.google.com/search` and a `q` field.
-  - [ ] Provide a large search input, clear focus state, and visible submit button.
-  - [ ] Verify Enter submits and search works without JavaScript.
+- [x] Add prominent Google search above Favorites.
+  - [x] Submit with `GET https://www.google.com/search` and a `q` field.
+  - [x] Provide a large search input, clear focus state, and visible submit button.
+  - [x] Verify Enter submits and search works without JavaScript.
 - [ ] Render enabled favorites ordered by stored position.
 - [ ] Make the entire icon/name region a same-tab external link.
-- [ ] Keep the portal free of admin controls, admin links, and navigation menus.
-- [ ] Handle an empty favorites list without exposing administration to portal users.
+- [x] Keep the portal free of admin controls, admin links, and navigation menus.
+- [x] Handle an empty favorites list without exposing administration to portal users.
 
 ### 5. Responsive favorites grid
 
@@ -416,6 +417,8 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-15 — Node runtime:** Pin Node.js 22.12 because the current Vite-based Workers test toolchain requires Node 22.12 or newer.
 - **2026-08-16 — Public language:** Keep repository documentation and application copy neutral and free of references to any specific family member or intended individual.
 - **2026-08-16 — Frontend assets:** Use Tailwind CSS 4 with daisyUI 5's Nord theme, self-host HTMX and SortableJS from pinned npm packages, and generate `public/assets` during development and deployment rather than committing build output.
+- **2026-08-16 — Route boundary:** Keep all admin paths closed behind a temporary redirect/unavailable boundary until real password and signed-session authentication replaces it.
+- **2026-08-16 — Testing checkpoints:** After every runnable implementation increment, complete a local smoke test and give the user explicit startup instructions and a focused manual test list before continuing.
 
 ## Deferred ideas
 

@@ -50,6 +50,6 @@ The asset build compiles `src/styles/app.css` with Tailwind CSS and daisyUI, the
 
 ## Project status
 
-The Cloudflare Workers and Hono foundation is in progress. See [PLAN.md](PLAN.md) for the active checklist, roadmap, decisions, and definition of done.
+The first server-rendered portal checkpoint is runnable locally, with Google search and a deliberately closed admin boundary. Favorites persistence and authentication are not implemented yet. See [PLAN.md](PLAN.md) for the active checklist, roadmap, decisions, and definition of done.
 
 Contributors and coding agents must read [AGENTS.md](AGENTS.md) before changing the project.
