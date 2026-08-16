@@ -42,6 +42,7 @@ Useful checks:
 npm run typecheck
 npm test
 npm run build
+npm run db:seed:local
 npm run db:status:local
 npm run db:inspect:local
 ```
@@ -52,8 +53,10 @@ The asset build compiles `src/styles/app.css` with Tailwind CSS and daisyUI, the
 
 `wrangler.jsonc` uses a non-production placeholder for the D1 database ID. Creating a Cloudflare D1 resource and replacing that value are intentionally deferred to the deployment milestone; local commands do not access a remote database.
 
+`npm run db:seed:local` adds 12 idempotent example favorites to the local database so the portal grid can be exercised before the admin interface is available. It never targets the remote database.
+
 ## Project status
 
-The server-rendered portal is runnable locally with Google search and a deliberately closed admin boundary. Its D1-backed favorites service now supports validated create, read, update, delete, and reorder operations; rendering stored favorites and authentication are the next implementation phases. See [PLAN.md](PLAN.md) for the active checklist, roadmap, decisions, and definition of done.
+The server-rendered portal is runnable locally with Google search, a responsive D1-backed favorites grid, and a deliberately closed admin boundary. The favorites service supports validated create, read, update, delete, and reorder operations; automatic icon discovery and authentication are the next implementation phases. See [PLAN.md](PLAN.md) for the active checklist, roadmap, decisions, and definition of done.
 
 Contributors and coding agents must read [AGENTS.md](AGENTS.md) before changing the project.

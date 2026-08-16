@@ -8,8 +8,8 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 
 - Active milestone: **v1.0 — Favorites MVP**
 - Implementation status: **In progress**
-- Current phase: **Public favorites rendering**
-- Next task: **Render stored enabled favorites on the portal**
+- Current phase: **Public favorites verification**
+- Next task: **Verify the responsive favorite grid at priority widths**
 
 ## Core principles
 
@@ -73,7 +73,8 @@ Planned stack:
   - [x] Add the Worker entry point and typed Cloudflare bindings.
   - [x] Add portal, admin, and authentication route modules.
   - [x] Add the shared layout and initial portal/admin views.
-  - [ ] Add favorite, favorite-form, and admin-row partial views with their features.
+  - [x] Add the public favorite partial view.
+  - [ ] Add favorite-form and admin-row partial views with their features.
   - [x] Add the favorites service module.
   - [ ] Add the icon service module.
   - [ ] Add authentication middleware.
@@ -160,18 +161,19 @@ CREATE TABLE favorites (
   - [x] Provide a large search input, clear focus state, and visible submit button.
   - [x] Add an accessible multicolor visual prompt that disappears during entry.
   - [x] Verify Enter submits and search works without JavaScript.
-- [ ] Render enabled favorites ordered by stored position.
-- [ ] Make the entire icon/name region a same-tab external link.
+- [x] Render enabled favorites ordered by stored position.
+- [x] Make the entire icon/name region a same-tab external link.
 - [x] Keep the portal free of admin controls, admin links, and navigation menus.
 - [x] Handle an empty favorites list without exposing administration to portal users.
 
 ### 5. Responsive favorites grid
 
-- [ ] Display favorite icons at a consistent outer size of approximately 96–120px.
-- [ ] Use a width-driven CSS grid, based on `auto-fit`/`minmax`, rather than device detection.
-- [ ] Tune the grid to show roughly eight columns in a wide window, four at half-screen, and three when narrow.
+- [x] Display favorite icons at a consistent outer size of approximately 96–120px.
+- [x] Use a width-driven CSS grid, based on `auto-fit`/`minmax`, rather than device detection.
+- [x] Implement grid sizing intended to show roughly eight columns in a wide window, four at half-screen, and three when narrow.
 - [ ] Support at least 12 favorites without crowding or excessive stretching.
-- [ ] Keep long titles readable without allowing one item to distort the grid.
+  - [x] Provide an idempotent local-only seed dataset with 12 representative favorites.
+- [x] Clamp long titles to two lines without allowing one item to distort the grid.
 - [ ] Verify wide monitor, half-screen desktop, narrow desktop, tablet, and basic mobile fallback layouts.
 
 ### 6. Automatic and fallback icons
@@ -184,10 +186,10 @@ CREATE TABLE favorites (
   - [ ] Generated fallback.
 - [ ] Resolve relative icon and manifest URLs against the final page URL.
 - [ ] Prefer declared or inspected high-resolution assets and avoid enlarging tiny favicons when a better source exists.
-- [ ] Generate a consistent fallback using the favorite name or hostname.
+- [x] Generate a consistent fallback using the favorite name.
 - [ ] Add timeouts, response-size limits, content-type checks, and graceful failure behavior.
 - [ ] Prevent metadata retrieval from accessing unsafe local/private network targets.
-- [ ] Display every icon inside a consistent rounded macOS-style visual container.
+- [x] Display every icon inside a consistent rounded macOS-style visual container.
 - [ ] Add unit tests for candidate priority, URL resolution, malformed metadata, and fallback generation.
 
 ### 7. Admin authentication
@@ -285,7 +287,7 @@ GET    /admin/favorites/icon-preview
 
 ### 14. End-to-end quality pass
 
-- [ ] Seed or create at least 12 representative favorites for local testing.
+- [x] Seed or create at least 12 representative favorites for local testing.
 - [ ] Verify portal behavior with JavaScript disabled.
 - [ ] Verify add, edit, delete, icon preview/upload, enable/disable, logout, and reorder flows with HTMX enabled.
 - [ ] Verify all write routes reject unauthenticated requests.
@@ -426,6 +428,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-16 — Testing checkpoints:** After every runnable implementation increment, complete a local smoke test and give the user explicit startup instructions and a focused manual test list before continuing.
 - **2026-08-16 — Local D1:** Bind a Wrangler-local `webvista` D1 database, apply pending migrations automatically before local development, and retain a non-production database ID placeholder until the deployment milestone.
 - **2026-08-16 — Favorite data boundary:** Normalize favorite URLs before storage, enforce unique stored URLs, assign UUIDs and UTC timestamps in the service, and accept reorders only when they contain the complete stored ID set.
+- **2026-08-16 — Portal favorite fallback:** Render favorites as ordinary same-tab links in a width-driven grid, using deterministic initial-based icons until automatic icon discovery provides suitable assets.
 
 ## Deferred ideas
 
@@ -436,7 +439,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 
 ## Blockers
 
-- None.
+- Responsive browser verification is awaiting the current manual checkpoint because the in-app browser was unavailable during implementation. Automated route, rendering, D1, and build checks pass.
 
 ## Post-deployment usage validation
 

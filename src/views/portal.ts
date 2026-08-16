@@ -1,8 +1,12 @@
 import { html } from 'hono/html'
 import type { HtmlEscapedString } from 'hono/utils/html'
+import type { Favorite } from '../services/favorites'
 import { renderLayout } from './layout'
+import { renderFavorite } from './partials/favorite'
 
-export async function renderPortal(): Promise<HtmlEscapedString> {
+export async function renderPortal(
+  favorites: Favorite[],
+): Promise<HtmlEscapedString> {
   const content = await html`
     <main class="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-6 py-10 sm:px-10 sm:py-14 lg:px-12">
       <header class="mb-10 sm:mb-14">
@@ -58,10 +62,20 @@ export async function renderPortal(): Promise<HtmlEscapedString> {
           </div>
         </div>
 
-        <div class="rounded-3xl bg-base-100 px-6 py-12 text-center shadow-sm sm:px-10">
-          <p class="text-lg font-medium">Your favorites will appear here.</p>
-          <p class="mt-2 text-base-content/60">The favorites library is the next data-backed feature.</p>
-        </div>
+        ${favorites.length > 0
+          ? html`
+              <div class="favorites-grid" data-favorites-grid>
+                ${favorites.map(renderFavorite)}
+              </div>
+            `
+          : html`
+              <div class="rounded-3xl bg-base-100 px-6 py-12 text-center shadow-sm sm:px-10">
+                <p class="text-lg font-medium">Your favorites will appear here.</p>
+                <p class="mt-2 text-base-content/60">
+                  Add favorite sites from the administration area when it is available.
+                </p>
+              </div>
+            `}
       </section>
     </main>
   `
