@@ -1,6 +1,6 @@
 # WebVista Delivery Plan
 
-WebVista is a lightweight personal portal whose first release answers one question: **Will Dad actually use this as his browser home/start page?**
+WebVista is a lightweight personal portal whose first release answers one question: **Will people actually use this as their browser home/start page?**
 
 This file is the source of truth for scope and progress. Add newly discovered work beneath the relevant checkbox, and check work off only after it has been implemented and verified.
 
@@ -149,7 +149,7 @@ CREATE TABLE favorites (
 ### 4. Public portal
 
 - [ ] Implement `GET /` as server-rendered HTML.
-- [ ] Add a time-appropriate greeting addressed to Dad.
+- [ ] Add a friendly, time-appropriate greeting.
 - [ ] Add prominent Google search above Favorites.
   - [ ] Submit with `GET https://www.google.com/search` and a `q` field.
   - [ ] Provide a large search input, clear focus state, and visible submit button.
@@ -157,7 +157,7 @@ CREATE TABLE favorites (
 - [ ] Render enabled favorites ordered by stored position.
 - [ ] Make the entire icon/name region a same-tab external link.
 - [ ] Keep the portal free of admin controls, admin links, and navigation menus.
-- [ ] Handle an empty favorites list without exposing administration to Dad.
+- [ ] Handle an empty favorites list without exposing administration to portal users.
 
 ### 5. Responsive favorites grid
 
@@ -317,9 +317,9 @@ GET    /admin/favorites/icon-preview
 - [ ] Portal reflects that order.
 - [ ] Layout reflows cleanly in a split-screen browser window.
 - [ ] Nord Light theme is polished enough for daily use.
-- [ ] Dad can use the portal without understanding how it works.
+- [ ] A first-time user can use the portal without needing an explanation.
 
-After deployment, stop feature development long enough to determine whether Dad actually uses WebVista. That usage determines whether v1.1 is worth building.
+After deployment, stop feature development long enough to determine whether WebVista sees real everyday use. That usage determines whether v1.1 is worth building.
 
 ## v1.0 non-goals
 
@@ -365,7 +365,7 @@ Later milestones remain intentionally high-level until v1.0 usage is validated.
 - [ ] Make item sorting touch-friendly.
 - [ ] Optimize the bookmarklet → preview → add workflow.
 
-The Dad-facing portal should already resize reasonably before this release.
+The public portal should already resize reasonably before this release.
 
 ### v1.4 — Watch
 
@@ -414,6 +414,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-15 — Public repository:** Publish the project at `https://github.com/cmirza/webvista` with `origin` using SSH.
 - **2026-08-15 — Worker foundation:** Use Hono on Cloudflare Workers with Wrangler-generated runtime types and Cloudflare's Vitest Workers integration.
 - **2026-08-15 — Node runtime:** Pin Node.js 22.12 because the current Vite-based Workers test toolchain requires Node 22.12 or newer.
+- **2026-08-16 — Public language:** Keep repository documentation and application copy neutral and free of references to any specific family member or intended individual.
 
 ## Deferred ideas
 
@@ -429,7 +430,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 ## Post-deployment usage validation
 
 - [ ] Agree on a short observation period after v1.0 deployment.
-- [ ] Set WebVista as Dad's browser home/start page with his consent.
-- [ ] Observe whether he returns to it without prompting.
+- [ ] Set WebVista as the intended user's browser home/start page with their consent.
+- [ ] Observe whether they return to it without prompting.
 - [ ] Gather lightweight qualitative feedback about search, favorite choices, icon recognition, and layout.
 - [ ] Decide whether to stop, refine v1.0, or begin v1.1 based on actual use.

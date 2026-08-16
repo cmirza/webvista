@@ -1,8 +1,8 @@
 # WebVista
 
-WebVista is a lightweight personal web portal designed to work as Dad's browser home page. It favors large, obvious controls, minimal navigation, and genuinely useful information without becoming a traditional dashboard.
+WebVista is a lightweight personal web portal designed to work as a browser home page. It favors large, obvious controls, minimal navigation, and genuinely useful information without becoming a traditional dashboard.
 
-The first release has one job: determine whether Dad will actually use it. It will provide Google search and a polished, responsive grid of favorite sites, with administration kept behind a separate authenticated interface.
+The first release has one job: determine whether the portal earns a place in everyday browsing. It will provide Google search and a polished, responsive grid of favorite sites, with administration kept behind a separate authenticated interface.
 
 ## Product principles
 
