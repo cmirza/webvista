@@ -8,8 +8,8 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 
 - Active milestone: **v1.0 — Favorites MVP**
 - Implementation status: **In progress**
-- Current phase: **Admin authentication**
-- Next task: **Implement the single-password login and signed session**
+- Current phase: **Admin dashboard**
+- Next task: **Render authenticated favorites management rows**
 
 ## Core principles
 
@@ -77,7 +77,7 @@ Planned stack:
   - [ ] Add favorite-form and admin-row partial views with their features.
   - [x] Add the favorites service module.
   - [x] Add the icon service module.
-  - [ ] Add authentication middleware.
+  - [x] Add authentication middleware.
   - [x] Add the main stylesheet and asset pipeline.
 - [x] Add a minimal automated test harness suitable for Hono Worker routes.
 - [x] Confirm the starter application runs locally and produces a deployable Worker build.
@@ -194,15 +194,16 @@ CREATE TABLE favorites (
 
 ### 7. Admin authentication
 
-- [ ] Implement `GET /admin/login` and a clear single-password login form.
-- [ ] Implement `POST /admin/login` using a password stored as a Cloudflare secret.
-- [ ] Compare credentials safely and issue a signed, secure session cookie.
-- [ ] Set appropriate `HttpOnly`, `Secure`, `SameSite`, path, and expiration attributes.
-- [ ] Implement `POST /admin/logout` and invalidate the browser session.
-- [ ] Protect every `/admin/*` route except login endpoints.
-- [ ] Protect every write endpoint on the server, regardless of HTMX usage.
-- [ ] Verify rejected login, accepted login, tampered/expired cookie, logout, and unauthorized write behavior.
-- [ ] Do not build registration, recovery, multiple users, roles, or OAuth.
+- [x] Implement `GET /admin/login` and a clear single-password login form.
+- [x] Implement `POST /admin/login` using a password stored as a Cloudflare secret.
+- [x] Compare credentials safely and issue a signed, secure session cookie.
+- [x] Set appropriate `HttpOnly`, `Secure`, `SameSite`, path, and expiration attributes.
+- [x] Implement `POST /admin/logout` and invalidate the browser session.
+- [x] Protect every `/admin/*` route except login endpoints.
+- [x] Protect every write endpoint on the server, regardless of HTMX usage.
+  - [x] Reject cross-origin admin form submissions.
+- [x] Verify rejected login, accepted login, tampered/expired cookie, logout, and unauthorized write behavior.
+- [x] Do not build registration, recovery, multiple users, roles, or OAuth.
 
 ### 8. Admin dashboard
 
@@ -430,6 +431,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-16 — Favorite data boundary:** Normalize favorite URLs before storage, enforce unique stored URLs, assign UUIDs and UTC timestamps in the service, and accept reorders only when they contain the complete stored ID set.
 - **2026-08-16 — Portal favorite fallback:** Render favorites as ordinary same-tab links in a width-driven grid, using deterministic initial-based icons until automatic icon discovery provides suitable assets.
 - **2026-08-16 — Metadata retrieval boundary:** Fetch metadata with manual redirect validation, a four-second overall timeout, bounded streamed bodies, strict content-type checks, public HTTP/HTTPS targets only, and at most eight verified icon candidates.
+- **2026-08-16 — Admin sessions:** Keep the admin password and session-signing key as separate Worker secrets, issue an eight-hour signed `__Host-` cookie with strict browser attributes, and require same-origin admin writes in addition to authentication.
 
 ## Deferred ideas
 

@@ -31,10 +31,11 @@ Use Node.js 22.12 or newer.
 ```sh
 nvm use
 npm install
+cp .dev.vars.example .dev.vars
 npm run dev
 ```
 
-The development command applies pending migrations to a local D1 database, then runs Wrangler and the Tailwind watcher together. Browser dependencies are self-hosted from `/assets`; no CDN is required. Local D1 data is kept under `.wrangler/state` and is not committed.
+Before starting, replace both values in `.dev.vars`: `ADMIN_PASSWORD` is the login password and `ADMIN_SESSION_SECRET` is a separate, long random value used only to sign sessions. Neither `.dev.vars` nor its contents should be committed. The development command applies pending migrations to a local D1 database, then runs Wrangler and the Tailwind watcher together. Browser dependencies are self-hosted from `/assets`; no CDN is required. Local D1 data is kept under `.wrangler/state` and is not committed.
 
 Useful checks:
 
@@ -57,6 +58,6 @@ The asset build compiles `src/styles/app.css` with Tailwind CSS and daisyUI, the
 
 ## Project status
 
-The server-rendered portal is runnable locally with Google search, a responsive D1-backed favorites grid, and a deliberately closed admin boundary. Favorites support validated persistence plus bounded, SSRF-conscious website metadata and icon discovery. Single-password admin authentication is the next implementation phase. See [PLAN.md](PLAN.md) for the active checklist, roadmap, decisions, and definition of done.
+The server-rendered portal is runnable locally with Google search, a responsive D1-backed favorites grid, and a single-password authenticated admin boundary. Favorites support validated persistence plus bounded, SSRF-conscious website metadata and icon discovery. The favorites admin dashboard is the next implementation phase. See [PLAN.md](PLAN.md) for the active checklist, roadmap, decisions, and definition of done.
 
 Contributors and coding agents must read [AGENTS.md](AGENTS.md) before changing the project.

@@ -1,0 +1,4 @@
+# Copy this file to .dev.vars and replace both example values.
+# Wrangler loads .dev.vars only during local development.
+ADMIN_PASSWORD="choose-a-local-admin-password"
+ADMIN_SESSION_SECRET="generate-a-long-random-session-signing-secret"

@@ -13,6 +13,13 @@ export default defineConfig(async () => {
     plugins: [
       cloudflareTest({
         wrangler: { configPath: './wrangler.jsonc' },
+        miniflare: {
+          bindings: {
+            ADMIN_PASSWORD: 'webvista-test-password',
+            ADMIN_SESSION_SECRET:
+              'webvista-test-session-secret-with-at-least-32-characters',
+          },
+        },
       }),
     ],
     test: {

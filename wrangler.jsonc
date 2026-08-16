@@ -16,5 +16,8 @@
   ],
   "assets": {
     "directory": "./public"
+  },
+  "secrets": {
+    "required": ["ADMIN_PASSWORD", "ADMIN_SESSION_SECRET"]
   }
 }

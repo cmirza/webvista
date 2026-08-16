@@ -53,7 +53,7 @@ describe('WebVista Worker', () => {
     expect(body.indexOf(first.id)).toBeLessThan(body.indexOf(second.id))
   })
 
-  it('keeps the admin surface closed before authentication exists', async () => {
+  it('redirects unauthenticated admin requests to login', async () => {
     const response = await workerExports.default.fetch(
       new Request('https://webvista.test/admin', { redirect: 'manual' }),
     )
@@ -62,13 +62,15 @@ describe('WebVista Worker', () => {
     expect(response.headers.get('location')).toBe('/admin/login')
   })
 
-  it('marks the temporary admin login boundary as unavailable and private', async () => {
+  it('renders a private admin login form', async () => {
     const response = await workerExports.default.fetch('https://webvista.test/admin/login')
     const body = await response.text()
 
-    expect(response.status).toBe(503)
+    expect(response.status).toBe(200)
     expect(response.headers.get('cache-control')).toBe('no-store')
-    expect(body).toContain('Administration is not available yet.')
+    expect(body).toContain('action="/admin/login"')
+    expect(body).toContain('name="password"')
+    expect(body).toContain('autocomplete="current-password"')
     expect(body).toContain('content="noindex,nofollow"')
   })
 
