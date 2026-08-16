@@ -6,6 +6,7 @@ dist/
 coverage/
 .wrangler/
 .vite/
+public/assets/
 *.tsbuildinfo
 *.log
 worker-configuration.d.ts

@@ -29,9 +29,12 @@ The first release has one job: determine whether the portal earns a place in eve
 Use Node.js 22.12 or newer.
 
 ```sh
+nvm use
 npm install
 npm run dev
 ```
+
+The development command runs Wrangler and the Tailwind watcher together. Browser dependencies are self-hosted from `/assets`; no CDN is required.
 
 Useful checks:
 
@@ -42,6 +45,8 @@ npm run build
 ```
 
 `wrangler types` generates Worker runtime and binding types from `wrangler.jsonc`; `npm run typecheck` refreshes them automatically.
+
+The asset build compiles `src/styles/app.css` with Tailwind CSS and daisyUI, then copies pinned HTMX and SortableJS distributions from `node_modules`. Generated files under `public/assets` are intentionally ignored by Git and rebuilt by `npm run build` and `npm run deploy`.
 
 ## Project status
 

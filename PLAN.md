@@ -9,7 +9,7 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 - Active milestone: **v1.0 — Favorites MVP**
 - Implementation status: **In progress**
 - Current phase: **Application scaffolding**
-- Next task: **Add Tailwind CSS, daisyUI, HTMX, and SortableJS**
+- Next task: **Add portal, admin, and authentication route modules**
 
 ## Core principles
 
@@ -60,14 +60,14 @@ Planned stack:
 
 ### 1. Project foundation
 
-- [ ] Initialize the application toolchain.
+- [x] Initialize the application toolchain.
   - [x] Initialize the local Git repository when explicitly requested.
   - [x] Create the public GitHub repository and configure `origin` when explicitly requested.
   - [x] Scaffold a TypeScript Cloudflare Workers project using Hono.
   - [x] Configure npm scripts for local development, typechecking, testing, building, and deployment.
   - [x] Configure Wrangler without committing account-specific production identifiers.
   - [x] Pin the supported local Node.js runtime with `.nvmrc`.
-  - [ ] Add Tailwind CSS, daisyUI, HTMX, and SortableJS.
+  - [x] Add Tailwind CSS, daisyUI, HTMX, and SortableJS.
   - [x] Add `.gitignore` entries for dependencies, generated output, local D1/Wrangler state, secrets, and editor/OS files.
 - [ ] Establish the simple source layout.
   - [x] Add the Worker entry point and typed Cloudflare bindings.
@@ -75,7 +75,7 @@ Planned stack:
   - [ ] Add shared layout, portal, admin, and partial view modules.
   - [ ] Add favorites and icon service modules.
   - [ ] Add authentication middleware.
-  - [ ] Add the main stylesheet and asset pipeline.
+  - [x] Add the main stylesheet and asset pipeline.
 - [x] Add a minimal automated test harness suitable for Hono Worker routes.
 - [x] Confirm the starter application runs locally and produces a deployable Worker build.
 
@@ -415,6 +415,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-15 — Worker foundation:** Use Hono on Cloudflare Workers with Wrangler-generated runtime types and Cloudflare's Vitest Workers integration.
 - **2026-08-15 — Node runtime:** Pin Node.js 22.12 because the current Vite-based Workers test toolchain requires Node 22.12 or newer.
 - **2026-08-16 — Public language:** Keep repository documentation and application copy neutral and free of references to any specific family member or intended individual.
+- **2026-08-16 — Frontend assets:** Use Tailwind CSS 4 with daisyUI 5's Nord theme, self-host HTMX and SortableJS from pinned npm packages, and generate `public/assets` during development and deployment rather than committing build output.
 
 ## Deferred ideas
 

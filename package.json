@@ -7,20 +7,31 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "wrangler dev",
-    "build": "wrangler deploy --dry-run --outdir dist",
-    "deploy": "wrangler deploy --minify",
+    "dev": "npm run build:vendor && concurrently --kill-others --names css,worker \"npm:dev:css\" \"npm:dev:worker\"",
+    "dev:css": "tailwindcss -i ./src/styles/app.css -o ./public/assets/app.css --watch",
+    "dev:worker": "wrangler dev",
+    "build": "npm run build:assets && wrangler deploy --dry-run --outdir dist",
+    "build:assets": "npm run build:css && npm run build:vendor",
+    "build:css": "tailwindcss -i ./src/styles/app.css -o ./public/assets/app.css --minify",
+    "build:vendor": "node ./scripts/copy-vendor.mjs",
+    "deploy": "npm run build:assets && wrangler deploy --minify",
     "typegen": "wrangler types --env-interface CloudflareBindings",
     "typecheck": "npm run typegen && tsc --noEmit && tsc --noEmit -p test/tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
-    "hono": "^4.13.2"
+    "hono": "^4.13.2",
+    "htmx.org": "^2.0.10",
+    "sortablejs": "^1.15.7"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.21.3",
+    "@tailwindcss/cli": "^4.3.3",
     "@types/node": "^26.2.0",
+    "concurrently": "^10.0.5",
+    "daisyui": "^5.7.17",
+    "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
     "vitest": "^4.1.10",
     "wrangler": "^4.123.0"
