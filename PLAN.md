@@ -8,8 +8,8 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 
 - Active milestone: **v1.0 — Favorites MVP**
 - Implementation status: **In progress**
-- Current phase: **Delete favorite**
-- Next task: **User-test confirmed favorite deletion in the local admin**
+- Current phase: **Drag-and-drop ordering**
+- Next task: **Implement SortableJS ordering with authoritative D1 persistence**
 
 ## Core principles
 
@@ -273,6 +273,7 @@ CREATE TABLE favorites (
   - [x] Use a server-rendered confirmation page/fragment so deletion remains usable without JavaScript.
 - [x] Implement authenticated `DELETE /admin/favorites/:id`.
 - [x] Remove the row through HTMX after successful deletion.
+  - [x] Accept HTMX's query-string serialization of `DELETE` form values.
 - [x] Provide an accessible non-JavaScript deletion path using a confirmed POST action if needed.
 - [x] Delete associated uploaded icon objects only after the database mutation succeeds.
 - [x] Handle missing records and deletion failures without leaving a misleading UI state.

@@ -99,14 +99,13 @@ describe('delete favorite', () => {
       url: 'https://only.example',
       iconMode: 'fallback',
     })
-    const response = await adminRequest(`/admin/favorites/${favorite.id}`, {
-      body: new URLSearchParams({
-        confirmed: 'yes',
-        presentation: 'dashboard',
-      }),
-      headers: { 'HX-Request': 'true' },
-      method: 'DELETE',
-    })
+    const response = await adminRequest(
+      `/admin/favorites/${favorite.id}?confirmed=yes&presentation=dashboard`,
+      {
+        headers: { 'HX-Request': 'true' },
+        method: 'DELETE',
+      },
+    )
     const body = await response.text()
 
     expect(response.status).toBe(200)

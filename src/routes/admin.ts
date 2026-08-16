@@ -444,6 +444,17 @@ adminRoutes.post('/favorites/:id', async (context) => {
 
 type AdminContext = Context<{ Bindings: CloudflareBindings }>
 
+const hasDeletionConfirmation = async (
+  context: AdminContext,
+): Promise<boolean> => {
+  if (context.req.query('confirmed') === 'yes') {
+    return true
+  }
+
+  const body = await context.req.parseBody()
+  return bodyString(body, 'confirmed') === 'yes'
+}
+
 const deleteFavoriteAndRespond = async (
   context: AdminContext,
   favorite: Favorite,
@@ -502,9 +513,7 @@ adminRoutes.get('/favorites/:id/delete', async (context) => {
 })
 
 adminRoutes.post('/favorites/:id/delete', async (context) => {
-  const body = await context.req.parseBody()
-
-  if (bodyString(body, 'confirmed') !== 'yes') {
+  if (!(await hasDeletionConfirmation(context))) {
     return context.text('Confirmation required.', 400)
   }
 
@@ -518,9 +527,7 @@ adminRoutes.post('/favorites/:id/delete', async (context) => {
 })
 
 adminRoutes.delete('/favorites/:id', async (context) => {
-  const body = await context.req.parseBody()
-
-  if (bodyString(body, 'confirmed') !== 'yes') {
+  if (!(await hasDeletionConfirmation(context))) {
     return context.text('Confirmation required.', 400)
   }
 
