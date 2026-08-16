@@ -56,6 +56,7 @@ export async function renderDeleteFavoriteSuccess(
       class="rounded-3xl bg-base-100 p-5 shadow-sm sm:p-7"
       id="favorite-delete-shell"
       data-favorite-delete-shell
+      ${cleanupFailed ? '' : html`data-auto-dismiss="4500"`}
     >
       <div class="alert ${cleanupFailed ? 'alert-warning' : 'alert-success'}" role="status">
         <span>
@@ -64,9 +65,11 @@ export async function renderDeleteFavoriteSuccess(
             : ''}
         </span>
       </div>
-      <div class="mt-5 flex justify-end">
-        <a class="btn btn-primary rounded-xl" href="/admin">Done</a>
-      </div>
+      ${cleanupFailed
+        ? html`<div class="mt-5 flex justify-end">
+            <a class="btn btn-primary rounded-xl" href="/admin">Return to Admin</a>
+          </div>`
+        : ''}
     </section>
     <li id="admin-favorite-${favorite.id}" hx-swap-oob="delete"></li>
     <span

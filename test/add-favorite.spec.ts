@@ -129,6 +129,8 @@ describe('add favorite', () => {
     expect(response.status).toBe(200)
     expect(body).not.toContain('<!doctype html>')
     expect(body).toContain('<strong>HTMX Site</strong> was added to Favorites.')
+    expect(body).toContain('data-auto-dismiss="4500"')
+    expect(body).not.toContain('>Done<')
     expect(body).toContain(`data-favorite-id="${favorite.id}"`)
     expect(body).toContain('hx-swap-oob="beforeend:#admin-favorites-list"')
     expect(body).toContain('id="favorites-count"')

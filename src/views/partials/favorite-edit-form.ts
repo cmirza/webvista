@@ -264,12 +264,10 @@ export async function renderEditFavoriteSuccess(
       class="rounded-3xl bg-base-100 p-5 shadow-sm sm:p-7"
       id="favorite-form-shell"
       data-favorite-form-shell
+      data-auto-dismiss="4500"
     >
       <div class="alert alert-success" role="status">
         <span><strong>${favorite.title}</strong> was updated.</span>
-      </div>
-      <div class="mt-5 flex justify-end">
-        <a class="btn btn-primary rounded-xl" href="/admin">Done</a>
       </div>
     </section>
     ${await renderAdminFavoriteRow(favorite, { oob: true })}

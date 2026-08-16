@@ -111,6 +111,8 @@ describe('delete favorite', () => {
     expect(response.status).toBe(200)
     expect(body).not.toContain('<!doctype html>')
     expect(body).toContain('<strong>Only Favorite</strong> was removed.')
+    expect(body).toContain('data-auto-dismiss="4500"')
+    expect(body).not.toContain('>Done<')
     expect(body).toContain(
       `id="admin-favorite-${favorite.id}" hx-swap-oob="delete"`,
     )

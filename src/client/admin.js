@@ -2,6 +2,22 @@ const supportedIconTypes = new Set(['image/jpeg', 'image/png', 'image/webp'])
 const maximumIconBytes = 2 * 1024 * 1024
 let previewUrl
 
+const scheduleAutoDismiss = () => {
+  document
+    .querySelectorAll('[data-auto-dismiss]:not([data-auto-dismiss-scheduled])')
+    .forEach((notice) => {
+      notice.setAttribute('data-auto-dismiss-scheduled', '')
+
+      const configuredDelay = Number(notice.getAttribute('data-auto-dismiss'))
+      const delay = Number.isFinite(configuredDelay) ? configuredDelay : 4500
+
+      window.setTimeout(() => notice.remove(), delay)
+    })
+}
+
+document.addEventListener('DOMContentLoaded', scheduleAutoDismiss)
+document.addEventListener('htmx:afterSettle', scheduleAutoDismiss)
+
 const showUploadPreview = (input) => {
   const target = input.form?.querySelector('#favorite-icon-preview')
   const file = input.files?.[0]

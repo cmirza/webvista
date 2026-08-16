@@ -286,12 +286,12 @@ export async function renderAddFavoriteSuccess(
       class="rounded-3xl bg-base-100 p-5 shadow-sm sm:p-7"
       id="favorite-form-shell"
       data-favorite-form-shell
+      data-auto-dismiss="4500"
     >
       <div class="alert alert-success" role="status">
         <span><strong>${favorite.title}</strong> was added to Favorites.</span>
       </div>
       <div class="mt-5 flex flex-wrap justify-end gap-3">
-        <a class="btn btn-ghost rounded-xl" href="/admin">Done</a>
         <button
           class="btn btn-primary rounded-xl"
           type="button"

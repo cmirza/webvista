@@ -214,6 +214,7 @@ CREATE TABLE favorites (
 - [x] Add a clear Add Site action and sorting instructions.
 - [x] Use standard daisyUI components; do not spend custom-design effort intended for the public portal.
 - [x] Keep the admin usable at narrower widths without implementing the v1.3 mobile-specific workflow.
+- [x] Auto-dismiss successful HTMX add, edit, and delete confirmations without requiring a Done action.
 
 ### 9. Add favorite
 

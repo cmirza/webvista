@@ -129,6 +129,8 @@ describe('edit favorite', () => {
     expect(response.status).toBe(200)
     expect(body).not.toContain('<!doctype html>')
     expect(body).toContain('<strong>Updated Site</strong> was updated.')
+    expect(body).toContain('data-auto-dismiss="4500"')
+    expect(body).not.toContain('>Done<')
     expect(body).toContain(`id="admin-favorite-${favorite.id}"`)
     expect(body).toContain('hx-swap-oob="outerHTML"')
   })
