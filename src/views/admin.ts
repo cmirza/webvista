@@ -9,6 +9,23 @@ type LoginOptions = {
   unavailable?: boolean
 }
 
+async function renderAdminHeader(): Promise<HtmlEscapedString> {
+  return html`
+    <header class="flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-base-100 p-6 shadow-sm">
+      <div>
+        <p class="text-sm font-semibold tracking-[0.16em] text-primary uppercase">WebVista</p>
+        <h1 class="mt-1 text-3xl font-semibold tracking-tight">WebVista Admin</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <a class="btn btn-ghost rounded-xl" href="/">View Portal</a>
+        <form method="post" action="/admin/logout">
+          <button class="btn btn-outline rounded-xl" type="submit">Log out</button>
+        </form>
+      </div>
+    </header>
+  `
+}
+
 export async function renderAdminLogin({
   error,
   unavailable = false,
@@ -61,28 +78,22 @@ export async function renderAdminDashboard(
   favorites: Favorite[],
 ): Promise<HtmlEscapedString> {
   const favoriteRows = await Promise.all(
-    favorites.map(renderAdminFavoriteRow),
+    favorites.map((favorite) => renderAdminFavoriteRow(favorite)),
   )
   const content = await html`
     <main class="mx-auto min-h-screen w-full max-w-5xl px-4 py-6 sm:px-8 sm:py-10">
-      <header class="flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-base-100 p-6 shadow-sm">
-        <div>
-          <p class="text-sm font-semibold tracking-[0.16em] text-primary uppercase">WebVista</p>
-          <h1 class="mt-1 text-3xl font-semibold tracking-tight">WebVista Admin</h1>
-        </div>
-        <div class="flex items-center gap-2">
-          <a class="btn btn-ghost rounded-xl" href="/">View Portal</a>
-          <form method="post" action="/admin/logout">
-            <button class="btn btn-outline rounded-xl" type="submit">Log out</button>
-          </form>
-        </div>
-      </header>
+      ${await renderAdminHeader()}
+      <div class="mt-6 empty:hidden" id="admin-workspace" aria-live="polite"></div>
       <section class="mt-6 rounded-3xl bg-base-100 p-4 shadow-sm sm:p-6">
         <div class="flex flex-wrap items-center justify-between gap-4 px-2 py-2">
           <div>
             <div class="flex items-center gap-2">
               <h2 class="text-xl font-semibold">Favorites</h2>
-              <span class="badge badge-ghost" aria-label="${favorites.length} favorites">
+              <span
+                class="badge badge-ghost"
+                id="favorites-count"
+                aria-label="${favorites.length} favorites"
+              >
                 ${favorites.length}
               </span>
             </div>
@@ -90,33 +101,38 @@ export async function renderAdminDashboard(
               These sites appear on the portal in this order.
             </p>
           </div>
-          <button
+          <a
             class="btn btn-primary rounded-xl"
-            type="button"
-            disabled
-            title="Adding favorites will be available in the next step"
+            href="/admin/favorites/new"
+            hx-get="/admin/favorites/new"
+            hx-target="#admin-workspace"
+            hx-swap="innerHTML"
           >
             <span aria-hidden="true">+</span>
             Add Site
-          </button>
+          </a>
         </div>
-        ${favorites.length > 0
-          ? html`<ol
-                class="mt-4 divide-y divide-base-300"
-                id="admin-favorites-list"
-                data-admin-favorites-list
-              >
-                ${favoriteRows}
-              </ol>
-              <p class="px-2 pt-5 text-center text-sm text-base-content/55">
-                Drag-and-drop ordering will be enabled in a later step.
-              </p>`
-          : html`<div class="mt-4 rounded-2xl border border-dashed border-base-300 px-6 py-12 text-center">
+        <ol
+          class="mt-4 divide-y divide-base-300"
+          id="admin-favorites-list"
+          data-admin-favorites-list
+        >
+          ${favoriteRows}
+        </ol>
+        ${favorites.length === 0
+          ? html`<div
+              class="mt-4 rounded-2xl border border-dashed border-base-300 px-6 py-12 text-center"
+              id="admin-empty-state"
+            >
               <h3 class="font-semibold">No favorites yet</h3>
               <p class="mt-2 text-sm text-base-content/60">
-                The Add Site workflow is the next implementation step.
+                Add a site to place it on the portal.
               </p>
-            </div>`}
+            </div>`
+          : ''}
+        <p class="px-2 pt-5 text-center text-sm text-base-content/55">
+          Drag-and-drop ordering will be enabled in a later step.
+        </p>
       </section>
     </main>
   `
@@ -126,5 +142,23 @@ export async function renderAdminDashboard(
     description: 'WebVista administration',
     robots: 'noindex,nofollow',
     title: 'Admin · WebVista',
+  })
+}
+
+export async function renderAdminAddPage(
+  form: HtmlEscapedString,
+): Promise<HtmlEscapedString> {
+  const content = await html`
+    <main class="mx-auto min-h-screen w-full max-w-3xl px-4 py-6 sm:px-8 sm:py-10">
+      ${await renderAdminHeader()}
+      <div class="mt-6">${form}</div>
+    </main>
+  `
+
+  return renderLayout({
+    children: content,
+    description: 'Add a WebVista favorite',
+    robots: 'noindex,nofollow',
+    title: 'Add Site · WebVista',
   })
 }

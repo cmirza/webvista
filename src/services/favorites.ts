@@ -81,7 +81,7 @@ const mapFavorite = (row: FavoriteRow): Favorite => ({
   updatedAt: row.updated_at,
 })
 
-const normalizeTitle = (value: string): string => {
+export const normalizeFavoriteTitle = (value: string): string => {
   const title = value.trim()
 
   if (!title) {
@@ -203,7 +203,7 @@ export const createFavorite = async (
   db: D1Database,
   input: FavoriteInput,
 ): Promise<Favorite> => {
-  const title = normalizeTitle(input.title)
+  const title = normalizeFavoriteTitle(input.title)
   const url = normalizeFavoriteUrl(input.url)
   const iconMode = normalizeIconMode(input.iconMode ?? 'auto')
   const iconUrl = normalizeOptionalValue(input.iconUrl)
@@ -256,7 +256,7 @@ export const updateFavorite = async (
     return null
   }
 
-  const title = normalizeTitle(input.title)
+  const title = normalizeFavoriteTitle(input.title)
   const url = normalizeFavoriteUrl(input.url)
   const iconMode = normalizeIconMode(input.iconMode)
   const iconUrl = normalizeOptionalValue(input.iconUrl)

@@ -173,7 +173,7 @@ describe('admin authentication', () => {
   it('returns not found for unknown authenticated admin routes', async () => {
     const cookie = await login()
     const response = await workerExports.default.fetch(
-      new Request(`${origin}/admin/favorites/new`, {
+      new Request(`${origin}/admin/not-a-route`, {
         headers: { Cookie: cookie },
       }),
     )

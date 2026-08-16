@@ -8,8 +8,8 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 
 - Active milestone: **v1.0 — Favorites MVP**
 - Implementation status: **In progress**
-- Current phase: **Add favorite**
-- Next task: **Implement the add-favorite form and validated submission**
+- Current phase: **Custom icon upload**
+- Next task: **Configure R2 and implement validated custom icon storage**
 
 ## Core principles
 
@@ -217,15 +217,19 @@ CREATE TABLE favorites (
 
 ### 9. Add favorite
 
-- [ ] Implement the add form and supporting HTMX routes.
-- [ ] Accept a manually editable display name and an absolute HTTP/HTTPS URL.
-- [ ] Normalize and validate form values on the server with field-level errors.
-- [ ] Fetch site metadata after URL entry and show the discovered title/icon preview.
-- [ ] Allow the manually entered title to override discovered metadata.
+- [x] Implement the add form and supporting HTMX routes.
+- [x] Accept a manually editable display name and an absolute HTTP/HTTPS URL.
+- [x] Normalize and validate form values on the server with field-level errors.
+- [x] Fetch site metadata after URL entry and show the discovered title/icon preview.
+- [x] Allow the manually entered title to override discovered metadata.
 - [ ] Let the admin select automatic, uploaded, or generated fallback icon mode.
-- [ ] Save the favorite and insert the rendered row into the admin list without a full reload.
-- [ ] Ensure the same operation has a usable non-HTMX response/redirect.
-- [ ] Test valid submission, validation errors, duplicate URLs, metadata failure, and non-HTMX submission.
+  - [x] Enable automatic and generated fallback choices.
+  - [x] Show the custom upload choice as unavailable until R2 support is implemented.
+  - [ ] Enable the custom upload choice with the validated R2 workflow.
+- [x] Save the favorite and insert the rendered row into the admin list without a full reload.
+  - [x] Append the complete row element through an HTMX out-of-band swap and update the count/empty state.
+- [x] Ensure the same operation has a usable non-HTMX response/redirect.
+- [x] Test valid submission, validation errors, duplicate URLs, metadata failure, and non-HTMX submission.
 
 ### 10. Custom icon upload
 
@@ -434,6 +438,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-16 — Metadata retrieval boundary:** Fetch metadata with manual redirect validation, a four-second overall timeout, bounded streamed bodies, strict content-type checks, public HTTP/HTTPS targets only, and at most eight verified icon candidates.
 - **2026-08-16 — Admin sessions:** Keep the admin password and session-signing key as separate Worker secrets, issue an eight-hour signed `__Host-` cookie with strict browser attributes, and require same-origin admin writes in addition to authentication.
 - **2026-08-16 — Dashboard controls:** Render the complete favorites-management dashboard shell, but keep Add, Edit, Remove, and ordering controls disabled until each authenticated workflow is implemented so the interface never leads to dead routes.
+- **2026-08-16 — Add favorite flow:** Keep icon previews advisory and re-run bounded discovery on save instead of trusting browser-supplied icon URLs; enhance the normal form with HTMX fragments and out-of-band dashboard updates while preserving full-page validation and redirects without JavaScript.
 
 ## Deferred ideas
 
