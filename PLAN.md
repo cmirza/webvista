@@ -8,8 +8,8 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 
 - Active milestone: **v1.0 — Favorites MVP**
 - Implementation status: **In progress**
-- Current phase: **Automatic and fallback icons**
-- Next task: **Implement safe, bounded website metadata retrieval**
+- Current phase: **Admin authentication**
+- Next task: **Implement the single-password login and signed session**
 
 ## Core principles
 
@@ -76,7 +76,7 @@ Planned stack:
   - [x] Add the public favorite partial view.
   - [ ] Add favorite-form and admin-row partial views with their features.
   - [x] Add the favorites service module.
-  - [ ] Add the icon service module.
+  - [x] Add the icon service module.
   - [ ] Add authentication middleware.
   - [x] Add the main stylesheet and asset pipeline.
 - [x] Add a minimal automated test harness suitable for Hono Worker routes.
@@ -178,19 +178,19 @@ CREATE TABLE favorites (
 
 ### 6. Automatic and fallback icons
 
-- [ ] Implement safe, bounded website metadata retrieval for an entered URL.
-- [ ] Discover icon candidates in this order:
-  - [ ] Apple touch icon.
-  - [ ] Web app manifest icons.
-  - [ ] Highest-resolution favicon.
-  - [ ] Generated fallback.
-- [ ] Resolve relative icon and manifest URLs against the final page URL.
-- [ ] Prefer declared or inspected high-resolution assets and avoid enlarging tiny favicons when a better source exists.
+- [x] Implement safe, bounded website metadata retrieval for an entered URL.
+- [x] Discover icon candidates in this order:
+  - [x] Apple touch icon.
+  - [x] Web app manifest icons.
+  - [x] Highest-resolution favicon.
+  - [x] Generated fallback.
+- [x] Resolve relative icon and manifest URLs against the final page URL.
+- [x] Prefer declared or inspected high-resolution assets and avoid enlarging tiny favicons when a better source exists.
 - [x] Generate a consistent fallback using the favorite name.
-- [ ] Add timeouts, response-size limits, content-type checks, and graceful failure behavior.
-- [ ] Prevent metadata retrieval from accessing unsafe local/private network targets.
+- [x] Add timeouts, response-size limits, content-type checks, and graceful failure behavior.
+- [x] Prevent metadata retrieval from accessing unsafe local/private network targets.
 - [x] Display every icon inside a consistent rounded macOS-style visual container.
-- [ ] Add unit tests for candidate priority, URL resolution, malformed metadata, and fallback generation.
+- [x] Add unit tests for candidate priority, URL resolution, malformed metadata, and fallback generation.
 
 ### 7. Admin authentication
 
@@ -429,6 +429,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-16 — Local D1:** Bind a Wrangler-local `webvista` D1 database, apply pending migrations automatically before local development, and retain a non-production database ID placeholder until the deployment milestone.
 - **2026-08-16 — Favorite data boundary:** Normalize favorite URLs before storage, enforce unique stored URLs, assign UUIDs and UTC timestamps in the service, and accept reorders only when they contain the complete stored ID set.
 - **2026-08-16 — Portal favorite fallback:** Render favorites as ordinary same-tab links in a width-driven grid, using deterministic initial-based icons until automatic icon discovery provides suitable assets.
+- **2026-08-16 — Metadata retrieval boundary:** Fetch metadata with manual redirect validation, a four-second overall timeout, bounded streamed bodies, strict content-type checks, public HTTP/HTTPS targets only, and at most eight verified icon candidates.
 
 ## Deferred ideas
 
