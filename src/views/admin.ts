@@ -164,3 +164,22 @@ export async function renderAdminAddPage(
     title: 'Add Site · WebVista',
   })
 }
+
+export async function renderAdminEditPage(
+  form: HtmlEscapedString,
+): Promise<HtmlEscapedString> {
+  const content = await html`
+    <main class="mx-auto min-h-screen w-full max-w-3xl px-4 py-6 sm:px-8 sm:py-10">
+      ${await renderAdminHeader()}
+      <div class="mt-6">${form}</div>
+    </main>
+  `
+
+  return renderLayout({
+    children: content,
+    description: 'Edit a WebVista favorite',
+    robots: 'noindex,nofollow',
+    scripts: ['/assets/admin.js'],
+    title: 'Edit Site · WebVista',
+  })
+}

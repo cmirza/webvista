@@ -67,6 +67,7 @@ describe('admin dashboard', () => {
     expect(body).toContain('src="https://cdn.example.com/icon.png"')
     expect(body).toContain('referrerpolicy="no-referrer"')
     expect(body).toContain('Edit')
+    expect(body).toContain(`/admin/favorites/${first.id}/edit`)
     expect(body).toContain('Remove')
     expect(body).toContain('Drag-and-drop ordering will be enabled in a later step.')
   })

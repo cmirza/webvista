@@ -13,12 +13,15 @@ function hostnameFor(url: string): string {
 
 export async function renderAdminFavoriteRow(
   favorite: Favorite,
+  options: { oob?: boolean } = {},
 ): Promise<HtmlEscapedString> {
   return html`
     <li
       class="admin-favorite-row"
+      id="admin-favorite-${favorite.id}"
       data-admin-favorite-row
       data-favorite-id="${favorite.id}"
+      ${options.oob ? html`hx-swap-oob="outerHTML"` : ''}
     >
       <span
         class="admin-drag-handle"
@@ -38,14 +41,15 @@ export async function renderAdminFavoriteRow(
         <p class="truncate text-sm text-base-content/60">${hostnameFor(favorite.url)}</p>
       </div>
       <div class="admin-row-actions" aria-label="Actions for ${favorite.title}">
-        <button
+        <a
           class="btn btn-ghost btn-sm rounded-lg"
-          type="button"
-          disabled
-          title="Editing will be available in a later step"
+          href="/admin/favorites/${favorite.id}/edit"
+          hx-get="/admin/favorites/${favorite.id}/edit"
+          hx-target="#admin-workspace"
+          hx-swap="innerHTML"
         >
           Edit
-        </button>
+        </a>
         <button
           class="btn btn-ghost btn-sm rounded-lg text-error"
           type="button"

@@ -8,8 +8,8 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 
 - Active milestone: **v1.0 — Favorites MVP**
 - Implementation status: **In progress**
-- Current phase: **Custom icon upload**
-- Next task: **User-test custom icon upload and selected-file preview**
+- Current phase: **Edit favorite**
+- Next task: **User-test favorite editing in the local admin**
 
 ## Core principles
 
@@ -243,23 +243,28 @@ CREATE TABLE favorites (
   - [x] Render all three choices and automatic/fallback preview states.
   - [x] Verify the selected custom-file preview through the local browser checkpoint.
   - [x] Clear a stale upload-validation message when a corrected file is selected.
-- [ ] Add a Refresh automatic icon action.
-- [ ] Preserve the previous icon when an edit or replacement upload fails.
+- [x] Add a Refresh automatic icon action.
+- [x] Preserve the previous icon when an edit or replacement upload fails.
 - [ ] Remove unreferenced uploaded objects after successful replacement or favorite deletion.
+  - [x] Remove the previous object after a successful replacement or icon-mode change.
+  - [ ] Remove the associated object after favorite deletion.
 - [ ] Test invalid types, oversized uploads, missing R2 objects, replacement, and cleanup behavior.
   - [x] Cover invalid types, spoofed contents, oversized uploads, missing objects, and failed-create cleanup.
-  - [ ] Cover replacement and deletion cleanup with their edit/delete workflows.
+  - [x] Cover replacement cleanup with the edit workflow.
+  - [ ] Cover deletion cleanup with the delete workflow.
 
 ### 11. Edit favorite
 
-- [ ] Implement `GET /admin/favorites/:id/edit`.
-- [ ] Implement the authenticated update endpoint.
-- [ ] Allow changes to display name, URL, icon source, and enabled state.
-- [ ] When the URL changes, offer Keep existing icon or Find icon from new site.
-- [ ] Show a current/new icon preview before saving when applicable.
-- [ ] Return field-level errors without discarding valid input.
-- [ ] Replace the admin row with HTMX after a successful update and support a normal redirect fallback.
-- [ ] Test missing favorite, URL change choices, enable/disable, icon-mode changes, and invalid updates.
+- [x] Implement `GET /admin/favorites/:id/edit`.
+- [x] Implement the authenticated update endpoint.
+- [x] Allow changes to display name, URL, icon source, and enabled state.
+- [x] When the URL changes, offer Keep existing icon or Find icon from new site.
+  - [x] Keep the current automatic icon by default and require an explicit refresh choice.
+- [x] Show a current/new icon preview before saving when applicable.
+- [x] Return field-level errors without discarding valid input.
+- [x] Replace the admin row with HTMX after a successful update and support a normal redirect fallback.
+- [x] Test missing favorite, URL change choices, enable/disable, icon-mode changes, and invalid updates.
+  - [x] Verify a failed replacement leaves the prior D1 reference and R2 object intact.
 
 ### 12. Delete favorite
 
@@ -331,7 +336,7 @@ GET    /admin/favorites/icon-preview
 - [ ] Favorites have large high-resolution icons.
 - [ ] Custom icons can replace bad automatic icons.
 - [ ] Admin can add a favorite.
-- [ ] Admin can edit a favorite.
+- [x] Admin can edit a favorite.
 - [ ] Admin can delete a favorite.
 - [ ] Admin can drag favorites into a new order.
 - [ ] Portal reflects that order.
@@ -446,6 +451,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-16 — Dashboard controls:** Render the complete favorites-management dashboard shell, but keep Add, Edit, Remove, and ordering controls disabled until each authenticated workflow is implemented so the interface never leads to dead routes.
 - **2026-08-16 — Add favorite flow:** Keep icon previews advisory and re-run bounded discovery on save instead of trusting browser-supplied icon URLs; enhance the normal form with HTMX fragments and out-of-band dashboard updates while preserving full-page validation and redirects without JavaScript.
 - **2026-08-16 — Custom icon storage:** Bind R2 without a committed production bucket name, accept only signature-validated PNG/JPEG/WebP files up to 2 MB, store UUID-based object keys in D1, and serve objects through a constrained immutable `/icons/:fileName` route.
+- **2026-08-16 — Favorite editing:** Keep an existing automatic icon unless refresh is explicitly selected, validate and store replacement uploads before changing D1, delete a failed replacement object when D1 rejects the update, and remove the previous upload only after a successful update.
 
 ## Deferred ideas
 

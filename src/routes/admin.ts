@@ -6,9 +6,11 @@ import {
 import {
   createFavorite,
   FavoriteValidationError,
+  getFavorite,
   listFavorites,
   normalizeFavoriteTitle,
   normalizeFavoriteUrl,
+  updateFavorite,
 } from '../services/favorites'
 import {
   deleteCustomIcon,
@@ -17,7 +19,17 @@ import {
   validateCustomIcon,
 } from '../services/icon-storage'
 import { discoverSiteMetadata } from '../services/icons'
-import { renderAdminAddPage, renderAdminDashboard } from '../views/admin'
+import {
+  renderAdminAddPage,
+  renderAdminDashboard,
+  renderAdminEditPage,
+} from '../views/admin'
+import {
+  type AutomaticIconAction,
+  type EditFavoriteFormValues,
+  renderEditFavoriteForm,
+  renderEditFavoriteSuccess,
+} from '../views/partials/favorite-edit-form'
 import {
   type AddFavoriteFormValues,
   renderAddFavoriteForm,
@@ -48,7 +60,8 @@ const bodyString = (
 const bodyFile = (
   body: Record<string, string | File | (string | File)[]>,
   key: string,
-): File | null => (body[key] instanceof File ? body[key] : null)
+): File | null =>
+  body[key] instanceof File && body[key].size > 0 ? body[key] : null
 
 const formValues = (
   title: string,
@@ -261,6 +274,164 @@ adminRoutes.post('/favorites', async (context) => {
     }
 
     return context.html(await renderAdminAddPage(form), 422)
+  }
+})
+
+adminRoutes.get('/favorites/:id/edit', async (context) => {
+  const favorite = await getFavorite(context.env.DB, context.req.param('id'))
+
+  if (!favorite) {
+    return context.notFound()
+  }
+
+  const enhanced = isHtmxRequest(context.req)
+  const form = await renderEditFavoriteForm({ enhanced, favorite })
+
+  if (enhanced) {
+    return context.html(form)
+  }
+
+  return context.html(await renderAdminEditPage(form))
+})
+
+adminRoutes.post('/favorites/:id', async (context) => {
+  const favorite = await getFavorite(context.env.DB, context.req.param('id'))
+
+  if (!favorite) {
+    return context.notFound()
+  }
+
+  const body = await context.req.parseBody()
+  const title = bodyString(body, 'title')
+  const url = bodyString(body, 'url')
+  const requestedIconMode = bodyString(body, 'iconMode')
+  const requestedAutomaticAction = bodyString(body, 'automaticIconAction')
+  const iconFile = bodyFile(body, 'iconFile')
+  const enabled = bodyString(body, 'enabled') === '1'
+  const enhanced =
+    isHtmxRequest(context.req) && bodyString(body, 'presentation') === 'dashboard'
+  const validation = validateAddFavorite(title, url, requestedIconMode)
+  const automaticIconAction: AutomaticIconAction =
+    requestedAutomaticAction === 'keep' ? 'keep' : 'refresh'
+  const values: EditFavoriteFormValues = {
+    title,
+    url,
+    iconMode: formValues(title, url, requestedIconMode).iconMode,
+    automaticIconAction,
+    enabled,
+  }
+
+  if (!['keep', 'refresh'].includes(requestedAutomaticAction)) {
+    validation.errors.automaticIconAction =
+      'Choose whether to keep or refresh the automatic icon.'
+  }
+
+  if (requestedIconMode === 'upload') {
+    if (!iconFile && !(favorite.iconMode === 'upload' && favorite.iconStorageKey)) {
+      validation.errors.iconFile = 'Choose a PNG, JPEG, or WebP image.'
+    } else if (iconFile) {
+      try {
+        await validateCustomIcon(iconFile)
+      } catch (error) {
+        if (error instanceof IconUploadError) {
+          validation.errors.iconFile = error.userMessage
+        } else {
+          throw error
+        }
+      }
+    }
+  }
+
+  const renderError = async (errors: Record<string, string>) => {
+    const form = await renderEditFavoriteForm({
+      enhanced,
+      errors,
+      favorite,
+      values,
+    })
+
+    if (enhanced) {
+      return context.html(form)
+    }
+
+    return context.html(await renderAdminEditPage(form), 422)
+  }
+
+  if (
+    Object.keys(validation.errors).length > 0 ||
+    !validation.normalizedTitle ||
+    !validation.normalizedUrl
+  ) {
+    return renderError(validation.errors)
+  }
+
+  const iconMode = values.iconMode
+  let iconUrl: string | null = null
+  let iconStorageKey: string | null = null
+  let newlyStoredKey: string | null = null
+
+  if (iconMode === 'auto') {
+    const mayKeepCurrent =
+      automaticIconAction === 'keep' && favorite.iconMode === 'auto'
+
+    if (mayKeepCurrent) {
+      iconUrl = favorite.iconUrl
+    } else {
+      const metadata = await discoverSiteMetadata(validation.normalizedUrl)
+      iconUrl = metadata.icon?.url ?? null
+    }
+  } else if (iconMode === 'upload') {
+    if (iconFile) {
+      try {
+        newlyStoredKey = await storeCustomIcon(context.env.ICONS, iconFile)
+        iconStorageKey = newlyStoredKey
+      } catch (error) {
+        const message =
+          error instanceof IconUploadError
+            ? error.userMessage
+            : 'The custom icon could not be stored. Try again.'
+        return renderError({ iconFile: message })
+      }
+    } else {
+      iconStorageKey = favorite.iconStorageKey
+    }
+  }
+
+  try {
+    const updated = await updateFavorite(context.env.DB, favorite.id, {
+      title: validation.normalizedTitle,
+      url: validation.normalizedUrl,
+      iconMode,
+      iconUrl,
+      iconStorageKey,
+      enabled,
+    })
+
+    if (!updated) {
+      await deleteCustomIcon(context.env.ICONS, newlyStoredKey)
+      return context.notFound()
+    }
+
+    if (
+      favorite.iconStorageKey &&
+      favorite.iconStorageKey !== updated.iconStorageKey
+    ) {
+      await deleteCustomIcon(context.env.ICONS, favorite.iconStorageKey)
+    }
+
+    if (enhanced) {
+      return context.html(await renderEditFavoriteSuccess(updated))
+    }
+
+    return context.redirect('/admin', 303)
+  } catch (error) {
+    await deleteCustomIcon(context.env.ICONS, newlyStoredKey)
+
+    if (!(error instanceof FavoriteValidationError)) {
+      throw error
+    }
+
+    return renderError(error.fieldErrors)
   }
 })
 
