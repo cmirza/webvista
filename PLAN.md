@@ -263,6 +263,7 @@ CREATE TABLE favorites (
 - [x] Show a current/new icon preview before saving when applicable.
 - [x] Return field-level errors without discarding valid input.
 - [x] Replace the admin row with HTMX after a successful update and support a normal redirect fallback.
+- [x] Bring the admin workspace into view when Edit or Add Site is selected from lower on the dashboard.
 - [x] Test missing favorite, URL change choices, enable/disable, icon-mode changes, and invalid updates.
   - [x] Verify a failed replacement leaves the prior D1 reference and R2 object intact.
 

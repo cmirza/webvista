@@ -46,7 +46,7 @@ export async function renderAdminFavoriteRow(
           href="/admin/favorites/${favorite.id}/edit"
           hx-get="/admin/favorites/${favorite.id}/edit"
           hx-target="#admin-workspace"
-          hx-swap="innerHTML"
+          hx-swap="innerHTML show:#admin-workspace:top"
         >
           Edit
         </a>

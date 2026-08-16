@@ -106,7 +106,7 @@ export async function renderAdminDashboard(
             href="/admin/favorites/new"
             hx-get="/admin/favorites/new"
             hx-target="#admin-workspace"
-            hx-swap="innerHTML"
+            hx-swap="innerHTML show:#admin-workspace:top"
           >
             <span aria-hidden="true">+</span>
             Add Site

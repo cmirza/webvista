@@ -68,6 +68,7 @@ describe('admin dashboard', () => {
     expect(body).toContain('referrerpolicy="no-referrer"')
     expect(body).toContain('Edit')
     expect(body).toContain(`/admin/favorites/${first.id}/edit`)
+    expect(body).toContain('hx-swap="innerHTML show:#admin-workspace:top"')
     expect(body).toContain('Remove')
     expect(body).toContain('Drag-and-drop ordering will be enabled in a later step.')
   })
