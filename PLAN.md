@@ -8,8 +8,8 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 
 - Active milestone: **v1.0 — Favorites MVP**
 - Implementation status: **In progress**
-- Current phase: **Public favorites verification**
-- Next task: **Verify the responsive favorite grid at priority widths**
+- Current phase: **Automatic and fallback icons**
+- Next task: **Implement safe, bounded website metadata retrieval**
 
 ## Core principles
 
@@ -145,12 +145,12 @@ CREATE TABLE favorites (
 ### 3. Shared UI and Nord Light theme
 
 - [x] Build the base HTML document with responsive metadata and shared assets.
-- [ ] Configure daisyUI's Nord theme and customize it into a light macOS-like start page.
-- [ ] Express colors, radii, shadows, spacing, and typography through theme variables or design tokens.
-- [ ] Use a cool-gray page background, light surfaces, Nord blue accents, charcoal text, soft shadows, and minimal borders.
-- [ ] Set a maximum content width and generous responsive page spacing.
-- [ ] Provide visible keyboard focus states and respect reduced-motion preferences.
-- [ ] Do not add dark mode in v1.0.
+- [x] Configure daisyUI's Nord theme and customize it into a light macOS-like start page.
+- [x] Express colors, radii, shadows, spacing, and typography through theme variables or design tokens.
+- [x] Use a cool-gray page background, light surfaces, Nord blue accents, charcoal text, soft shadows, and minimal borders.
+- [x] Set a maximum content width and generous responsive page spacing.
+- [x] Provide visible keyboard focus states and respect reduced-motion preferences.
+- [x] Do not add dark mode in v1.0.
 
 ### 4. Public portal
 
@@ -171,10 +171,10 @@ CREATE TABLE favorites (
 - [x] Display favorite icons at a consistent outer size of approximately 96–120px.
 - [x] Use a width-driven CSS grid, based on `auto-fit`/`minmax`, rather than device detection.
 - [x] Implement grid sizing intended to show roughly eight columns in a wide window, four at half-screen, and three when narrow.
-- [ ] Support at least 12 favorites without crowding or excessive stretching.
+- [x] Support at least 12 favorites without crowding or excessive stretching.
   - [x] Provide an idempotent local-only seed dataset with 12 representative favorites.
 - [x] Clamp long titles to two lines without allowing one item to distort the grid.
-- [ ] Verify wide monitor, half-screen desktop, narrow desktop, tablet, and basic mobile fallback layouts.
+- [x] Verify wide monitor, half-screen desktop, narrow desktop, tablet, and basic mobile fallback layouts.
 
 ### 6. Automatic and fallback icons
 
@@ -439,7 +439,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 
 ## Blockers
 
-- Responsive browser verification is awaiting the current manual checkpoint because the in-app browser was unavailable during implementation. Automated route, rendering, D1, and build checks pass.
+- None.
 
 ## Post-deployment usage validation
 
