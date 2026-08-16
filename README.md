@@ -34,7 +34,7 @@ npm install
 npm run dev
 ```
 
-The development command runs Wrangler and the Tailwind watcher together. Browser dependencies are self-hosted from `/assets`; no CDN is required.
+The development command applies pending migrations to a local D1 database, then runs Wrangler and the Tailwind watcher together. Browser dependencies are self-hosted from `/assets`; no CDN is required. Local D1 data is kept under `.wrangler/state` and is not committed.
 
 Useful checks:
 
@@ -42,14 +42,18 @@ Useful checks:
 npm run typecheck
 npm test
 npm run build
+npm run db:status:local
+npm run db:inspect:local
 ```
 
 `wrangler types` generates Worker runtime and binding types from `wrangler.jsonc`; `npm run typecheck` refreshes them automatically.
 
 The asset build compiles `src/styles/app.css` with Tailwind CSS and daisyUI, then copies pinned HTMX and SortableJS distributions from `node_modules`. Generated files under `public/assets` are intentionally ignored by Git and rebuilt by `npm run build` and `npm run deploy`.
 
+`wrangler.jsonc` uses a non-production placeholder for the D1 database ID. Creating a Cloudflare D1 resource and replacing that value are intentionally deferred to the deployment milestone; local commands do not access a remote database.
+
 ## Project status
 
-The first server-rendered portal checkpoint is runnable locally, with Google search and a deliberately closed admin boundary. Favorites persistence and authentication are not implemented yet. See [PLAN.md](PLAN.md) for the active checklist, roadmap, decisions, and definition of done.
+The first server-rendered portal checkpoint is runnable locally, with Google search, a deliberately closed admin boundary, and the initial favorites schema in local D1. Favorite operations and authentication are not implemented yet. See [PLAN.md](PLAN.md) for the active checklist, roadmap, decisions, and definition of done.
 
 Contributors and coding agents must read [AGENTS.md](AGENTS.md) before changing the project.

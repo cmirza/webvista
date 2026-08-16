@@ -3,6 +3,17 @@
   "name": "webvista",
   "main": "src/index.ts",
   "compatibility_date": "2026-08-15",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "webvista",
+      // Local-only placeholder. Replace this with the created D1 database ID
+      // as part of the production deployment milestone.
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "preview_database_id": "webvista-local",
+      "migrations_dir": "migrations"
+    }
+  ],
   "assets": {
     "directory": "./public"
   }

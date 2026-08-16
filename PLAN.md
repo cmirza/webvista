@@ -9,7 +9,7 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 - Active milestone: **v1.0 — Favorites MVP**
 - Implementation status: **In progress**
 - Current phase: **D1 favorites persistence**
-- Next task: **Create the initial D1 favorites migration**
+- Next task: **Implement the favorites data service**
 
 ## Core principles
 
@@ -111,11 +111,12 @@ migrations/
 
 ### 2. D1 favorites persistence
 
-- [ ] Create the initial D1 migration.
-  - [ ] Add a `favorites` table with `id`, `title`, `url`, `position`, icon fields, `enabled`, and timestamps.
-  - [ ] Restrict `icon_mode` to `auto`, `upload`, or `fallback` at the application boundary.
-  - [ ] Add indexes needed by enabled/position queries if query inspection justifies them.
+- [x] Create the initial D1 migration.
+  - [x] Add a `favorites` table with `id`, `title`, `url`, `position`, icon fields, `enabled`, and timestamps.
+  - [x] Restrict stored `icon_mode` values to `auto`, `upload`, or `fallback` with a database constraint.
+  - [x] Add an index supporting enabled/position queries.
 - [ ] Implement favorite list, lookup, create, update, delete, and reorder operations.
+  - [ ] Restrict `icon_mode` to `auto`, `upload`, or `fallback` at the application boundary.
 - [ ] Use stable text IDs and UTC ISO-8601 timestamps.
 - [ ] Assign default positions in increments of 10 and normalize positions after a complete reorder.
 - [ ] Verify migrations and persistence against a local D1 database.
@@ -420,6 +421,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-16 — Frontend assets:** Use Tailwind CSS 4 with daisyUI 5's Nord theme, self-host HTMX and SortableJS from pinned npm packages, and generate `public/assets` during development and deployment rather than committing build output.
 - **2026-08-16 — Route boundary:** Keep all admin paths closed behind a temporary redirect/unavailable boundary until real password and signed-session authentication replaces it.
 - **2026-08-16 — Testing checkpoints:** After every runnable implementation increment, complete a local smoke test and give the user explicit startup instructions and a focused manual test list before continuing.
+- **2026-08-16 — Local D1:** Bind a Wrangler-local `webvista` D1 database, apply pending migrations automatically before local development, and retain a non-production database ID placeholder until the deployment milestone.
 
 ## Deferred ideas
 
