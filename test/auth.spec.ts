@@ -79,7 +79,8 @@ describe('admin authentication', () => {
     expect(adminResponse.headers.get('cache-control')).toBe('no-store')
     expect(body).toContain('<title>Admin · WebVista</title>')
     expect(body).toContain('action="/admin/logout"')
-    expect(body).toContain('Authentication is ready.')
+    expect(body).toContain('WebVista Admin')
+    expect(body).toContain('Favorites')
   })
 
   it('redirects an already authenticated login page to admin', async () => {

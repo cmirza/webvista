@@ -3,7 +3,8 @@ import {
   requireAdmin,
   requireSameOriginForWrites,
 } from '../middleware/auth'
-import { renderAuthenticatedAdmin } from '../views/admin'
+import { listFavorites } from '../services/favorites'
+import { renderAdminDashboard } from '../views/admin'
 
 export const adminRoutes = new Hono<{ Bindings: CloudflareBindings }>()
 
@@ -12,7 +13,8 @@ adminRoutes.use('*', requireSameOriginForWrites)
 
 adminRoutes.get('/', async (context) => {
   context.header('Cache-Control', 'no-store')
-  return context.html(await renderAuthenticatedAdmin())
+  const favorites = await listFavorites(context.env.DB)
+  return context.html(await renderAdminDashboard(favorites))
 })
 
 adminRoutes.all('*', (context) => context.notFound())

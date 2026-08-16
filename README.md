@@ -58,6 +58,6 @@ The asset build compiles `src/styles/app.css` with Tailwind CSS and daisyUI, the
 
 ## Project status
 
-The server-rendered portal is runnable locally with Google search, a responsive D1-backed favorites grid, and a single-password authenticated admin boundary. Favorites support validated persistence plus bounded, SSRF-conscious website metadata and icon discovery. The favorites admin dashboard is the next implementation phase. See [PLAN.md](PLAN.md) for the active checklist, roadmap, decisions, and definition of done.
+The server-rendered portal is runnable locally with Google search, a responsive D1-backed favorites grid, and a single-password authenticated admin area. The admin dashboard now lists every favorite in stored order and remains usable at narrow widths; its mutation controls will become active as their workflows are implemented. The add-favorite workflow is the next implementation phase. See [PLAN.md](PLAN.md) for the active checklist, roadmap, decisions, and definition of done.
 
 Contributors and coding agents must read [AGENTS.md](AGENTS.md) before changing the project.

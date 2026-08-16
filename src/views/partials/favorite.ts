@@ -46,15 +46,37 @@ const renderableIconUrl = (value: string | null): string | null => {
   }
 }
 
-export async function renderFavorite(
+export async function renderFavoriteIcon(
   favorite: Favorite,
+  variant: 'admin' | 'portal' = 'portal',
 ): Promise<HtmlEscapedString> {
   const iconUrl =
     favorite.iconMode === 'fallback'
       ? null
       : renderableIconUrl(favorite.iconUrl)
   const fallbackStyle = fallbackStyles[stringHash(favorite.title) % fallbackStyles.length]
+  const iconClass = variant === 'admin' ? 'admin-favorite-icon' : 'favorite-icon'
+  const initialsClass =
+    variant === 'admin' ? 'admin-favorite-initials' : 'favorite-initials'
 
+  return html`
+    <span class="${iconClass} ${fallbackStyle}" aria-hidden="true">
+      ${iconUrl
+        ? html`<img
+            class="h-full w-full object-cover"
+            src="${iconUrl}"
+            alt=""
+            loading="lazy"
+            referrerpolicy="no-referrer"
+          />`
+        : html`<span class="${initialsClass}">${fallbackInitials(favorite.title)}</span>`}
+    </span>
+  `
+}
+
+export async function renderFavorite(
+  favorite: Favorite,
+): Promise<HtmlEscapedString> {
   return html`
     <a
       class="favorite-link group"
@@ -62,17 +84,7 @@ export async function renderFavorite(
       aria-label="Open ${favorite.title}"
       data-favorite-id="${favorite.id}"
     >
-      <span class="favorite-icon ${fallbackStyle}" aria-hidden="true">
-        ${iconUrl
-          ? html`<img
-              class="h-full w-full object-cover"
-              src="${iconUrl}"
-              alt=""
-              loading="lazy"
-              referrerpolicy="no-referrer"
-            />`
-          : html`<span class="favorite-initials">${fallbackInitials(favorite.title)}</span>`}
-      </span>
+      ${await renderFavoriteIcon(favorite)}
       <span class="favorite-title">${favorite.title}</span>
     </a>
   `

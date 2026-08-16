@@ -8,8 +8,8 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 
 - Active milestone: **v1.0 — Favorites MVP**
 - Implementation status: **In progress**
-- Current phase: **Admin dashboard**
-- Next task: **Render authenticated favorites management rows**
+- Current phase: **Add favorite**
+- Next task: **Implement the add-favorite form and validated submission**
 
 ## Core principles
 
@@ -207,12 +207,13 @@ CREATE TABLE favorites (
 
 ### 8. Admin dashboard
 
-- [ ] Implement authenticated `GET /admin`.
-- [ ] Add a simple header with “WebVista Admin,” a View Portal link, and logout action.
-- [ ] Render favorites as ordered rows with drag handle, icon, name, hostname, edit, and delete actions.
-- [ ] Add a clear Add Site action and sorting instructions.
-- [ ] Use standard daisyUI components; do not spend custom-design effort intended for the public portal.
-- [ ] Keep the admin usable at narrow widths without implementing the v1.3 mobile-specific workflow.
+- [x] Implement authenticated `GET /admin`.
+- [x] Add a simple header with “WebVista Admin,” a View Portal link, and logout action.
+- [x] Render favorites as ordered rows with drag handle, icon, name, hostname, edit, and delete actions.
+  - [x] Keep controls disabled until their corresponding mutation workflows are implemented.
+- [x] Add a clear Add Site action and sorting instructions.
+- [x] Use standard daisyUI components; do not spend custom-design effort intended for the public portal.
+- [x] Keep the admin usable at narrower widths without implementing the v1.3 mobile-specific workflow.
 
 ### 9. Add favorite
 
@@ -432,6 +433,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-16 — Portal favorite fallback:** Render favorites as ordinary same-tab links in a width-driven grid, using deterministic initial-based icons until automatic icon discovery provides suitable assets.
 - **2026-08-16 — Metadata retrieval boundary:** Fetch metadata with manual redirect validation, a four-second overall timeout, bounded streamed bodies, strict content-type checks, public HTTP/HTTPS targets only, and at most eight verified icon candidates.
 - **2026-08-16 — Admin sessions:** Keep the admin password and session-signing key as separate Worker secrets, issue an eight-hour signed `__Host-` cookie with strict browser attributes, and require same-origin admin writes in addition to authentication.
+- **2026-08-16 — Dashboard controls:** Render the complete favorites-management dashboard shell, but keep Add, Edit, Remove, and ordering controls disabled until each authenticated workflow is implemented so the interface never leads to dead routes.
 
 ## Deferred ideas
 

@@ -1,6 +1,8 @@
 import { html } from 'hono/html'
 import type { HtmlEscapedString } from 'hono/utils/html'
+import type { Favorite } from '../services/favorites'
 import { renderLayout } from './layout'
+import { renderAdminFavoriteRow } from './partials/admin-favorite-row'
 
 type LoginOptions = {
   error?: string
@@ -55,13 +57,18 @@ export async function renderAdminLogin({
   })
 }
 
-export async function renderAuthenticatedAdmin(): Promise<HtmlEscapedString> {
+export async function renderAdminDashboard(
+  favorites: Favorite[],
+): Promise<HtmlEscapedString> {
+  const favoriteRows = await Promise.all(
+    favorites.map(renderAdminFavoriteRow),
+  )
   const content = await html`
-    <main class="mx-auto min-h-screen w-full max-w-5xl px-6 py-10 sm:px-10">
+    <main class="mx-auto min-h-screen w-full max-w-5xl px-4 py-6 sm:px-8 sm:py-10">
       <header class="flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-base-100 p-6 shadow-sm">
         <div>
           <p class="text-sm font-semibold tracking-[0.16em] text-primary uppercase">WebVista</p>
-          <h1 class="mt-1 text-3xl font-semibold tracking-tight">Admin</h1>
+          <h1 class="mt-1 text-3xl font-semibold tracking-tight">WebVista Admin</h1>
         </div>
         <div class="flex items-center gap-2">
           <a class="btn btn-ghost rounded-xl" href="/">View Portal</a>
@@ -70,9 +77,46 @@ export async function renderAuthenticatedAdmin(): Promise<HtmlEscapedString> {
           </form>
         </div>
       </header>
-      <section class="mt-6 rounded-3xl bg-base-100 p-8 shadow-sm">
-        <h2 class="text-xl font-semibold">Authentication is ready.</h2>
-        <p class="mt-2 text-base-content/65">Favorite management is the next implementation step.</p>
+      <section class="mt-6 rounded-3xl bg-base-100 p-4 shadow-sm sm:p-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 px-2 py-2">
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-xl font-semibold">Favorites</h2>
+              <span class="badge badge-ghost" aria-label="${favorites.length} favorites">
+                ${favorites.length}
+              </span>
+            </div>
+            <p class="mt-1 text-sm text-base-content/60">
+              These sites appear on the portal in this order.
+            </p>
+          </div>
+          <button
+            class="btn btn-primary rounded-xl"
+            type="button"
+            disabled
+            title="Adding favorites will be available in the next step"
+          >
+            <span aria-hidden="true">+</span>
+            Add Site
+          </button>
+        </div>
+        ${favorites.length > 0
+          ? html`<ol
+                class="mt-4 divide-y divide-base-300"
+                id="admin-favorites-list"
+                data-admin-favorites-list
+              >
+                ${favoriteRows}
+              </ol>
+              <p class="px-2 pt-5 text-center text-sm text-base-content/55">
+                Drag-and-drop ordering will be enabled in a later step.
+              </p>`
+          : html`<div class="mt-4 rounded-2xl border border-dashed border-base-300 px-6 py-12 text-center">
+              <h3 class="font-semibold">No favorites yet</h3>
+              <p class="mt-2 text-sm text-base-content/60">
+                The Add Site workflow is the next implementation step.
+              </p>
+            </div>`}
       </section>
     </main>
   `
