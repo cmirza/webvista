@@ -9,7 +9,7 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 - Active milestone: **v1.0 — Favorites MVP**
 - Implementation status: **In progress**
 - Current phase: **Custom icon upload**
-- Next task: **Configure R2 and implement validated custom icon storage**
+- Next task: **User-test custom icon upload and selected-file preview**
 
 ## Core principles
 
@@ -222,10 +222,11 @@ CREATE TABLE favorites (
 - [x] Normalize and validate form values on the server with field-level errors.
 - [x] Fetch site metadata after URL entry and show the discovered title/icon preview.
 - [x] Allow the manually entered title to override discovered metadata.
-- [ ] Let the admin select automatic, uploaded, or generated fallback icon mode.
+- [x] Let the admin select automatic, uploaded, or generated fallback icon mode.
   - [x] Enable automatic and generated fallback choices.
   - [x] Show the custom upload choice as unavailable until R2 support is implemented.
-  - [ ] Enable the custom upload choice with the validated R2 workflow.
+  - [x] Enable the custom upload choice with the validated R2 workflow.
+  - [x] Confirm the selected-file preview and completed upload in the local browser checkpoint.
 - [x] Save the favorite and insert the rendered row into the admin list without a full reload.
   - [x] Append the complete row element through an HTMX out-of-band swap and update the count/empty state.
 - [x] Ensure the same operation has a usable non-HTMX response/redirect.
@@ -233,16 +234,21 @@ CREATE TABLE favorites (
 
 ### 10. Custom icon upload
 
-- [ ] Use R2 for custom icon objects rather than storing image blobs in D1.
-- [ ] Configure an R2 binding separately from production bucket identifiers.
-- [ ] Accept only supported raster image types and enforce a conservative size limit.
-- [ ] Generate collision-resistant object keys and store only the key in D1.
-- [ ] Serve uploaded icons through a controlled application route or suitable bound-bucket response.
-- [ ] Show automatic, uploaded, and fallback choices with an icon preview.
+- [x] Use R2 for custom icon objects rather than storing image blobs in D1.
+- [x] Configure an R2 binding separately from production bucket identifiers.
+- [x] Accept only supported raster image types and enforce a conservative size limit.
+- [x] Generate collision-resistant object keys and store only the key in D1.
+- [x] Serve uploaded icons through a controlled application route or suitable bound-bucket response.
+- [x] Show automatic, uploaded, and fallback choices with an icon preview.
+  - [x] Render all three choices and automatic/fallback preview states.
+  - [x] Verify the selected custom-file preview through the local browser checkpoint.
+  - [x] Clear a stale upload-validation message when a corrected file is selected.
 - [ ] Add a Refresh automatic icon action.
 - [ ] Preserve the previous icon when an edit or replacement upload fails.
 - [ ] Remove unreferenced uploaded objects after successful replacement or favorite deletion.
 - [ ] Test invalid types, oversized uploads, missing R2 objects, replacement, and cleanup behavior.
+  - [x] Cover invalid types, spoofed contents, oversized uploads, missing objects, and failed-create cleanup.
+  - [ ] Cover replacement and deletion cleanup with their edit/delete workflows.
 
 ### 11. Edit favorite
 
@@ -439,6 +445,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-16 — Admin sessions:** Keep the admin password and session-signing key as separate Worker secrets, issue an eight-hour signed `__Host-` cookie with strict browser attributes, and require same-origin admin writes in addition to authentication.
 - **2026-08-16 — Dashboard controls:** Render the complete favorites-management dashboard shell, but keep Add, Edit, Remove, and ordering controls disabled until each authenticated workflow is implemented so the interface never leads to dead routes.
 - **2026-08-16 — Add favorite flow:** Keep icon previews advisory and re-run bounded discovery on save instead of trusting browser-supplied icon URLs; enhance the normal form with HTMX fragments and out-of-band dashboard updates while preserving full-page validation and redirects without JavaScript.
+- **2026-08-16 — Custom icon storage:** Bind R2 without a committed production bucket name, accept only signature-validated PNG/JPEG/WebP files up to 2 MB, store UUID-based object keys in D1, and serve objects through a constrained immutable `/icons/:fileName` route.
 
 ## Deferred ideas
 

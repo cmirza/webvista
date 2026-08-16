@@ -5,4 +5,13 @@ import { beforeEach, inject } from 'vitest'
 beforeEach(async () => {
   await applyD1Migrations(env.DB, inject('migrations'))
   await env.DB.prepare('DELETE FROM favorites').run()
+  let cursor: string | undefined
+
+  do {
+    const objects = await env.ICONS.list({ cursor })
+    if (objects.objects.length > 0) {
+      await env.ICONS.delete(objects.objects.map(({ key }) => key))
+    }
+    cursor = objects.truncated ? objects.cursor : undefined
+  } while (cursor)
 })

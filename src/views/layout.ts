@@ -5,6 +5,7 @@ type LayoutOptions = {
   children: HtmlEscapedString
   description: string
   robots?: 'index,follow' | 'noindex,nofollow'
+  scripts?: string[]
   title: string
 }
 
@@ -12,6 +13,7 @@ export async function renderLayout({
   children,
   description,
   robots = 'index,follow',
+  scripts = [],
   title,
 }: LayoutOptions): Promise<HtmlEscapedString> {
   return html`<!doctype html>
@@ -26,6 +28,7 @@ export async function renderLayout({
         <title>${title}</title>
         <link rel="stylesheet" href="/assets/app.css" />
         <script src="/assets/htmx.min.js" defer></script>
+        ${scripts.map((source) => html`<script src="${source}" defer></script>`)}
       </head>
       <body class="bg-base-200 text-base-content">
         ${children}

@@ -57,7 +57,8 @@ describe('favorites service', () => {
       title: ' Example Docs ',
       url: 'https://example.com/docs#intro',
       iconMode: 'upload',
-      iconStorageKey: ' icons/example.png ',
+      iconStorageKey:
+        ' favorite-icons/123e4567-e89b-42d3-a456-426614174000.png ',
       enabled: false,
     })
 
@@ -67,7 +68,8 @@ describe('favorites service', () => {
       url: 'https://example.com/docs',
       position: 10,
       iconMode: 'upload',
-      iconStorageKey: 'icons/example.png',
+      iconStorageKey:
+        'favorite-icons/123e4567-e89b-42d3-a456-426614174000.png',
       enabled: false,
       createdAt: created.createdAt,
     })

@@ -141,6 +141,7 @@ export async function renderAdminDashboard(
     children: content,
     description: 'WebVista administration',
     robots: 'noindex,nofollow',
+    scripts: ['/assets/admin.js'],
     title: 'Admin · WebVista',
   })
 }
@@ -159,6 +160,7 @@ export async function renderAdminAddPage(
     children: content,
     description: 'Add a WebVista favorite',
     robots: 'noindex,nofollow',
+    scripts: ['/assets/admin.js'],
     title: 'Add Site · WebVista',
   })
 }

@@ -9,6 +9,26 @@ import {
 } from '../src/views/partials/favorite-form'
 
 const origin = 'https://webvista.test'
+const pngBytes = new Uint8Array([
+  0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00,
+])
+
+const customIconForm = (
+  overrides: Record<string, string> = {},
+  file: File = new File([pngBytes], 'portal.png', { type: 'image/png' }),
+): FormData => {
+  const form = new FormData()
+  const values = {
+    title: 'Custom Icon Site',
+    url: 'https://custom-icon.example',
+    iconMode: 'upload',
+    ...overrides,
+  }
+
+  Object.entries(values).forEach(([key, value]) => form.set(key, value))
+  form.set('iconFile', file)
+  return form
+}
 
 async function adminCookie(): Promise<string> {
   const response = await workerExports.default.fetch(
@@ -58,10 +78,15 @@ describe('add favorite', () => {
     expect(page).toContain('name="url"')
     expect(page).toContain('value="auto"')
     expect(page).toContain('value="fallback"')
-    expect(page).toContain('value="upload" disabled')
+    expect(page).toContain('enctype="multipart/form-data"')
+    expect(page).toContain('value="upload"')
+    expect(page).toContain('name="iconFile"')
+    expect(page).toContain('accept="image/png,image/jpeg,image/webp"')
+    expect(page).toContain('<script src="/assets/admin.js" defer></script>')
     expect(fragmentResponse.status).toBe(200)
     expect(fragment).not.toContain('<!doctype html>')
     expect(fragment).toContain('hx-post="/admin/favorites"')
+    expect(fragment).toContain('hx-encoding="multipart/form-data"')
     expect(fragment).toContain('name="presentation" value="dashboard"')
   })
 
@@ -189,6 +214,119 @@ describe('add favorite', () => {
       iconMode: 'auto',
       iconUrl: null,
     })
+  })
+
+  it('stores a validated custom icon and serves it through the public route', async () => {
+    const response = await adminRequest('/admin/favorites', {
+      body: customIconForm(),
+      method: 'POST',
+    })
+    const [favorite] = await listFavorites(env.DB)
+
+    expect(response.status).toBe(303)
+    expect(favorite).toMatchObject({
+      title: 'Custom Icon Site',
+      iconMode: 'upload',
+      iconUrl: null,
+    })
+    expect(favorite.iconStorageKey).toMatch(
+      /^favorite-icons\/[0-9a-f-]{36}\.png$/,
+    )
+
+    const stored = await env.ICONS.get(favorite.iconStorageKey!)
+    expect(stored).not.toBeNull()
+    expect(stored?.httpMetadata?.contentType).toBe('image/png')
+    expect(stored?.customMetadata).toEqual({ purpose: 'favorite-icon' })
+
+    const fileName = favorite.iconStorageKey!.replace('favorite-icons/', '')
+    const iconResponse = await workerExports.default.fetch(
+      new Request(`${origin}/icons/${fileName}`),
+    )
+
+    expect(iconResponse.status).toBe(200)
+    expect(iconResponse.headers.get('content-type')).toBe('image/png')
+    expect(iconResponse.headers.get('cache-control')).toContain('immutable')
+    expect(iconResponse.headers.get('x-content-type-options')).toBe('nosniff')
+    expect(new Uint8Array(await iconResponse.arrayBuffer())).toEqual(pngBytes)
+  })
+
+  it('rejects missing, unsupported, spoofed, and oversized custom icons', async () => {
+    const missingForm = customIconForm()
+    missingForm.delete('iconFile')
+    const cases = [
+      {
+        form: missingForm,
+        message: 'Choose a PNG, JPEG, or WebP image.',
+      },
+      {
+        form: customIconForm(
+          { url: 'https://unsupported.example' },
+          new File(['plain text'], 'icon.txt', { type: 'text/plain' }),
+        ),
+        message: 'Choose a PNG, JPEG, or WebP image.',
+      },
+      {
+        form: customIconForm(
+          { url: 'https://spoofed.example' },
+          new File(['not png'], 'icon.png', { type: 'image/png' }),
+        ),
+        message: 'does not appear to be a valid PNG, JPEG, or WebP image',
+      },
+      {
+        form: customIconForm(
+          { url: 'https://large.example' },
+          new File([new Uint8Array(2 * 1024 * 1024 + 1)], 'large.png', {
+            type: 'image/png',
+          }),
+        ),
+        message: 'Custom icons must be 2 MB or smaller.',
+      },
+    ]
+
+    for (const { form, message } of cases) {
+      const response = await adminRequest('/admin/favorites', {
+        body: form,
+        method: 'POST',
+      })
+      expect(response.status).toBe(422)
+      expect(await response.text()).toContain(message)
+    }
+
+    await expect(listFavorites(env.DB)).resolves.toEqual([])
+    await expect(env.ICONS.list()).resolves.toMatchObject({ objects: [] })
+  })
+
+  it('cleans up an uploaded object when favorite creation fails', async () => {
+    await createFavorite(env.DB, {
+      title: 'Existing',
+      url: 'https://custom-icon.example',
+      iconMode: 'fallback',
+    })
+
+    const response = await adminRequest('/admin/favorites', {
+      body: customIconForm(),
+      method: 'POST',
+    })
+
+    expect(response.status).toBe(422)
+    expect(await response.text()).toContain(
+      'This web address is already in Favorites.',
+    )
+    await expect(env.ICONS.list()).resolves.toMatchObject({ objects: [] })
+  })
+
+  it('returns 404 for invalid or missing custom icon objects', async () => {
+    const invalid = await workerExports.default.fetch(
+      new Request(`${origin}/icons/not-an-icon.png`),
+    )
+    const missing = await workerExports.default.fetch(
+      new Request(
+        `${origin}/icons/123e4567-e89b-42d3-a456-426614174000.png`,
+      ),
+    )
+
+    expect(invalid.status).toBe(404)
+    expect(missing.status).toBe(404)
   })
 
   it('returns validation and fallback states from the icon preview route', async () => {

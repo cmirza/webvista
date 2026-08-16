@@ -1,3 +1,5 @@
+import { customIconFileName } from './icon-storage'
+
 export const ICON_MODES = ['auto', 'upload', 'fallback'] as const
 
 export type IconMode = (typeof ICON_MODES)[number]
@@ -150,6 +152,31 @@ const normalizeOptionalValue = (
   return normalized ? normalized : null
 }
 
+const normalizeIconFields = (
+  iconMode: IconMode,
+  iconUrlValue?: string | null,
+  iconStorageKeyValue?: string | null,
+): { iconUrl: string | null; iconStorageKey: string | null } => {
+  const iconUrl = normalizeOptionalValue(iconUrlValue)
+  const iconStorageKey = normalizeOptionalValue(iconStorageKeyValue)
+
+  if (iconMode === 'upload') {
+    if (!iconStorageKey || !customIconFileName(iconStorageKey)) {
+      throw new FavoriteValidationError({
+        iconFile: 'Choose a valid custom icon.',
+      })
+    }
+
+    return { iconUrl: null, iconStorageKey }
+  }
+
+  if (iconMode === 'fallback') {
+    return { iconUrl: null, iconStorageKey: null }
+  }
+
+  return { iconUrl, iconStorageKey: null }
+}
+
 const ensureUrlAvailable = async (
   db: D1Database,
   url: string,
@@ -206,8 +233,11 @@ export const createFavorite = async (
   const title = normalizeFavoriteTitle(input.title)
   const url = normalizeFavoriteUrl(input.url)
   const iconMode = normalizeIconMode(input.iconMode ?? 'auto')
-  const iconUrl = normalizeOptionalValue(input.iconUrl)
-  const iconStorageKey = normalizeOptionalValue(input.iconStorageKey)
+  const { iconUrl, iconStorageKey } = normalizeIconFields(
+    iconMode,
+    input.iconUrl,
+    input.iconStorageKey,
+  )
 
   await ensureUrlAvailable(db, url)
 
@@ -259,8 +289,11 @@ export const updateFavorite = async (
   const title = normalizeFavoriteTitle(input.title)
   const url = normalizeFavoriteUrl(input.url)
   const iconMode = normalizeIconMode(input.iconMode)
-  const iconUrl = normalizeOptionalValue(input.iconUrl)
-  const iconStorageKey = normalizeOptionalValue(input.iconStorageKey)
+  const { iconUrl, iconStorageKey } = normalizeIconFields(
+    iconMode,
+    input.iconUrl,
+    input.iconStorageKey,
+  )
 
   await ensureUrlAvailable(db, url, id)
 

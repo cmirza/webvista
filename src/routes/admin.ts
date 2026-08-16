@@ -10,6 +10,12 @@ import {
   normalizeFavoriteTitle,
   normalizeFavoriteUrl,
 } from '../services/favorites'
+import {
+  deleteCustomIcon,
+  IconUploadError,
+  storeCustomIcon,
+  validateCustomIcon,
+} from '../services/icon-storage'
 import { discoverSiteMetadata } from '../services/icons'
 import { renderAdminAddPage, renderAdminDashboard } from '../views/admin'
 import {
@@ -39,6 +45,11 @@ const bodyString = (
   key: string,
 ): string => (typeof body[key] === 'string' ? body[key] : '')
 
+const bodyFile = (
+  body: Record<string, string | File | (string | File)[]>,
+  key: string,
+): File | null => (body[key] instanceof File ? body[key] : null)
+
 const formValues = (
   title: string,
   url: string,
@@ -46,7 +57,9 @@ const formValues = (
 ): AddFavoriteFormValues => ({
   title,
   url,
-  iconMode: requestedIconMode === 'fallback' ? 'fallback' : 'auto',
+  iconMode: ['auto', 'upload', 'fallback'].includes(requestedIconMode)
+    ? (requestedIconMode as AddFavoriteFormValues['iconMode'])
+    : 'auto',
 })
 
 const validateAddFavorite = (
@@ -82,8 +95,8 @@ const validateAddFavorite = (
     }
   }
 
-  if (!['auto', 'fallback'].includes(requestedIconMode)) {
-    errors.iconMode = 'Choose Automatic or Generated fallback.'
+  if (!['auto', 'upload', 'fallback'].includes(requestedIconMode)) {
+    errors.iconMode = 'Choose Automatic, Custom upload, or Generated fallback.'
   }
 
   return { errors, normalizedTitle, normalizedUrl }
@@ -104,6 +117,15 @@ adminRoutes.get('/favorites/icon-preview', async (context) => {
   const title = context.req.query('title') ?? ''
   const url = context.req.query('url') ?? ''
   const requestedIconMode = context.req.query('iconMode') ?? 'auto'
+
+  if (requestedIconMode === 'upload') {
+    return context.html(
+      await renderFavoritePreviewError(
+        'Choose a custom image above to preview it before saving.',
+      ),
+    )
+  }
+
   let normalizedUrl: string
 
   try {
@@ -135,10 +157,27 @@ adminRoutes.post('/favorites', async (context) => {
   const title = bodyString(body, 'title')
   const url = bodyString(body, 'url')
   const requestedIconMode = bodyString(body, 'iconMode')
+  const iconFile = bodyFile(body, 'iconFile')
   const enhanced =
     isHtmxRequest(context.req) && bodyString(body, 'presentation') === 'dashboard'
   const validation = validateAddFavorite(title, url, requestedIconMode)
   const values = formValues(title, url, requestedIconMode)
+
+  if (requestedIconMode === 'upload') {
+    if (!iconFile) {
+      validation.errors.iconFile = 'Choose a PNG, JPEG, or WebP image.'
+    } else {
+      try {
+        await validateCustomIcon(iconFile)
+      } catch (error) {
+        if (error instanceof IconUploadError) {
+          validation.errors.iconFile = error.userMessage
+        } else {
+          throw error
+        }
+      }
+    }
+  }
 
   if (
     Object.keys(validation.errors).length > 0 ||
@@ -158,11 +197,34 @@ adminRoutes.post('/favorites', async (context) => {
     return context.html(await renderAdminAddPage(form), 422)
   }
 
-  const iconMode = requestedIconMode === 'fallback' ? 'fallback' : 'auto'
+  const iconMode = requestedIconMode as AddFavoriteFormValues['iconMode']
   const metadata =
     iconMode === 'auto'
       ? await discoverSiteMetadata(validation.normalizedUrl)
       : null
+  let iconStorageKey: string | null = null
+
+  if (iconMode === 'upload' && iconFile) {
+    try {
+      iconStorageKey = await storeCustomIcon(context.env.ICONS, iconFile)
+    } catch (error) {
+      const message =
+        error instanceof IconUploadError
+          ? error.userMessage
+          : 'The custom icon could not be stored. Try again.'
+      const form = await renderAddFavoriteForm({
+        enhanced,
+        errors: { iconFile: message },
+        values,
+      })
+
+      if (enhanced) {
+        return context.html(form)
+      }
+
+      return context.html(await renderAdminAddPage(form), 422)
+    }
+  }
 
   try {
     const favorite = await createFavorite(context.env.DB, {
@@ -170,6 +232,7 @@ adminRoutes.post('/favorites', async (context) => {
       url: validation.normalizedUrl,
       iconMode,
       iconUrl: metadata?.icon?.url ?? null,
+      iconStorageKey,
     })
 
     if (enhanced) {
@@ -181,6 +244,8 @@ adminRoutes.post('/favorites', async (context) => {
 
     return context.redirect('/admin', 303)
   } catch (error) {
+    await deleteCustomIcon(context.env.ICONS, iconStorageKey)
+
     if (!(error instanceof FavoriteValidationError)) {
       throw error
     }

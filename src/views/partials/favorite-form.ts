@@ -77,8 +77,10 @@ export async function renderAddFavoriteForm({
         class="mt-6 space-y-5"
         method="post"
         action="/admin/favorites"
+        enctype="multipart/form-data"
         ${enhanced
           ? html`hx-post="/admin/favorites"
+              hx-encoding="multipart/form-data"
               hx-target="#favorite-form-shell"
               hx-swap="outerHTML"`
           : ''}
@@ -141,13 +143,34 @@ export async function renderAddFavoriteForm({
               </span>
             </span>
           </label>
-          <label class="flex cursor-not-allowed items-start gap-3 rounded-2xl border border-base-300 p-4 opacity-55">
-            <input class="radio mt-0.5" type="radio" name="iconMode" value="upload" disabled />
-            <span>
+          <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-base-300 p-4">
+            <input
+              class="radio radio-primary mt-0.5"
+              type="radio"
+              name="iconMode"
+              value="upload"
+              ${values.iconMode === 'upload' ? 'checked' : ''}
+            />
+            <span class="min-w-0 flex-1">
               <span class="block font-medium">Custom upload</span>
-              <span class="mt-1 block text-sm">Available in the custom-icons step.</span>
+              <span class="mt-1 block text-sm text-base-content/60">
+                Upload a PNG, JPEG, or WebP image up to 2 MB.
+              </span>
+              <input
+                class="file-input file-input-bordered mt-3 w-full rounded-xl"
+                type="file"
+                name="iconFile"
+                accept="image/png,image/jpeg,image/webp"
+                data-custom-icon-input
+                aria-describedby="${errors.iconFile ? 'favorite-icon-file-error' : undefined}"
+              />
             </span>
           </label>
+          ${errors.iconFile
+            ? html`<p class="text-sm text-error" id="favorite-icon-file-error">
+                ${errors.iconFile}
+              </p>`
+            : ''}
           ${errors.iconMode
             ? html`<p class="text-sm text-error" id="favorite-icon-mode-error">
                 ${errors.iconMode}

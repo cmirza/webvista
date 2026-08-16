@@ -17,6 +17,11 @@
   "assets": {
     "directory": "./public"
   },
+  "r2_buckets": [
+    {
+      "binding": "ICONS"
+    }
+  ],
   "secrets": {
     "required": ["ADMIN_PASSWORD", "ADMIN_SESSION_SECRET"]
   }

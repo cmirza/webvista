@@ -1,6 +1,7 @@
 import { html } from 'hono/html'
 import type { HtmlEscapedString } from 'hono/utils/html'
 import type { Favorite } from '../../services/favorites'
+import { customIconPath } from '../../services/icon-storage'
 
 const fallbackStyles = [
   'bg-primary text-primary-content',
@@ -51,9 +52,11 @@ export async function renderFavoriteIcon(
   variant: 'admin' | 'portal' = 'portal',
 ): Promise<HtmlEscapedString> {
   const iconUrl =
-    favorite.iconMode === 'fallback'
-      ? null
-      : renderableIconUrl(favorite.iconUrl)
+    favorite.iconMode === 'upload'
+      ? customIconPath(favorite.iconStorageKey)
+      : favorite.iconMode === 'fallback'
+        ? null
+        : renderableIconUrl(favorite.iconUrl)
   const fallbackStyle = fallbackStyles[stringHash(favorite.title) % fallbackStyles.length]
   const iconClass = variant === 'admin' ? 'admin-favorite-icon' : 'favorite-icon'
   const initialsClass =

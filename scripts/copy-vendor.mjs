@@ -11,6 +11,10 @@ const vendorAssets = [
     source: new URL('../node_modules/sortablejs/Sortable.min.js', import.meta.url),
     destination: new URL('sortable.min.js', assetsDirectory),
   },
+  {
+    source: new URL('../src/client/admin.js', import.meta.url),
+    destination: new URL('admin.js', assetsDirectory),
+  },
 ]
 
 await mkdir(assetsDirectory, { recursive: true })
