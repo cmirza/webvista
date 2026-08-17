@@ -330,7 +330,10 @@ GET    /admin/favorites/icon-preview
   - [x] Report successful edits and deletions truthfully when obsolete R2 object cleanup fails.
   - [x] Ensure a failed D1 create cleans up any newly uploaded R2 object without masking the original failure.
 - [x] Run typechecking, automated tests, and production build successfully.
-- [ ] Perform visual checks at the priority widths and polish the Nord Light portal.
+- [x] Perform visual checks at the priority widths and polish the Nord Light portal.
+  - [x] Use four favorite columns across typical half-screen and tablet widths while retaining eight wide, three narrow, and two basic-mobile columns.
+  - [x] Hide Automatic-only edit choices when Generated fallback or Custom upload is selected.
+  - [x] Verify the portal, dashboard, add form, and edit form have no horizontal overflow at the priority widths.
 - [ ] Confirm no v1.1+ feature or unnecessary abstraction slipped into v1.0.
 
 ### 15. Cloudflare deployment
@@ -476,6 +479,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-16 — Accessible Nord contrast:** Keep the Google-style search hint decorative with a separate accessible input label, derive darker brand and critical-text colors from theme variables, render functional muted text at 75% base-content opacity, and keep primary-button hover backgrounds light enough for WCAG AA text contrast.
 - **2026-08-16 — Contextual icon previews:** In the edit form, show web-address preview controls only while Automatic mode is selected and render replacement-file previews inside the Custom upload option so each preview stays attached to the choice it affects.
 - **2026-08-16 — Storage failure semantics:** Render generic no-store 503 pages without internal error details for unexpected D1 failures, use mutation `RETURNING` results and pre-write counts to avoid ambiguous post-write failures, treat R2 deletion as best-effort cleanup after a successful D1 mutation, and surface persistent warnings when that cleanup fails.
+- **2026-08-16 — Responsive grid:** Keep the automatic wide/narrow/mobile grid, but use four explicit equal columns from 768px through 1280px so typical tablet and split-screen windows retain the intended large, obvious favorite targets.
 
 ## Deferred ideas
 

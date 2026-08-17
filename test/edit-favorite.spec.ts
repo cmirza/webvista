@@ -83,6 +83,7 @@ describe('edit favorite', () => {
     expect(page).toContain('Find icon from web address')
     expect(page).toContain('src="https://existing.example/icon.png"')
     expect(page).toContain('data-automatic-icon-preview')
+    expect(page).toContain('data-automatic-icon-actions')
     expect(page).toContain('Automatic icon preview')
     expect(page).toContain('Preview automatic icon')
     expect(page).toContain('data-upload-icon-preview')
@@ -105,6 +106,7 @@ describe('edit favorite', () => {
 
     expect(response.status).toBe(200)
     expect(page).toMatch(/data-automatic-icon-preview\s+hidden/)
+    expect(page).toMatch(/data-automatic-icon-actions\s+hidden/)
     expect(page).toContain('data-upload-icon-preview')
   })
 

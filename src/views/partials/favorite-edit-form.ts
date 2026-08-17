@@ -139,7 +139,11 @@ export async function renderEditFavoriteForm({
                 </span>
               </span>
             </label>
-            <div class="mt-4 space-y-2 border-l-2 border-base-300 pl-5">
+            <div
+              class="mt-4 space-y-2 border-l-2 border-base-300 pl-5"
+              data-automatic-icon-actions
+              ${values.iconMode === 'auto' ? '' : 'hidden'}
+            >
               <label class="flex cursor-pointer items-start gap-3 text-sm">
                 <input
                   class="radio radio-primary radio-sm mt-0.5"

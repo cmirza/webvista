@@ -147,10 +147,15 @@ const syncEditIconPreviews = () => {
     .forEach((form) => {
       const mode = form.querySelector('[name="iconMode"]:checked')?.value
       const automaticPreview = form.querySelector('[data-automatic-icon-preview]')
+      const automaticActions = form.querySelector('[data-automatic-icon-actions]')
       const uploadPreview = form.querySelector('[data-upload-icon-preview]')
 
       if (automaticPreview instanceof HTMLElement) {
         automaticPreview.hidden = mode !== 'auto'
+      }
+
+      if (automaticActions instanceof HTMLElement) {
+        automaticActions.hidden = mode !== 'auto'
       }
 
       if (uploadPreview instanceof HTMLElement) {
