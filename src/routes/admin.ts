@@ -224,6 +224,9 @@ adminRoutes.post('/favorites', async (context) => {
     iconMode === 'auto'
       ? await discoverSiteMetadata(validation.normalizedUrl)
       : null
+  const totalAfterCreate = enhanced
+    ? (await listFavorites(context.env.DB)).length + 1
+    : null
   let iconStorageKey: string | null = null
 
   if (iconMode === 'upload' && iconFile) {
@@ -258,15 +261,18 @@ adminRoutes.post('/favorites', async (context) => {
     })
 
     if (enhanced) {
-      const favorites = await listFavorites(context.env.DB)
       return context.html(
-        await renderAddFavoriteSuccess(favorite, favorites.length),
+        await renderAddFavoriteSuccess(favorite, totalAfterCreate ?? 1),
       )
     }
 
     return context.redirect('/admin', 303)
   } catch (error) {
-    await deleteCustomIcon(context.env.ICONS, iconStorageKey)
+    try {
+      await deleteCustomIcon(context.env.ICONS, iconStorageKey)
+    } catch {
+      // Preserve the original database failure if best-effort cleanup also fails.
+    }
 
     if (!(error instanceof FavoriteValidationError)) {
       throw error
@@ -455,20 +461,40 @@ adminRoutes.post('/favorites/:id', async (context) => {
       return context.notFound()
     }
 
+    let cleanupFailed = false
+
     if (
       favorite.iconStorageKey &&
       favorite.iconStorageKey !== updated.iconStorageKey
     ) {
-      await deleteCustomIcon(context.env.ICONS, favorite.iconStorageKey)
+      try {
+        await deleteCustomIcon(context.env.ICONS, favorite.iconStorageKey)
+      } catch {
+        cleanupFailed = true
+      }
     }
 
     if (enhanced) {
-      return context.html(await renderEditFavoriteSuccess(updated))
+      return context.html(
+        await renderEditFavoriteSuccess(updated, cleanupFailed),
+      )
+    }
+
+    if (cleanupFailed) {
+      return context.html(
+        await renderAdminEditPage(
+          await renderEditFavoriteSuccess(updated, true, false),
+        ),
+      )
     }
 
     return context.redirect('/admin', 303)
   } catch (error) {
-    await deleteCustomIcon(context.env.ICONS, newlyStoredKey)
+    try {
+      await deleteCustomIcon(context.env.ICONS, newlyStoredKey)
+    } catch {
+      // Preserve the original database failure if best-effort cleanup also fails.
+    }
 
     if (!(error instanceof FavoriteValidationError)) {
       throw error
@@ -496,6 +522,7 @@ const deleteFavoriteAndRespond = async (
   favorite: Favorite,
   enhanced: boolean,
 ) => {
+  const total = Math.max((await listFavorites(context.env.DB)).length - 1, 0)
   const deleted = await deleteFavorite(context.env.DB, favorite.id)
 
   if (!deleted) {
@@ -510,7 +537,6 @@ const deleteFavoriteAndRespond = async (
     cleanupFailed = true
   }
 
-  const total = (await listFavorites(context.env.DB)).length
   const result = await renderDeleteFavoriteSuccess(
     favorite,
     total,

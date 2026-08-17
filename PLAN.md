@@ -322,7 +322,13 @@ GET    /admin/favorites/icon-preview
   - [x] Verify rendered landmark/heading structure, accessible names, image alternatives, keyboard order, and minimum 24px targets on the portal and admin dashboard.
   - [x] Raise small brand, muted, placeholder, and destructive-action text to WCAG AA contrast while retaining the Nord theme.
   - [x] Verify visible focus indicators on portal search, favorite links, and admin controls.
-- [ ] Check external metadata failure and R2/D1 failure states.
+- [x] Check external metadata failure and R2/D1 failure states.
+  - [x] Verify unsafe URLs, timeouts, invalid content types, oversized responses, and redirect failures degrade to generated icon fallbacks.
+  - [x] Return a safe, actionable service-unavailable response when D1 fails without exposing internal details.
+    - [x] Avoid post-write reads that can turn successful add, edit, or delete mutations into ambiguous failures.
+  - [x] Preserve entered values and stored data when an R2 upload fails.
+  - [x] Report successful edits and deletions truthfully when obsolete R2 object cleanup fails.
+  - [x] Ensure a failed D1 create cleans up any newly uploaded R2 object without masking the original failure.
 - [x] Run typechecking, automated tests, and production build successfully.
 - [ ] Perform visual checks at the priority widths and polish the Nord Light portal.
 - [ ] Confirm no v1.1+ feature or unnecessary abstraction slipped into v1.0.
@@ -469,6 +475,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-16 — Favorite ordering:** Send the complete favorite ID order as authenticated same-origin JSON, persist it through the existing transactional D1 batch, reload the authoritative stored order after client failure, and provide Move up/Move down controls as a keyboard-accessible alternative to dragging.
 - **2026-08-16 — Accessible Nord contrast:** Keep the Google-style search hint decorative with a separate accessible input label, derive darker brand and critical-text colors from theme variables, render functional muted text at 75% base-content opacity, and keep primary-button hover backgrounds light enough for WCAG AA text contrast.
 - **2026-08-16 — Contextual icon previews:** In the edit form, show web-address preview controls only while Automatic mode is selected and render replacement-file previews inside the Custom upload option so each preview stays attached to the choice it affects.
+- **2026-08-16 — Storage failure semantics:** Render generic no-store 503 pages without internal error details for unexpected D1 failures, use mutation `RETURNING` results and pre-write counts to avoid ambiguous post-write failures, treat R2 deletion as best-effort cleanup after a successful D1 mutation, and surface persistent warnings when that cleanup fails.
 
 ## Deferred ideas
 

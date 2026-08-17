@@ -247,12 +247,13 @@ export const createFavorite = async (
   const id = crypto.randomUUID()
   const timestamp = new Date().toISOString()
 
-  await db
+  const favorite = await db
     .prepare(`
       INSERT INTO favorites (
         id, title, url, position, icon_mode, icon_url, icon_storage_key,
         enabled, created_at, updated_at
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      RETURNING ${favoriteColumns}
     `)
     .bind(
       id,
@@ -266,15 +267,13 @@ export const createFavorite = async (
       timestamp,
       timestamp,
     )
-    .run()
-
-  const favorite = await getFavorite(db, id)
+    .first<FavoriteRow>()
 
   if (!favorite) {
-    throw new Error('Favorite was created but could not be loaded.')
+    throw new Error('Favorite could not be created.')
   }
 
-  return favorite
+  return mapFavorite(favorite)
 }
 
 export const updateFavorite = async (
@@ -297,12 +296,13 @@ export const updateFavorite = async (
 
   await ensureUrlAvailable(db, url, id)
 
-  await db
+  const updated = await db
     .prepare(`
       UPDATE favorites
       SET title = ?, url = ?, icon_mode = ?, icon_url = ?,
           icon_storage_key = ?, enabled = ?, updated_at = ?
       WHERE id = ?
+      RETURNING ${favoriteColumns}
     `)
     .bind(
       title,
@@ -314,9 +314,9 @@ export const updateFavorite = async (
       new Date().toISOString(),
       id,
     )
-    .run()
+    .first<FavoriteRow>()
 
-  return getFavorite(db, id)
+  return updated ? mapFavorite(updated) : null
 }
 
 export const deleteFavorite = async (

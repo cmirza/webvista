@@ -271,18 +271,31 @@ export async function renderEditFavoriteForm({
 
 export async function renderEditFavoriteSuccess(
   favorite: Favorite,
+  cleanupFailed = false,
+  includeDashboardRow = true,
 ): Promise<HtmlEscapedString> {
   return html`
     <section
       class="rounded-3xl bg-base-100 p-5 shadow-sm sm:p-7"
       id="favorite-form-shell"
       data-favorite-form-shell
-      data-auto-dismiss="4500"
+      ${cleanupFailed ? '' : html`data-auto-dismiss="4500"`}
     >
-      <div class="alert alert-success" role="status">
-        <span><strong>${favorite.title}</strong> was updated.</span>
+      <div class="alert ${cleanupFailed ? 'alert-warning' : 'alert-success'}" role="status">
+        <span>
+          <strong>${favorite.title}</strong> was updated.${cleanupFailed
+            ? ' The previous uploaded icon could not be cleaned up automatically.'
+            : ''}
+        </span>
       </div>
+      ${cleanupFailed
+        ? html`<div class="mt-5 flex justify-end">
+            <a class="btn btn-primary rounded-xl" href="/admin">Return to Admin</a>
+          </div>`
+        : ''}
     </section>
-    ${await renderAdminFavoriteRow(favorite, { oob: true })}
+    ${includeDashboardRow
+      ? await renderAdminFavoriteRow(favorite, { oob: true })
+      : ''}
   `
 }
