@@ -263,6 +263,7 @@ CREATE TABLE favorites (
 - [x] When the URL changes, offer Keep existing icon or Find icon from new site.
   - [x] Keep the current automatic icon by default and require an explicit refresh choice.
 - [x] Show a current/new icon preview before saving when applicable.
+  - [x] Show the web-address preview only for Automatic mode and keep custom-upload previews inside the Custom upload option.
 - [x] Return field-level errors without discarding valid input.
 - [x] Replace the admin row with HTMX after a successful update and support a normal redirect fallback.
 - [x] Bring the admin workspace into view when Edit or Add Site is selected from lower on the dashboard.
@@ -467,6 +468,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-16 — Favorite deletion:** Require an explicit server-validated confirmation, use `DELETE` for the HTMX flow and confirmed `POST` as the no-JavaScript fallback, remove D1 data before its R2 object, and report an R2 cleanup failure without implying that the favorite still exists.
 - **2026-08-16 — Favorite ordering:** Send the complete favorite ID order as authenticated same-origin JSON, persist it through the existing transactional D1 batch, reload the authoritative stored order after client failure, and provide Move up/Move down controls as a keyboard-accessible alternative to dragging.
 - **2026-08-16 — Accessible Nord contrast:** Keep the Google-style search hint decorative with a separate accessible input label, derive darker brand and critical-text colors from theme variables, render functional muted text at 75% base-content opacity, and keep primary-button hover backgrounds light enough for WCAG AA text contrast.
+- **2026-08-16 — Contextual icon previews:** In the edit form, show web-address preview controls only while Automatic mode is selected and render replacement-file previews inside the Custom upload option so each preview stays attached to the choice it affects.
 
 ## Deferred ideas
 

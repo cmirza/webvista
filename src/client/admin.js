@@ -141,8 +141,33 @@ document.addEventListener('click', (event) => {
 
 document.addEventListener('htmx:afterSettle', () => refreshMoveButtons())
 
+const syncEditIconPreviews = () => {
+  document
+    .querySelectorAll('form[data-favorite-form-action="edit"]')
+    .forEach((form) => {
+      const mode = form.querySelector('[name="iconMode"]:checked')?.value
+      const automaticPreview = form.querySelector('[data-automatic-icon-preview]')
+      const uploadPreview = form.querySelector('[data-upload-icon-preview]')
+
+      if (automaticPreview instanceof HTMLElement) {
+        automaticPreview.hidden = mode !== 'auto'
+      }
+
+      if (uploadPreview instanceof HTMLElement) {
+        uploadPreview.hidden =
+          mode !== 'upload' || !uploadPreview.hasAttribute('data-has-preview')
+      }
+    })
+}
+
+document.addEventListener('DOMContentLoaded', syncEditIconPreviews)
+document.addEventListener('htmx:afterSettle', syncEditIconPreviews)
+
 const showUploadPreview = (input) => {
-  const target = input.form?.querySelector('#favorite-icon-preview')
+  const target =
+    input.form?.dataset.favoriteFormAction === 'edit'
+      ? input.form.querySelector('[data-upload-icon-preview]')
+      : input.form?.querySelector('#favorite-icon-preview')
   const file = input.files?.[0]
 
   if (!target || !file) return
@@ -152,6 +177,8 @@ const showUploadPreview = (input) => {
 
   if (previewUrl) URL.revokeObjectURL(previewUrl)
   target.replaceChildren()
+  target.setAttribute('data-has-preview', '')
+  target.hidden = false
 
   if (!supportedIconTypes.has(file.type) || file.size > maximumIconBytes) {
     const warning = document.createElement('div')
@@ -197,9 +224,14 @@ const showUploadPreview = (input) => {
 document.addEventListener('change', (event) => {
   if (!(event.target instanceof HTMLInputElement)) return
 
+  if (event.target.matches('[name="iconMode"]')) {
+    syncEditIconPreviews()
+  }
+
   if (event.target.matches('[data-custom-icon-input]')) {
     const uploadMode = event.target.form?.querySelector('[name="iconMode"][value="upload"]')
     if (uploadMode instanceof HTMLInputElement) uploadMode.checked = true
     showUploadPreview(event.target)
+    syncEditIconPreviews()
   }
 })

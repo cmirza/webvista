@@ -203,6 +203,12 @@ export async function renderEditFavoriteForm({
                 data-custom-icon-input
                 aria-describedby="${errors.iconFile ? 'favorite-icon-file-error' : undefined}"
               />
+              <div
+                class="mt-4"
+                data-upload-icon-preview
+                aria-live="polite"
+                hidden
+              ></div>
             </span>
           </label>
           ${errors.iconFile
@@ -217,16 +223,20 @@ export async function renderEditFavoriteForm({
           <div class="mt-4 flex items-center gap-4">
             ${await renderFavoriteIcon(favorite, 'admin')}
             <p class="text-sm text-base-content/75">
-              Preview a newly discovered or selected icon below before saving.
+              This icon stays in place until you save a different choice.
             </p>
           </div>
         </div>
-        <div class="rounded-2xl bg-base-200 p-4">
+        <div
+          class="rounded-2xl bg-base-200 p-4"
+          data-automatic-icon-preview
+          ${values.iconMode === 'auto' ? '' : 'hidden'}
+        >
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h3 class="font-semibold">New icon preview</h3>
+              <h3 class="font-semibold">Automatic icon preview</h3>
               <p class="mt-1 text-sm text-base-content/75">
-                Automatic discovery runs again only when refresh is selected.
+                Check the icon available from the current web address.
               </p>
             </div>
             <button
@@ -238,11 +248,13 @@ export async function renderEditFavoriteForm({
               hx-swap="innerHTML"
               hx-indicator="#favorite-preview-loading"
             >
-              Preview from web address
+              Preview automatic icon
             </button>
           </div>
           <div class="mt-4" id="favorite-icon-preview" aria-live="polite">
-            <p class="text-sm text-base-content/75">No replacement preview selected.</p>
+            <p class="text-sm text-base-content/75">
+              Your current icon stays unless you select refresh and save changes.
+            </p>
           </div>
           <span class="loading loading-spinner loading-sm htmx-indicator mt-3" id="favorite-preview-loading">
             <span class="sr-only">Loading preview</span>

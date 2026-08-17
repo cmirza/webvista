@@ -82,11 +82,30 @@ describe('edit favorite', () => {
     expect(page).toContain('Keep current icon')
     expect(page).toContain('Find icon from web address')
     expect(page).toContain('src="https://existing.example/icon.png"')
+    expect(page).toContain('data-automatic-icon-preview')
+    expect(page).toContain('Automatic icon preview')
+    expect(page).toContain('Preview automatic icon')
+    expect(page).toContain('data-upload-icon-preview')
+    expect(page).not.toContain('No replacement preview selected.')
     expect(page).toContain('Save Changes')
     expect(fragmentResponse.status).toBe(200)
     expect(fragment).not.toContain('<!doctype html>')
     expect(fragment).toContain(`hx-post="/admin/favorites/${favorite.id}"`)
     expect(fragment).toContain('name="presentation" value="dashboard"')
+  })
+
+  it('hides automatic preview controls when another icon mode is selected', async () => {
+    const favorite = await createFavorite(env.DB, {
+      title: 'Fallback Site',
+      url: 'https://fallback.example',
+      iconMode: 'fallback',
+    })
+    const response = await adminRequest(`/admin/favorites/${favorite.id}/edit`)
+    const page = await response.text()
+
+    expect(response.status).toBe(200)
+    expect(page).toMatch(/data-automatic-icon-preview\s+hidden/)
+    expect(page).toContain('data-upload-icon-preview')
   })
 
   it('updates fields through a normal form and redirects', async () => {
