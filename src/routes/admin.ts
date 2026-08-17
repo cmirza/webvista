@@ -7,11 +7,13 @@ import {
   createFavorite,
   deleteFavorite,
   type Favorite,
+  FavoriteReorderError,
   FavoriteValidationError,
   getFavorite,
   listFavorites,
   normalizeFavoriteTitle,
   normalizeFavoriteUrl,
+  reorderFavorites,
   updateFavorite,
 } from '../services/favorites'
 import {
@@ -281,6 +283,40 @@ adminRoutes.post('/favorites', async (context) => {
     }
 
     return context.html(await renderAdminAddPage(form), 422)
+  }
+})
+
+adminRoutes.post('/favorites/reorder', async (context) => {
+  let payload: unknown
+
+  try {
+    payload = await context.req.json()
+  } catch {
+    return context.json({ error: 'Send a valid JSON favorite order.' }, 400)
+  }
+
+  if (
+    typeof payload !== 'object' ||
+    payload === null ||
+    !('ids' in payload) ||
+    !Array.isArray(payload.ids) ||
+    payload.ids.some((id) => typeof id !== 'string' || id.length === 0)
+  ) {
+    return context.json(
+      { error: 'Favorite order must be an array of IDs.' },
+      400,
+    )
+  }
+
+  try {
+    await reorderFavorites(context.env.DB, payload.ids as string[])
+    return context.json({ ok: true })
+  } catch (error) {
+    if (error instanceof FavoriteReorderError) {
+      return context.json({ error: error.message }, 400)
+    }
+
+    throw error
   }
 })
 

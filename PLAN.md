@@ -9,7 +9,7 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 - Active milestone: **v1.0 — Favorites MVP**
 - Implementation status: **In progress**
 - Current phase: **Drag-and-drop ordering**
-- Next task: **Implement SortableJS ordering with authoritative D1 persistence**
+- Next task: **Verify pointer dragging in the local browser checkpoint**
 
 ## Core principles
 
@@ -282,12 +282,14 @@ CREATE TABLE favorites (
 ### 13. Drag-and-drop ordering
 
 - [ ] Initialize SortableJS only on the admin favorites list.
-- [ ] Send the complete ordered favorite ID list to `POST /admin/favorites/reorder`.
-- [ ] Validate authentication, JSON shape, duplicate IDs, missing IDs, and unknown IDs.
-- [ ] Update all positions transactionally with increments of 10.
-- [ ] Keep the server authoritative and restore/reload the stored order after a failed request.
-- [ ] Provide clear save/failure feedback and a keyboard-accessible ordering alternative if practical within v1.0.
-- [ ] Verify the public portal immediately reflects the persisted order.
+  - [x] Load the self-hosted SortableJS bundle only on the admin dashboard and bind it to the favorites list.
+  - [ ] Verify pointer dragging in the local browser; the automated browser surface does not expose a drag gesture, so this remains a user checkpoint.
+- [x] Send the complete ordered favorite ID list to `POST /admin/favorites/reorder`.
+- [x] Validate authentication, JSON shape, duplicate IDs, missing IDs, and unknown IDs.
+- [x] Update all positions transactionally with increments of 10.
+- [x] Keep the server authoritative and restore/reload the stored order after a failed request.
+- [x] Provide clear save/failure feedback and a keyboard-accessible ordering alternative if practical within v1.0.
+- [x] Verify the public portal immediately reflects the persisted order.
 
 Expected initial routes; exact naming may change if recorded in the decision log:
 
@@ -457,6 +459,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-16 — Custom icon storage:** Bind R2 without a committed production bucket name, accept only signature-validated PNG/JPEG/WebP files up to 2 MB, store UUID-based object keys in D1, and serve objects through a constrained immutable `/icons/:fileName` route.
 - **2026-08-16 — Favorite editing:** Keep an existing automatic icon unless refresh is explicitly selected, validate and store replacement uploads before changing D1, delete a failed replacement object when D1 rejects the update, and remove the previous upload only after a successful update.
 - **2026-08-16 — Favorite deletion:** Require an explicit server-validated confirmation, use `DELETE` for the HTMX flow and confirmed `POST` as the no-JavaScript fallback, remove D1 data before its R2 object, and report an R2 cleanup failure without implying that the favorite still exists.
+- **2026-08-16 — Favorite ordering:** Send the complete favorite ID order as authenticated same-origin JSON, persist it through the existing transactional D1 batch, reload the authoritative stored order after client failure, and provide Move up/Move down controls as a keyboard-accessible alternative to dragging.
 
 ## Deferred ideas
 

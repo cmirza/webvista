@@ -105,9 +105,15 @@
     display: grid;
     width: 1.25rem;
     flex: none;
+    cursor: grab;
     gap: 0.1875rem;
     padding: 0.25rem 0;
     opacity: 0.35;
+    touch-action: none;
+  }
+
+  .admin-drag-handle:active {
+    cursor: grabbing;
   }
 
   .admin-drag-handle span {
@@ -137,6 +143,12 @@
     display: flex;
     flex: none;
     gap: 0.25rem;
+  }
+
+  .admin-sortable-ghost {
+    border-radius: 1rem;
+    background: color-mix(in oklab, var(--color-primary) 12%, transparent);
+    opacity: 0.55;
   }
 
   @media (max-width: 36rem) {

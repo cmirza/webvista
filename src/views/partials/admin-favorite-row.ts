@@ -26,7 +26,7 @@ export async function renderAdminFavoriteRow(
       <span
         class="admin-drag-handle"
         aria-hidden="true"
-        title="Drag ordering will be enabled in a later step"
+        title="Drag to reorder"
       >
         <span></span><span></span><span></span>
       </span>
@@ -41,6 +41,24 @@ export async function renderAdminFavoriteRow(
         <p class="truncate text-sm text-base-content/60">${hostnameFor(favorite.url)}</p>
       </div>
       <div class="admin-row-actions" aria-label="Actions for ${favorite.title}">
+        <button
+          class="btn btn-ghost btn-sm rounded-lg"
+          type="button"
+          data-move-favorite="up"
+          aria-label="Move ${favorite.title} up"
+          title="Move up"
+        >
+          ↑
+        </button>
+        <button
+          class="btn btn-ghost btn-sm rounded-lg"
+          type="button"
+          data-move-favorite="down"
+          aria-label="Move ${favorite.title} down"
+          title="Move down"
+        >
+          ↓
+        </button>
         <a
           class="btn btn-ghost btn-sm rounded-lg"
           href="/admin/favorites/${favorite.id}/edit"

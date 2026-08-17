@@ -130,8 +130,13 @@ export async function renderAdminDashboard(
               </p>
             </div>`
           : ''}
-        <p class="px-2 pt-5 text-center text-sm text-base-content/55">
-          Drag-and-drop ordering will be enabled in a later step.
+        <p
+          class="px-2 pt-5 text-center text-sm text-base-content/55"
+          id="favorites-order-status"
+          role="status"
+          aria-live="polite"
+        >
+          Drag a row or use its Move buttons to change the portal order.
         </p>
       </section>
     </main>
@@ -141,7 +146,7 @@ export async function renderAdminDashboard(
     children: content,
     description: 'WebVista administration',
     robots: 'noindex,nofollow',
-    scripts: ['/assets/admin.js'],
+    scripts: ['/assets/sortable.min.js', '/assets/admin.js'],
     title: 'Admin · WebVista',
   })
 }
