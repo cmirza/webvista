@@ -87,7 +87,7 @@ describe('favorites service', () => {
     await expect(getFavorite(env.DB, created.id)).resolves.toBeNull()
   })
 
-  it('validates URLs, titles, icon modes, and duplicate URLs', async () => {
+  it('validates URLs, titles, and icon modes while allowing shared destinations', async () => {
     expect(normalizeFavoriteUrl('weather://')).toBe('weather://')
     expect(normalizeFavoriteUrl('shortcuts://run-shortcut?name=Morning')).toBe(
       'shortcuts://run-shortcut?name=Morning',
@@ -129,8 +129,9 @@ describe('favorites service', () => {
         title: 'Duplicate',
         url: 'HTTPS://EXAMPLE.COM/#different-fragment',
       }),
-    ).rejects.toMatchObject({
-      fieldErrors: { url: 'This address is already in Favorites.' },
+    ).resolves.toMatchObject({
+      title: 'Duplicate',
+      url: 'https://example.com/',
     })
     await expect(
       createFavorite(env.DB, {

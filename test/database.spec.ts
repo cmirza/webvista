@@ -25,7 +25,7 @@ describe('favorites database migration', () => {
     expect(indexes.results.map(({ name }) => name)).toContain(
       'favorites_enabled_position_idx',
     )
-    expect(indexes.results.map(({ name }) => name)).toContain(
+    expect(indexes.results.map(({ name }) => name)).not.toContain(
       'favorites_url_idx',
     )
   })
@@ -50,6 +50,21 @@ describe('favorites database migration', () => {
         timestamp,
       )
       .run()
+
+    await expect(
+      insert
+        .bind(
+          'favorite-same-destination',
+          'Same destination',
+          'https://example.com',
+          20,
+          'fallback',
+          1,
+          timestamp,
+          timestamp,
+        )
+        .run(),
+    ).resolves.toBeDefined()
 
     const favorite = await env.DB.prepare(
       'SELECT id, position, icon_mode, enabled FROM favorites WHERE id = ?',

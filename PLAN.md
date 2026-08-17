@@ -119,7 +119,7 @@ migrations/
   - [x] Add an index supporting enabled/position queries.
 - [x] Implement favorite list, lookup, create, update, delete, and reorder operations.
   - [x] Restrict `icon_mode` to `auto`, `upload`, or `fallback` at the application boundary.
-  - [x] Normalize stored addresses and reject duplicate favorite URLs.
+  - [x] Normalize stored addresses and allow separately named/iconed favorites to share a destination.
   - [x] Accept safe application URL schemes such as `weather://` while rejecting browser-executable and internal schemes.
   - [x] Require a complete, duplicate-free ID set before persisting a reorder.
 - [x] Use stable text IDs and UTC ISO-8601 timestamps.
@@ -232,7 +232,7 @@ CREATE TABLE favorites (
 - [x] Save the favorite and insert the rendered row into the admin list without a full reload.
   - [x] Append the complete row element through an HTMX out-of-band swap and update the count/empty state.
 - [x] Ensure the same operation has a usable non-HTMX response/redirect.
-- [x] Test valid submission, validation errors, duplicate URLs, metadata failure, and non-HTMX submission.
+- [x] Test valid submission, validation errors, shared destination URLs, metadata failure, and non-HTMX submission.
 
 ### 10. Custom icon upload
 
@@ -485,6 +485,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-16 — v1.0 scope freeze:** Keep the public introduction neutral and static so it needs neither personalization nor timezone configuration; ship only search, favorites, icon handling, and their authenticated administration in v1.0, with later roadmap integrations remaining documentation-only until usage is evaluated.
 - **2026-08-16 — Production configuration:** Keep account-specific D1 identifiers in an ignored `wrangler.production.jsonc`, commit a placeholder example, and make the production smoke test remove its own D1 and R2 test data so deployment remains repeatable and repository-safe.
 - **2026-08-16 — Application links:** Allow administrator-authored registered app schemes such as `weather://` and `shortcuts://`, preserve meaningful non-web fragments, and block executable, local-file, browser-internal, and credential-bearing addresses before storage or rendering.
+- **2026-08-16 — Shared destinations:** Allow multiple favorites to use the same normalized address because independently named and iconed tiles may intentionally target the same service; keep favorite IDs, not URLs, as the identity and ordering boundary.
 
 ## Deferred ideas
 

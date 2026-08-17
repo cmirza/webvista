@@ -34,6 +34,7 @@ const pngBytes = new Uint8Array([
 
 let cookie = ''
 let favoriteId = ''
+let sharedDestinationId = ''
 let originalIds = []
 
 function assert(condition, message) {
@@ -64,17 +65,20 @@ function favoriteIds(html) {
   )
 }
 
-async function deleteTemporaryFavorite() {
-  if (!favoriteId) {
-    return
-  }
+async function deleteTemporaryFavorites() {
+  for (const id of [sharedDestinationId, favoriteId]) {
+    if (!id) {
+      continue
+    }
 
-  const response = await request(`/admin/favorites/${favoriteId}/delete`, {
-    body: new URLSearchParams({ confirmed: 'yes' }),
-    method: 'POST',
-  })
-  assert(response.status === 303 || response.status === 404, 'Cleanup failed.')
+    const response = await request(`/admin/favorites/${id}/delete`, {
+      body: new URLSearchParams({ confirmed: 'yes' }),
+      method: 'POST',
+    })
+    assert(response.status === 303 || response.status === 404, 'Cleanup failed.')
+  }
   favoriteId = ''
+  sharedDestinationId = ''
 }
 
 try {
@@ -137,7 +141,27 @@ try {
   assert(favoriteId, 'The temporary favorite could not be identified.')
   assert(createdHtml.includes(testTitle), 'The temporary favorite is not listed.')
 
-  const reorderedIds = [favoriteId, ...originalIds]
+  const createSharedDestination = await request('/admin/favorites', {
+    body: new URLSearchParams({
+      title: `${testTitle} shared destination`,
+      url: testUrl,
+      iconMode: 'fallback',
+    }),
+    method: 'POST',
+  })
+  assert(
+    createSharedDestination.status === 303,
+    'Creating a favorite with a shared destination failed.',
+  )
+  const sharedAdmin = await request('/admin')
+  const sharedIds = favoriteIds(await sharedAdmin.text())
+  sharedDestinationId =
+    sharedIds.find(
+      (id) => !originalIds.includes(id) && id !== favoriteId,
+    ) ?? ''
+  assert(sharedDestinationId, 'The shared-destination favorite was not identified.')
+
+  const reorderedIds = [sharedDestinationId, favoriteId, ...originalIds]
   const reorder = await request('/admin/favorites/reorder', {
     body: JSON.stringify({ ids: reorderedIds }),
     headers: { 'Content-Type': 'application/json' },
@@ -146,7 +170,7 @@ try {
   assert(reorder.status === 200, 'Reordering favorites failed.')
 
   const restoreOrder = await request('/admin/favorites/reorder', {
-    body: JSON.stringify({ ids: [...originalIds, favoriteId] }),
+    body: JSON.stringify({ ids: [...originalIds, favoriteId, sharedDestinationId] }),
     headers: { 'Content-Type': 'application/json' },
     method: 'POST',
   })
@@ -181,7 +205,7 @@ try {
     'The uploaded icon has the wrong content type.',
   )
 
-  await deleteTemporaryFavorite()
+  await deleteTemporaryFavorites()
 
   const finalAdmin = await request('/admin')
   const finalHtml = await finalAdmin.text()
@@ -203,7 +227,7 @@ try {
   console.log(`Production smoke test passed: ${baseUrl}`)
 } catch (error) {
   try {
-    await deleteTemporaryFavorite()
+    await deleteTemporaryFavorites()
   } catch (cleanupError) {
     console.error(cleanupError instanceof Error ? cleanupError.message : cleanupError)
   }

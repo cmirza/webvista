@@ -203,27 +203,6 @@ const normalizeIconFields = (
   return { iconUrl, iconStorageKey: null }
 }
 
-const ensureUrlAvailable = async (
-  db: D1Database,
-  url: string,
-  excludedId?: string,
-): Promise<void> => {
-  const existing = await db
-    .prepare(
-      excludedId
-        ? 'SELECT id FROM favorites WHERE url = ? AND id != ? LIMIT 1'
-        : 'SELECT id FROM favorites WHERE url = ? LIMIT 1',
-    )
-    .bind(...(excludedId ? [url, excludedId] : [url]))
-    .first<{ id: string }>()
-
-  if (existing) {
-    throw new FavoriteValidationError({
-      url: 'This address is already in Favorites.',
-    })
-  }
-}
-
 export const listFavorites = async (
   db: D1Database,
   options: { enabledOnly?: boolean } = {},
@@ -264,8 +243,6 @@ export const createFavorite = async (
     input.iconUrl,
     input.iconStorageKey,
   )
-
-  await ensureUrlAvailable(db, url)
 
   const nextPosition = await db
     .prepare('SELECT COALESCE(MAX(position), 0) + 10 AS position FROM favorites')
@@ -319,8 +296,6 @@ export const updateFavorite = async (
     input.iconUrl,
     input.iconStorageKey,
   )
-
-  await ensureUrlAvailable(db, url, id)
 
   const updated = await db
     .prepare(`

@@ -312,45 +312,6 @@ describe('edit favorite', () => {
     })
   })
 
-  it('cleans up a new upload and preserves the previous one after a D1 validation failure', async () => {
-    await createFavorite(env.DB, {
-      title: 'Taken URL',
-      url: 'https://taken.example',
-      iconMode: 'fallback',
-    })
-    const previousKey = await storeCustomIcon(env.ICONS, pngFile('old.png'))
-    const favorite = await createFavorite(env.DB, {
-      title: 'Uploaded Icon',
-      url: 'https://upload.example',
-      iconMode: 'upload',
-      iconStorageKey: previousKey,
-    })
-    const form = new FormData()
-    form.set('title', favorite.title)
-    form.set('url', 'https://taken.example')
-    form.set('iconMode', 'upload')
-    form.set('automaticIconAction', 'refresh')
-    form.set('enabled', '1')
-    form.set('iconFile', pngFile('replacement.png'))
-
-    const response = await adminRequest(`/admin/favorites/${favorite.id}`, {
-      body: form,
-      method: 'POST',
-    })
-
-    expect(response.status).toBe(422)
-    expect(await response.text()).toContain(
-      'This address is already in Favorites.',
-    )
-    await expect(getFavorite(env.DB, favorite.id)).resolves.toMatchObject({
-      url: 'https://upload.example/',
-      iconStorageKey: previousKey,
-    })
-    await expect(env.ICONS.list()).resolves.toMatchObject({
-      objects: [{ key: previousKey }],
-    })
-  })
-
   it('returns field errors without changing the stored favorite', async () => {
     const favorite = await createFavorite(env.DB, {
       title: 'Original',

@@ -180,7 +180,7 @@ describe('add favorite', () => {
     expect(body).toContain('Enter a display name.')
   })
 
-  it('rejects duplicate URLs without discarding entered values', async () => {
+  it('allows multiple favorites with the same normalized destination', async () => {
     await createFavorite(env.DB, {
       title: 'Existing',
       url: 'https://example.com',
@@ -194,12 +194,11 @@ describe('add favorite', () => {
       }),
       method: 'POST',
     })
-    const body = await response.text()
-
-    expect(response.status).toBe(422)
-    expect(body).toContain('This address is already in Favorites.')
-    expect(body).toContain('value="Duplicate"')
-    await expect(listFavorites(env.DB)).resolves.toHaveLength(1)
+    expect(response.status).toBe(303)
+    await expect(listFavorites(env.DB)).resolves.toMatchObject([
+      { title: 'Existing', url: 'https://example.com/' },
+      { title: 'Duplicate', url: 'https://example.com/' },
+    ])
   })
 
   it('falls back safely when automatic metadata cannot be retrieved', async () => {
@@ -318,25 +317,6 @@ describe('add favorite', () => {
     }
 
     await expect(listFavorites(env.DB)).resolves.toEqual([])
-    await expect(env.ICONS.list()).resolves.toMatchObject({ objects: [] })
-  })
-
-  it('cleans up an uploaded object when favorite creation fails', async () => {
-    await createFavorite(env.DB, {
-      title: 'Existing',
-      url: 'https://custom-icon.example',
-      iconMode: 'fallback',
-    })
-
-    const response = await adminRequest('/admin/favorites', {
-      body: customIconForm(),
-      method: 'POST',
-    })
-
-    expect(response.status).toBe(422)
-    expect(await response.text()).toContain(
-      'This address is already in Favorites.',
-    )
     await expect(env.ICONS.list()).resolves.toMatchObject({ objects: [] })
   })
 

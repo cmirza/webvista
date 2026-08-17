@@ -217,4 +217,56 @@ describe('storage failure states', () => {
     await expect(listFavorites(env.DB)).resolves.toEqual([])
     await expect(env.ICONS.list()).resolves.toMatchObject({ objects: [] })
   })
+
+  it('cleans up a replacement upload and preserves the old one when a D1 update fails', async () => {
+    const oldKey = await storeCustomIcon(
+      env.ICONS,
+      new File([pngBytes], 'old.png', { type: 'image/png' }),
+    )
+    const favorite = await createFavorite(env.DB, {
+      title: 'Existing upload',
+      url: 'https://existing-upload.example',
+      iconMode: 'upload',
+      iconStorageKey: oldKey,
+    })
+    const failingDb = {
+      prepare: (query: string) => {
+        if (/UPDATE\s+favorites/i.test(query)) {
+          return {
+            bind: () => ({
+              first: async () => {
+                throw new Error('Simulated D1 update failure')
+              },
+            }),
+          }
+        }
+
+        return env.DB.prepare(query)
+      },
+    } as unknown as D1Database
+    const form = new FormData()
+    form.set('title', favorite.title)
+    form.set('url', favorite.url)
+    form.set('iconMode', 'upload')
+    form.set('automaticIconAction', 'refresh')
+    form.set('enabled', '1')
+    form.set(
+      'iconFile',
+      new File([pngBytes], 'replacement.png', { type: 'image/png' }),
+    )
+
+    const response = await adminRequest(
+      bindings({ DB: failingDb }),
+      `/admin/favorites/${favorite.id}`,
+      { body: form, method: 'POST' },
+    )
+
+    expect(response.status).toBe(503)
+    await expect(getFavorite(env.DB, favorite.id)).resolves.toMatchObject({
+      iconStorageKey: oldKey,
+    })
+    await expect(env.ICONS.list()).resolves.toMatchObject({
+      objects: [{ key: oldKey }],
+    })
+  })
 })
