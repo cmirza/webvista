@@ -14,7 +14,7 @@ async function renderAdminHeader(): Promise<HtmlEscapedString> {
     <header class="flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-base-100 p-6 shadow-sm">
       <div>
         <p class="text-sm font-semibold tracking-[0.16em] text-primary uppercase">WebVista</p>
-        <h1 class="mt-1 text-3xl font-semibold tracking-tight">WebVista Admin</h1>
+        <h1 class="mt-1 text-3xl font-semibold tracking-tight">Admin Panel</h1>
       </div>
       <div class="flex items-center gap-2">
         <a class="btn btn-ghost rounded-xl" href="/">View Portal</a>

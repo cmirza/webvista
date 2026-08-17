@@ -79,7 +79,7 @@ describe('admin authentication', () => {
     expect(adminResponse.headers.get('cache-control')).toBe('no-store')
     expect(body).toContain('<title>Admin · WebVista</title>')
     expect(body).toContain('action="/admin/logout"')
-    expect(body).toContain('WebVista Admin')
+    expect(body).toContain('Admin Panel')
     expect(body).toContain('Favorites')
   })
 

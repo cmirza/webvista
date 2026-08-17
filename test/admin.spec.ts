@@ -30,7 +30,7 @@ describe('admin dashboard', () => {
 
     expect(response.status).toBe(200)
     expect(response.headers.get('cache-control')).toBe('no-store')
-    expect(body).toContain('<h1 class="mt-1 text-3xl font-semibold tracking-tight">WebVista Admin</h1>')
+    expect(body).toContain('<h1 class="mt-1 text-3xl font-semibold tracking-tight">Admin Panel</h1>')
     expect(body).toContain('aria-label="0 favorites"')
     expect(body).toContain('No favorites yet')
     expect(body).toContain('Add Site')

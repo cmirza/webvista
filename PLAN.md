@@ -9,7 +9,7 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 - Active milestone: **v1.0 — Favorites MVP**
 - Implementation status: **In progress**
 - Current phase: **End-to-end quality pass**
-- Next task: **Verify the complete HTMX admin workflow**
+- Next task: **Audit every write route for authentication enforcement**
 
 ## Core principles
 
@@ -208,7 +208,7 @@ CREATE TABLE favorites (
 ### 8. Admin dashboard
 
 - [x] Implement authenticated `GET /admin`.
-- [x] Add a simple header with “WebVista Admin,” a View Portal link, and logout action.
+- [x] Add a simple header with a WebVista eyebrow, “Admin Panel,” a View Portal link, and logout action.
 - [x] Render favorites as ordered rows with drag handle, icon, name, hostname, edit, and delete actions.
   - [x] Keep controls disabled until their corresponding mutation workflows are implemented.
 - [x] Add a clear Add Site action and sorting instructions.
@@ -314,7 +314,7 @@ GET    /admin/favorites/icon-preview
 - [x] Seed or create at least 12 representative favorites for local testing.
 - [x] Verify portal behavior with JavaScript disabled.
   - [x] Keep the public portal response free of scripts and verify search/favorite navigation uses ordinary HTML.
-- [ ] Verify add, edit, delete, icon preview/upload, enable/disable, logout, and reorder flows with HTMX enabled.
+- [x] Verify add, edit, delete, icon preview/upload, enable/disable, logout, and reorder flows with HTMX enabled.
 - [ ] Verify all write routes reject unauthenticated requests.
 - [ ] Check keyboard navigation, focus order, labels, alternative text, contrast, and touch target sizes.
 - [ ] Check external metadata failure and R2/D1 failure states.
@@ -342,8 +342,8 @@ GET    /admin/favorites/icon-preview
 - [ ] Google search works.
 - [ ] Portal comfortably displays at least 12 favorites.
 - [ ] Favorites have large high-resolution icons.
-- [ ] Custom icons can replace bad automatic icons.
-- [ ] Admin can add a favorite.
+- [x] Custom icons can replace bad automatic icons.
+- [x] Admin can add a favorite.
 - [x] Admin can edit a favorite.
 - [x] Admin can delete a favorite.
 - [x] Admin can drag favorites into a new order.
