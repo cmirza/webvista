@@ -45,7 +45,7 @@ export async function renderEditFavoriteForm({
     >
       <div class="flex items-start justify-between gap-4">
         <div>
-          <p class="text-sm font-semibold tracking-[0.16em] text-primary uppercase">Favorites</p>
+          <p class="brand-eyebrow text-sm font-semibold tracking-[0.16em] uppercase">Favorites</p>
           <h2 class="mt-1 text-2xl font-semibold tracking-tight">Edit Site</h2>
         </div>
         <a class="btn btn-ghost btn-sm rounded-lg" href="/admin">Cancel</a>
@@ -68,7 +68,7 @@ export async function renderEditFavoriteForm({
           : ''}
         <div class="form-control">
           <label class="label" for="favorite-title">
-            <span class="label-text font-semibold">Display name</span>
+            <span class="label-text font-semibold text-base-content">Display name</span>
           </label>
           <input
             class="input input-bordered w-full rounded-xl ${errors.title ? 'input-error' : ''}"
@@ -82,12 +82,12 @@ export async function renderEditFavoriteForm({
             required
           />
           ${errors.title
-            ? html`<p class="mt-2 text-sm text-error" id="favorite-title-error">${errors.title}</p>`
+            ? html`<p class="critical-text mt-2 text-sm" id="favorite-title-error">${errors.title}</p>`
             : ''}
         </div>
         <div class="form-control">
           <label class="label" for="favorite-url">
-            <span class="label-text font-semibold">Web address</span>
+            <span class="label-text font-semibold text-base-content">Web address</span>
           </label>
           <input
             class="input input-bordered w-full rounded-xl ${errors.url ? 'input-error' : ''}"
@@ -101,15 +101,15 @@ export async function renderEditFavoriteForm({
             required
           />
           ${errors.url
-            ? html`<p class="mt-2 text-sm text-error" id="favorite-url-error">${errors.url}</p>`
-            : html`<p class="mt-2 text-sm text-base-content/55" id="favorite-url-help">
+            ? html`<p class="critical-text mt-2 text-sm" id="favorite-url-error">${errors.url}</p>`
+            : html`<p class="mt-2 text-sm text-base-content/75" id="favorite-url-help">
                 If this changes, choose whether to keep or refresh the automatic icon below.
               </p>`}
         </div>
         <label class="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-base-300 p-4">
           <span>
             <span class="block font-medium">Show on portal</span>
-            <span class="mt-1 block text-sm text-base-content/60">
+            <span class="mt-1 block text-sm text-base-content/75">
               Hidden favorites stay in admin but do not appear on the homepage.
             </span>
           </span>
@@ -134,7 +134,7 @@ export async function renderEditFavoriteForm({
               />
               <span>
                 <span class="block font-medium">Automatic</span>
-                <span class="mt-1 block text-sm text-base-content/60">
+                <span class="mt-1 block text-sm text-base-content/75">
                   Use an icon supplied by the website.
                 </span>
               </span>
@@ -162,7 +162,7 @@ export async function renderEditFavoriteForm({
               </label>
             </div>
             ${errors.automaticIconAction
-              ? html`<p class="mt-3 text-sm text-error">${errors.automaticIconAction}</p>`
+              ? html`<p class="critical-text mt-3 text-sm">${errors.automaticIconAction}</p>`
               : ''}
           </div>
           <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-base-300 p-4">
@@ -175,7 +175,7 @@ export async function renderEditFavoriteForm({
             />
             <span>
               <span class="block font-medium">Generated fallback</span>
-              <span class="mt-1 block text-sm text-base-content/60">
+              <span class="mt-1 block text-sm text-base-content/75">
                 Use a simple initial-based icon.
               </span>
             </span>
@@ -190,7 +190,7 @@ export async function renderEditFavoriteForm({
             />
             <span class="min-w-0 flex-1">
               <span class="block font-medium">Custom upload</span>
-              <span class="mt-1 block text-sm text-base-content/60">
+              <span class="mt-1 block text-sm text-base-content/75">
                 ${favorite.iconMode === 'upload'
                   ? 'Leave empty to keep the current upload, or choose a replacement.'
                   : 'Choose a PNG, JPEG, or WebP image up to 2 MB.'}
@@ -206,17 +206,17 @@ export async function renderEditFavoriteForm({
             </span>
           </label>
           ${errors.iconFile
-            ? html`<p class="text-sm text-error" id="favorite-icon-file-error">${errors.iconFile}</p>`
+            ? html`<p class="critical-text text-sm" id="favorite-icon-file-error">${errors.iconFile}</p>`
             : ''}
           ${errors.iconMode
-            ? html`<p class="text-sm text-error" id="favorite-icon-mode-error">${errors.iconMode}</p>`
+            ? html`<p class="critical-text text-sm" id="favorite-icon-mode-error">${errors.iconMode}</p>`
             : ''}
         </fieldset>
         <div class="rounded-2xl bg-base-200 p-4">
           <h3 class="font-semibold">Current icon</h3>
           <div class="mt-4 flex items-center gap-4">
             ${await renderFavoriteIcon(favorite, 'admin')}
-            <p class="text-sm text-base-content/60">
+            <p class="text-sm text-base-content/75">
               Preview a newly discovered or selected icon below before saving.
             </p>
           </div>
@@ -225,7 +225,7 @@ export async function renderEditFavoriteForm({
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h3 class="font-semibold">New icon preview</h3>
-              <p class="mt-1 text-sm text-base-content/60">
+              <p class="mt-1 text-sm text-base-content/75">
                 Automatic discovery runs again only when refresh is selected.
               </p>
             </div>
@@ -242,7 +242,7 @@ export async function renderEditFavoriteForm({
             </button>
           </div>
           <div class="mt-4" id="favorite-icon-preview" aria-live="polite">
-            <p class="text-sm text-base-content/55">No replacement preview selected.</p>
+            <p class="text-sm text-base-content/75">No replacement preview selected.</p>
           </div>
           <span class="loading loading-spinner loading-sm htmx-indicator mt-3" id="favorite-preview-loading">
             <span class="sr-only">Loading preview</span>

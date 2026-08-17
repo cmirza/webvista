@@ -77,6 +77,8 @@ describe('add favorite', () => {
     expect(page).toContain('action="/admin/favorites"')
     expect(page).toContain('name="title"')
     expect(page).toContain('name="url"')
+    expect(page).toContain('label-text font-semibold text-base-content')
+    expect(page).not.toMatch(/text-base-content\/(45|50|55|60)/)
     expect(page).toContain('value="auto"')
     expect(page).toContain('value="fallback"')
     expect(page).toContain('enctype="multipart/form-data"')

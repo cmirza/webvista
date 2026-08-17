@@ -38,7 +38,7 @@ export async function renderAdminFavoriteRow(
             ? ''
             : html`<span class="badge badge-ghost badge-sm">Hidden</span>`}
         </div>
-        <p class="truncate text-sm text-base-content/60">${hostnameFor(favorite.url)}</p>
+        <p class="truncate text-sm text-base-content/75">${hostnameFor(favorite.url)}</p>
       </div>
       <div class="admin-row-actions" aria-label="Actions for ${favorite.title}">
         <button
@@ -69,7 +69,7 @@ export async function renderAdminFavoriteRow(
           Edit
         </a>
         <a
-          class="btn btn-ghost btn-sm rounded-lg text-error"
+          class="critical-text btn btn-ghost btn-sm rounded-lg"
           href="/admin/favorites/${favorite.id}/delete"
           hx-get="/admin/favorites/${favorite.id}/delete"
           hx-target="#admin-workspace"

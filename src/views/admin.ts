@@ -13,7 +13,7 @@ async function renderAdminHeader(): Promise<HtmlEscapedString> {
   return html`
     <header class="flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-base-100 p-6 shadow-sm">
       <div>
-        <p class="text-sm font-semibold tracking-[0.16em] text-primary uppercase">WebVista</p>
+        <p class="brand-eyebrow text-sm font-semibold tracking-[0.16em] uppercase">WebVista</p>
         <h1 class="mt-1 text-3xl font-semibold tracking-tight">Admin Panel</h1>
       </div>
       <div class="flex items-center gap-2">
@@ -33,7 +33,7 @@ export async function renderAdminLogin({
   const content = await html`
     <main class="grid min-h-screen place-items-center px-6 py-12">
       <section class="w-full max-w-md rounded-3xl bg-base-100 p-8 shadow-sm sm:p-10">
-        <p class="mb-3 text-sm font-semibold tracking-[0.16em] text-primary uppercase">
+        <p class="brand-eyebrow mb-3 text-sm font-semibold tracking-[0.16em] uppercase">
           WebVista Admin
         </p>
         <h1 class="text-3xl font-semibold tracking-tight">Sign in</h1>
@@ -46,7 +46,7 @@ export async function renderAdminLogin({
                 ? html`<div class="alert alert-error" role="alert">${error}</div>`
                 : ''}
               <label class="form-control block">
-                <span class="label-text mb-2 block font-semibold">Password</span>
+                <span class="label-text mb-2 block font-semibold text-base-content">Password</span>
                 <input
                   class="input input-bordered input-lg w-full rounded-xl"
                   type="password"
@@ -97,7 +97,7 @@ export async function renderAdminDashboard(
                 ${favorites.length}
               </span>
             </div>
-            <p class="mt-1 text-sm text-base-content/60">
+            <p class="mt-1 text-sm text-base-content/75">
               These sites appear on the portal in this order.
             </p>
           </div>
@@ -125,13 +125,13 @@ export async function renderAdminDashboard(
               id="admin-empty-state"
             >
               <h3 class="font-semibold">No favorites yet</h3>
-              <p class="mt-2 text-sm text-base-content/60">
+              <p class="mt-2 text-sm text-base-content/75">
                 Add a site to place it on the portal.
               </p>
             </div>`
           : ''}
         <p
-          class="px-2 pt-5 text-center text-sm text-base-content/55"
+          class="px-2 pt-5 text-center text-sm text-base-content/75"
           id="favorites-order-status"
           role="status"
           aria-live="polite"

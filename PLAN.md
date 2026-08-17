@@ -317,9 +317,12 @@ GET    /admin/favorites/icon-preview
 - [x] Verify add, edit, delete, icon preview/upload, enable/disable, logout, and reorder flows with HTMX enabled.
 - [x] Verify all write routes reject unauthenticated requests.
   - [x] Enumerate logout, add, update, reorder, and both delete routes in unauthorized and cross-origin tests.
-- [ ] Check keyboard navigation, focus order, labels, alternative text, contrast, and touch target sizes.
+- [x] Check keyboard navigation, focus order, labels, alternative text, contrast, and touch target sizes.
+  - [x] Verify rendered landmark/heading structure, accessible names, image alternatives, keyboard order, and minimum 24px targets on the portal and admin dashboard.
+  - [x] Raise small brand, muted, placeholder, and destructive-action text to WCAG AA contrast while retaining the Nord theme.
+  - [x] Verify visible focus indicators on portal search, favorite links, and admin controls.
 - [ ] Check external metadata failure and R2/D1 failure states.
-- [ ] Run typechecking, automated tests, and production build successfully.
+- [x] Run typechecking, automated tests, and production build successfully.
 - [ ] Perform visual checks at the priority widths and polish the Nord Light portal.
 - [ ] Confirm no v1.1+ feature or unnecessary abstraction slipped into v1.0.
 
@@ -463,6 +466,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-16 — Favorite editing:** Keep an existing automatic icon unless refresh is explicitly selected, validate and store replacement uploads before changing D1, delete a failed replacement object when D1 rejects the update, and remove the previous upload only after a successful update.
 - **2026-08-16 — Favorite deletion:** Require an explicit server-validated confirmation, use `DELETE` for the HTMX flow and confirmed `POST` as the no-JavaScript fallback, remove D1 data before its R2 object, and report an R2 cleanup failure without implying that the favorite still exists.
 - **2026-08-16 — Favorite ordering:** Send the complete favorite ID order as authenticated same-origin JSON, persist it through the existing transactional D1 batch, reload the authoritative stored order after client failure, and provide Move up/Move down controls as a keyboard-accessible alternative to dragging.
+- **2026-08-16 — Accessible Nord contrast:** Keep the Google-style search hint decorative with a separate accessible input label, derive darker brand and critical-text colors from theme variables, render functional muted text at 75% base-content opacity, and keep primary-button hover backgrounds light enough for WCAG AA text contrast.
 
 ## Deferred ideas
 

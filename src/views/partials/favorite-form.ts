@@ -34,7 +34,7 @@ async function renderTitleInput(
     ${oob ? html`hx-swap-oob="outerHTML"` : ''}
   >
     <label class="label" for="favorite-title">
-      <span class="label-text font-semibold">Display name</span>
+      <span class="label-text font-semibold text-base-content">Display name</span>
     </label>
     <input
       class="input input-bordered w-full rounded-xl ${error ? 'input-error' : ''}"
@@ -48,7 +48,7 @@ async function renderTitleInput(
       required
     />
     ${error
-      ? html`<p class="mt-2 text-sm text-error" id="favorite-title-error">${error}</p>`
+      ? html`<p class="critical-text mt-2 text-sm" id="favorite-title-error">${error}</p>`
       : ''}
   </div>`
 }
@@ -68,7 +68,7 @@ export async function renderAddFavoriteForm({
     >
       <div class="flex items-start justify-between gap-4">
         <div>
-          <p class="text-sm font-semibold tracking-[0.16em] text-primary uppercase">Favorites</p>
+          <p class="brand-eyebrow text-sm font-semibold tracking-[0.16em] uppercase">Favorites</p>
           <h2 class="mt-1 text-2xl font-semibold tracking-tight">Add Site</h2>
         </div>
         <a class="btn btn-ghost btn-sm rounded-lg" href="/admin">Cancel</a>
@@ -92,7 +92,7 @@ export async function renderAddFavoriteForm({
         ${await renderTitleInput(values.title, errors.title)}
         <div class="form-control">
           <label class="label" for="favorite-url">
-            <span class="label-text font-semibold">Web address</span>
+            <span class="label-text font-semibold text-base-content">Web address</span>
           </label>
           <input
             class="input input-bordered w-full rounded-xl ${errors.url ? 'input-error' : ''}"
@@ -107,8 +107,8 @@ export async function renderAddFavoriteForm({
             required
           />
           ${errors.url
-            ? html`<p class="mt-2 text-sm text-error" id="favorite-url-error">${errors.url}</p>`
-            : html`<p class="mt-2 text-sm text-base-content/55" id="favorite-url-help">
+            ? html`<p class="critical-text mt-2 text-sm" id="favorite-url-error">${errors.url}</p>`
+            : html`<p class="mt-2 text-sm text-base-content/75" id="favorite-url-help">
                 Include https:// or http://.
               </p>`}
         </div>
@@ -124,7 +124,7 @@ export async function renderAddFavoriteForm({
             />
             <span>
               <span class="block font-medium">Automatic</span>
-              <span class="mt-1 block text-sm text-base-content/60">
+              <span class="mt-1 block text-sm text-base-content/75">
                 Find the best icon supplied by the website.
               </span>
             </span>
@@ -139,7 +139,7 @@ export async function renderAddFavoriteForm({
             />
             <span>
               <span class="block font-medium">Generated fallback</span>
-              <span class="mt-1 block text-sm text-base-content/60">
+              <span class="mt-1 block text-sm text-base-content/75">
                 Use a simple initial-based icon.
               </span>
             </span>
@@ -154,7 +154,7 @@ export async function renderAddFavoriteForm({
             />
             <span class="min-w-0 flex-1">
               <span class="block font-medium">Custom upload</span>
-              <span class="mt-1 block text-sm text-base-content/60">
+              <span class="mt-1 block text-sm text-base-content/75">
                 Upload a PNG, JPEG, or WebP image up to 2 MB.
               </span>
               <input
@@ -168,12 +168,12 @@ export async function renderAddFavoriteForm({
             </span>
           </label>
           ${errors.iconFile
-            ? html`<p class="text-sm text-error" id="favorite-icon-file-error">
+            ? html`<p class="critical-text text-sm" id="favorite-icon-file-error">
                 ${errors.iconFile}
               </p>`
             : ''}
           ${errors.iconMode
-            ? html`<p class="text-sm text-error" id="favorite-icon-mode-error">
+            ? html`<p class="critical-text text-sm" id="favorite-icon-mode-error">
                 ${errors.iconMode}
               </p>`
             : ''}
@@ -182,7 +182,7 @@ export async function renderAddFavoriteForm({
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h3 class="font-semibold">Icon preview</h3>
-              <p class="mt-1 text-sm text-base-content/60">
+              <p class="mt-1 text-sm text-base-content/75">
                 Previewing is optional; automatic discovery also runs when you save.
               </p>
             </div>
@@ -199,7 +199,7 @@ export async function renderAddFavoriteForm({
             </button>
           </div>
           <div class="mt-4" id="favorite-icon-preview" aria-live="polite">
-            <p class="text-sm text-base-content/55">Enter a web address, then preview its icon.</p>
+            <p class="text-sm text-base-content/75">Enter a web address, then preview its icon.</p>
           </div>
           <span class="loading loading-spinner loading-sm htmx-indicator mt-3" id="favorite-preview-loading">
             <span class="sr-only">Loading preview</span>
@@ -257,13 +257,13 @@ export async function renderFavoriteIconPreview(
       ${await renderFavoriteIcon(previewFavorite, 'admin')}
       <div class="min-w-0">
         <p class="truncate font-semibold">${title}</p>
-        <p class="mt-1 text-sm text-base-content/60">
+        <p class="mt-1 text-sm text-base-content/75">
           ${metadata.icon
             ? `Found a ${metadata.icon.source.replaceAll('-', ' ')}.`
             : 'No suitable site icon was found; a generated fallback will be used.'}
         </p>
         ${values.title.trim() && suggestedTitle && values.title.trim() !== suggestedTitle
-          ? html`<p class="mt-1 text-sm text-base-content/55">
+          ? html`<p class="mt-1 text-sm text-base-content/75">
               Suggested name: ${suggestedTitle}. Your display name will be kept.
             </p>`
           : ''}

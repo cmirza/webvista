@@ -13,13 +13,13 @@ export async function renderDeleteFavoriteConfirmation(
       id="favorite-delete-shell"
       data-favorite-delete-shell
     >
-      <p class="text-sm font-semibold tracking-[0.16em] text-error uppercase">Favorites</p>
+      <p class="critical-text text-sm font-semibold tracking-[0.16em] uppercase">Favorites</p>
       <h2 class="mt-1 text-2xl font-semibold tracking-tight">Remove Favorite?</h2>
       <div class="mt-6 flex items-center gap-4 rounded-2xl bg-base-200 p-4">
         ${await renderFavoriteIcon(favorite, 'admin')}
         <div class="min-w-0">
           <p class="truncate font-semibold">${favorite.title}</p>
-          <p class="mt-1 truncate text-sm text-base-content/60">${favorite.url}</p>
+          <p class="mt-1 truncate text-sm text-base-content/75">${favorite.url}</p>
         </div>
       </div>
       <p class="mt-5 text-base-content/75">
@@ -87,7 +87,7 @@ export async function renderDeleteFavoriteSuccess(
           hx-swap-oob="afterend:#admin-favorites-list"
         >
           <h3 class="font-semibold">No favorites yet</h3>
-          <p class="mt-2 text-sm text-base-content/60">
+          <p class="mt-2 text-sm text-base-content/75">
             Add a site to place it on the portal.
           </p>
         </div>`

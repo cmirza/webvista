@@ -29,6 +29,14 @@
 }
 
 @layer components {
+  .brand-eyebrow {
+    color: color-mix(in oklab, var(--color-primary) 45%, var(--color-base-content));
+  }
+
+  .critical-text {
+    color: color-mix(in oklab, var(--color-error) 50%, var(--color-base-content));
+  }
+
   .favorites-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr));
@@ -186,4 +194,9 @@
       transform: none;
     }
   }
+}
+
+.btn.btn-primary:hover {
+  --btn-bg: color-mix(in oklab, var(--color-primary) 90%, var(--color-base-100));
+  background-color: color-mix(in oklab, var(--color-primary) 90%, var(--color-base-100));
 }

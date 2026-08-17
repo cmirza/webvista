@@ -53,16 +53,16 @@ const showOrderStatus = (message, tone = 'neutral') => {
   window.clearTimeout(orderStatusTimer)
   orderStatus.textContent = message
   orderStatus.classList.remove(
-    'text-base-content/55',
+    'text-base-content/75',
     'text-success',
-    'text-error',
+    'critical-text',
   )
   orderStatus.classList.add(
     tone === 'success'
       ? 'text-success'
       : tone === 'error'
-        ? 'text-error'
-        : 'text-base-content/55',
+        ? 'critical-text'
+        : 'text-base-content/75',
   )
 
   if (tone === 'success') {
@@ -184,7 +184,7 @@ const showUploadPreview = (input) => {
   name.textContent = file.name
   name.title = file.name
   const detail = document.createElement('p')
-  detail.className = 'mt-1 text-sm text-base-content/60'
+  detail.className = 'mt-1 text-sm text-base-content/75'
   detail.textContent =
     input.form?.dataset.favoriteFormAction === 'edit'
       ? 'This image will replace the current icon when you save changes.'
