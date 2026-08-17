@@ -7,9 +7,9 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 ## Status
 
 - Active milestone: **v1.0 — Favorites MVP**
-- Implementation status: **In progress**
-- Current phase: **End-to-end quality pass**
-- Next task: **Audit keyboard navigation, labels, focus, contrast, and touch targets**
+- Implementation status: **Ready for deployment**
+- Current phase: **Cloudflare deployment**
+- Next task: **Create and bind the production Cloudflare resources**
 
 ## Core principles
 
@@ -52,7 +52,7 @@ Planned stack:
 - Styling: Tailwind CSS and daisyUI
 - Theme: customized Nord Light
 - Database: Cloudflare D1
-- File storage: Cloudflare R2 when uploads are introduced
+- File storage: Cloudflare R2 for uploaded custom icons
 - Sorting: SortableJS
 - Authentication: one admin password with a signed session cookie
 
@@ -155,7 +155,7 @@ CREATE TABLE favorites (
 ### 4. Public portal
 
 - [x] Implement `GET /` as server-rendered HTML.
-- [ ] Add a friendly, time-appropriate greeting.
+- [x] Use a friendly, neutral static introduction without personalized or timezone-dependent copy.
 - [x] Add prominent Google search above Favorites.
   - [x] Submit with `GET https://www.google.com/search` and a `q` field.
   - [x] Provide a large search input, clear focus state, and visible submit button.
@@ -334,7 +334,7 @@ GET    /admin/favorites/icon-preview
   - [x] Use four favorite columns across typical half-screen and tablet widths while retaining eight wide, three narrow, and two basic-mobile columns.
   - [x] Hide Automatic-only edit choices when Generated fallback or Custom upload is selected.
   - [x] Verify the portal, dashboard, add form, and edit form have no horizontal overflow at the priority widths.
-- [ ] Confirm no v1.1+ feature or unnecessary abstraction slipped into v1.0.
+- [x] Confirm no v1.1+ feature or unnecessary abstraction slipped into v1.0.
 
 ### 15. Cloudflare deployment
 
@@ -353,17 +353,17 @@ GET    /admin/favorites/icon-preview
 
 - [ ] Portal is deployed publicly.
 - [x] Admin area requires authentication.
-- [ ] Google search works.
-- [ ] Portal comfortably displays at least 12 favorites.
-- [ ] Favorites have large high-resolution icons.
+- [x] Google search works.
+- [x] Portal comfortably displays at least 12 favorites.
+- [x] Favorites have large high-resolution icons.
 - [x] Custom icons can replace bad automatic icons.
 - [x] Admin can add a favorite.
 - [x] Admin can edit a favorite.
 - [x] Admin can delete a favorite.
 - [x] Admin can drag favorites into a new order.
 - [x] Portal reflects that order.
-- [ ] Layout reflows cleanly in a split-screen browser window.
-- [ ] Nord Light theme is polished enough for daily use.
+- [x] Layout reflows cleanly in a split-screen browser window.
+- [x] Nord Light theme is polished enough for daily use.
 - [ ] A first-time user can use the portal without needing an explanation.
 
 After deployment, stop feature development long enough to determine whether WebVista sees real everyday use. That usage determines whether v1.1 is worth building.
@@ -480,6 +480,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-16 — Contextual icon previews:** In the edit form, show web-address preview controls only while Automatic mode is selected and render replacement-file previews inside the Custom upload option so each preview stays attached to the choice it affects.
 - **2026-08-16 — Storage failure semantics:** Render generic no-store 503 pages without internal error details for unexpected D1 failures, use mutation `RETURNING` results and pre-write counts to avoid ambiguous post-write failures, treat R2 deletion as best-effort cleanup after a successful D1 mutation, and surface persistent warnings when that cleanup fails.
 - **2026-08-16 — Responsive grid:** Keep the automatic wide/narrow/mobile grid, but use four explicit equal columns from 768px through 1280px so typical tablet and split-screen windows retain the intended large, obvious favorite targets.
+- **2026-08-16 — v1.0 scope freeze:** Keep the public introduction neutral and static so it needs neither personalization nor timezone configuration; ship only search, favorites, icon handling, and their authenticated administration in v1.0, with later roadmap integrations remaining documentation-only until usage is evaluated.
 
 ## Deferred ideas
 

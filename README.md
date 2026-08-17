@@ -20,7 +20,7 @@ The first release has one job: determine whether the portal earns a place in eve
 - Server-rendered HTML with HTMX
 - Tailwind CSS and daisyUI using a customized light Nord theme
 - Cloudflare D1 for structured data
-- Cloudflare R2 when uploaded assets are introduced
+- Cloudflare R2 for uploaded custom icons
 - SortableJS for admin ordering
 - A single password-protected admin session
 
@@ -58,6 +58,6 @@ The asset build compiles `src/styles/app.css` with Tailwind CSS and daisyUI, the
 
 ## Project status
 
-The server-rendered portal is runnable locally with Google search, a responsive D1-backed favorites grid, and a single-password authenticated admin area. The admin can add, edit, remove, and reorder validated favorites through normal HTML or an HTMX-enhanced dashboard flow, including automatic metadata/icon discovery, generated fallbacks, enabled/hidden state, custom icon uploads backed by R2, and keyboard-accessible ordering controls. The project is now in its end-to-end v1.0 quality pass. See [PLAN.md](PLAN.md) for the active checklist, roadmap, decisions, and definition of done.
+The server-rendered portal is runnable locally with Google search, a responsive D1-backed favorites grid, and a single-password authenticated admin area. The admin can add, edit, remove, and reorder validated favorites through normal HTML or an HTMX-enhanced dashboard flow, including automatic metadata/icon discovery, generated fallbacks, enabled/hidden state, custom icon uploads backed by R2, and keyboard-accessible ordering controls. The local v1.0 implementation is complete and ready for Cloudflare deployment. See [PLAN.md](PLAN.md) for the active checklist, roadmap, decisions, and definition of done.
 
 Contributors and coding agents must read [AGENTS.md](AGENTS.md) before changing the project.
