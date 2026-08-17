@@ -9,7 +9,7 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 - Active milestone: **v1.0 — Favorites MVP**
 - Implementation status: **In progress**
 - Current phase: **End-to-end quality pass**
-- Next task: **Audit every write route for authentication enforcement**
+- Next task: **Audit keyboard navigation, labels, focus, contrast, and touch targets**
 
 ## Core principles
 
@@ -315,7 +315,8 @@ GET    /admin/favorites/icon-preview
 - [x] Verify portal behavior with JavaScript disabled.
   - [x] Keep the public portal response free of scripts and verify search/favorite navigation uses ordinary HTML.
 - [x] Verify add, edit, delete, icon preview/upload, enable/disable, logout, and reorder flows with HTMX enabled.
-- [ ] Verify all write routes reject unauthenticated requests.
+- [x] Verify all write routes reject unauthenticated requests.
+  - [x] Enumerate logout, add, update, reorder, and both delete routes in unauthorized and cross-origin tests.
 - [ ] Check keyboard navigation, focus order, labels, alternative text, contrast, and touch target sizes.
 - [ ] Check external metadata failure and R2/D1 failure states.
 - [ ] Run typechecking, automated tests, and production build successfully.
@@ -338,7 +339,7 @@ GET    /admin/favorites/icon-preview
 ## v1.0 definition of done
 
 - [ ] Portal is deployed publicly.
-- [ ] Admin area requires authentication.
+- [x] Admin area requires authentication.
 - [ ] Google search works.
 - [ ] Portal comfortably displays at least 12 favorites.
 - [ ] Favorites have large high-resolution icons.

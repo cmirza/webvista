@@ -7,6 +7,11 @@ import {
   isSessionValueValid,
   passwordsMatch,
 } from '../src/middleware/auth'
+import {
+  createFavorite,
+  getFavorite,
+  listFavorites,
+} from '../src/services/favorites'
 
 const origin = 'https://webvista.test'
 
@@ -142,23 +147,41 @@ describe('admin authentication', () => {
     expect(setCookie).toContain('SameSite=Strict')
   })
 
-  it('rejects unauthorized and cross-origin admin writes', async () => {
-    const unauthorized = await workerExports.default.fetch(
-      new Request(`${origin}/admin/favorites/reorder`, {
-        headers: { Origin: origin },
-        method: 'POST',
-      }),
-    )
-    expect(unauthorized.status).toBe(401)
-
+  it('rejects every unauthorized and cross-origin admin write', async () => {
+    const favorite = await createFavorite(env.DB, {
+      title: 'Protected Favorite',
+      url: 'https://protected.example',
+    })
     const cookie = await login()
-    const crossOrigin = await workerExports.default.fetch(
-      new Request(`${origin}/admin/favorites/reorder`, {
-        headers: { Cookie: cookie, Origin: 'https://attacker.example' },
-        method: 'POST',
-      }),
-    )
-    expect(crossOrigin.status).toBe(403)
+    const writeRoutes = [
+      { method: 'POST', path: '/admin/logout' },
+      { method: 'POST', path: '/admin/favorites' },
+      { method: 'POST', path: '/admin/favorites/reorder' },
+      { method: 'POST', path: `/admin/favorites/${favorite.id}` },
+      { method: 'POST', path: `/admin/favorites/${favorite.id}/delete` },
+      { method: 'DELETE', path: `/admin/favorites/${favorite.id}` },
+    ]
+
+    for (const { method, path } of writeRoutes) {
+      const unauthorized = await workerExports.default.fetch(
+        new Request(`${origin}${path}`, {
+          headers: { Origin: origin },
+          method,
+        }),
+      )
+      expect(unauthorized.status, `${method} ${path}`).toBe(401)
+
+      const crossOrigin = await workerExports.default.fetch(
+        new Request(`${origin}${path}`, {
+          headers: { Cookie: cookie, Origin: 'https://attacker.example' },
+          method,
+        }),
+      )
+      expect(crossOrigin.status, `${method} ${path}`).toBe(403)
+    }
+
+    await expect(getFavorite(env.DB, favorite.id)).resolves.toEqual(favorite)
+    await expect(listFavorites(env.DB)).resolves.toEqual([favorite])
   })
 
   it('requires same-origin login submissions', async () => {
