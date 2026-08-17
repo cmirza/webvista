@@ -72,6 +72,7 @@ describe('admin dashboard', () => {
     expect(body).toContain('Remove')
     expect(body).toContain(`/admin/favorites/${first.id}/delete`)
     expect(body).toContain('/assets/sortable.min.js')
+    expect(body).toContain('/assets/htmx.min.js')
     expect(body).toContain(`aria-label="Move Example &amp; Search up"`)
     expect(body).toContain(`aria-label="Move Example &amp; Search down"`)
     expect(body).toContain('Drag a row or use its Move buttons')

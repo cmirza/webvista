@@ -145,6 +145,7 @@ export async function renderAdminDashboard(
   return renderLayout({
     children: content,
     description: 'WebVista administration',
+    htmx: true,
     robots: 'noindex,nofollow',
     scripts: ['/assets/sortable.min.js', '/assets/admin.js'],
     title: 'Admin · WebVista',
@@ -164,6 +165,7 @@ export async function renderAdminAddPage(
   return renderLayout({
     children: content,
     description: 'Add a WebVista favorite',
+    htmx: true,
     robots: 'noindex,nofollow',
     scripts: ['/assets/admin.js'],
     title: 'Add Site · WebVista',
@@ -183,6 +185,7 @@ export async function renderAdminEditPage(
   return renderLayout({
     children: content,
     description: 'Edit a WebVista favorite',
+    htmx: true,
     robots: 'noindex,nofollow',
     scripts: ['/assets/admin.js'],
     title: 'Edit Site · WebVista',
@@ -203,7 +206,6 @@ export async function renderAdminDeletePage(
     children: content,
     description: 'Remove a WebVista favorite',
     robots: 'noindex,nofollow',
-    scripts: ['/assets/admin.js'],
     title: 'Remove Site · WebVista',
   })
 }

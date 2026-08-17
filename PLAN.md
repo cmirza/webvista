@@ -9,7 +9,7 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 - Active milestone: **v1.0 — Favorites MVP**
 - Implementation status: **In progress**
 - Current phase: **End-to-end quality pass**
-- Next task: **Verify portal behavior without JavaScript**
+- Next task: **Verify the complete HTMX admin workflow**
 
 ## Core principles
 
@@ -312,7 +312,8 @@ GET    /admin/favorites/icon-preview
 ### 14. End-to-end quality pass
 
 - [x] Seed or create at least 12 representative favorites for local testing.
-- [ ] Verify portal behavior with JavaScript disabled.
+- [x] Verify portal behavior with JavaScript disabled.
+  - [x] Keep the public portal response free of scripts and verify search/favorite navigation uses ordinary HTML.
 - [ ] Verify add, edit, delete, icon preview/upload, enable/disable, logout, and reorder flows with HTMX enabled.
 - [ ] Verify all write routes reject unauthenticated requests.
 - [ ] Check keyboard navigation, focus order, labels, alternative text, contrast, and touch target sizes.

@@ -4,6 +4,7 @@ import type { HtmlEscapedString } from 'hono/utils/html'
 type LayoutOptions = {
   children: HtmlEscapedString
   description: string
+  htmx?: boolean
   robots?: 'index,follow' | 'noindex,nofollow'
   scripts?: string[]
   title: string
@@ -12,6 +13,7 @@ type LayoutOptions = {
 export async function renderLayout({
   children,
   description,
+  htmx = false,
   robots = 'index,follow',
   scripts = [],
   title,
@@ -27,7 +29,7 @@ export async function renderLayout({
         <meta name="theme-color" content="#eceff4" />
         <title>${title}</title>
         <link rel="stylesheet" href="/assets/app.css" />
-        <script src="/assets/htmx.min.js" defer></script>
+        ${htmx ? html`<script src="/assets/htmx.min.js" defer></script>` : ''}
         ${scripts.map((source) => html`<script src="${source}" defer></script>`)}
       </head>
       <body class="bg-base-200 text-base-content">
