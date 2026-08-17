@@ -10,6 +10,7 @@ public/assets/
 *.tsbuildinfo
 *.log
 worker-configuration.d.ts
+wrangler.production.jsonc
 
 # Local Cloudflare and application secrets
 .dev.vars

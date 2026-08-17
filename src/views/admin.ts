@@ -98,7 +98,7 @@ export async function renderAdminDashboard(
               </span>
             </div>
             <p class="mt-1 text-sm text-base-content/75">
-              These sites appear on the portal in this order.
+              These favorites appear on the portal in this order.
             </p>
           </div>
           <a
@@ -109,7 +109,7 @@ export async function renderAdminDashboard(
             hx-swap="innerHTML show:#admin-workspace:top"
           >
             <span aria-hidden="true">+</span>
-            Add Site
+            Add Favorite
           </a>
         </div>
         <ol
@@ -126,7 +126,7 @@ export async function renderAdminDashboard(
             >
               <h3 class="font-semibold">No favorites yet</h3>
               <p class="mt-2 text-sm text-base-content/75">
-                Add a site to place it on the portal.
+                Add a website or app link to place it on the portal.
               </p>
             </div>`
           : ''}
@@ -168,7 +168,7 @@ export async function renderAdminAddPage(
     htmx: true,
     robots: 'noindex,nofollow',
     scripts: ['/assets/admin.js'],
-    title: 'Add Site · WebVista',
+    title: 'Add Favorite · WebVista',
   })
 }
 
@@ -188,7 +188,7 @@ export async function renderAdminEditPage(
     htmx: true,
     robots: 'noindex,nofollow',
     scripts: ['/assets/admin.js'],
-    title: 'Edit Site · WebVista',
+    title: 'Edit Favorite · WebVista',
   })
 }
 

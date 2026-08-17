@@ -155,8 +155,8 @@ adminRoutes.get('/favorites/icon-preview', async (context) => {
   } catch (error) {
     const message =
       error instanceof FavoriteValidationError
-        ? (error.fieldErrors.url ?? 'Enter a valid web address.')
-        : 'Enter a valid web address.'
+        ? (error.fieldErrors.url ?? 'Enter a valid web or app address.')
+        : 'Enter a valid web or app address.'
     return context.html(await renderFavoritePreviewError(message))
   }
 

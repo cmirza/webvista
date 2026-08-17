@@ -72,7 +72,7 @@ describe('add favorite', () => {
 
     expect(pageResponse.status).toBe(200)
     expect(page).toContain('<!doctype html>')
-    expect(page).toContain('<title>Add Site · WebVista</title>')
+    expect(page).toContain('<title>Add Favorite · WebVista</title>')
     expect(page).toContain('data-favorite-form-action="add"')
     expect(page).toContain('action="/admin/favorites"')
     expect(page).toContain('name="title"')
@@ -155,7 +155,7 @@ describe('add favorite', () => {
     expect(body).toContain('<!doctype html>')
     expect(body).toContain('Enter a display name.')
     expect(body).toContain(
-      'Enter a complete web address beginning with http:// or https://.',
+      'Enter a complete web or app address, such as https://example.com or weather://.',
     )
     expect(body).toContain('value="not-a-url"')
     await expect(listFavorites(env.DB)).resolves.toEqual([])
@@ -197,7 +197,7 @@ describe('add favorite', () => {
     const body = await response.text()
 
     expect(response.status).toBe(422)
-    expect(body).toContain('This web address is already in Favorites.')
+    expect(body).toContain('This address is already in Favorites.')
     expect(body).toContain('value="Duplicate"')
     await expect(listFavorites(env.DB)).resolves.toHaveLength(1)
   })
@@ -216,6 +216,26 @@ describe('add favorite', () => {
     expect(response.status).toBe(303)
     expect(favorite).toMatchObject({
       title: 'Local Router',
+      iconMode: 'auto',
+      iconUrl: null,
+    })
+  })
+
+  it('creates an application link without attempting website-only icon behavior', async () => {
+    const response = await adminRequest('/admin/favorites', {
+      body: new URLSearchParams({
+        title: 'Weather',
+        url: 'weather://',
+        iconMode: 'auto',
+      }),
+      method: 'POST',
+    })
+    const [favorite] = await listFavorites(env.DB)
+
+    expect(response.status).toBe(303)
+    expect(favorite).toMatchObject({
+      title: 'Weather',
+      url: 'weather://',
       iconMode: 'auto',
       iconUrl: null,
     })
@@ -315,7 +335,7 @@ describe('add favorite', () => {
 
     expect(response.status).toBe(422)
     expect(await response.text()).toContain(
-      'This web address is already in Favorites.',
+      'This address is already in Favorites.',
     )
     await expect(env.ICONS.list()).resolves.toMatchObject({ objects: [] })
   })
@@ -348,7 +368,7 @@ describe('add favorite', () => {
 
     expect(invalidResponse.status).toBe(200)
     expect(invalid).toContain(
-      'Enter a complete web address beginning with http:// or https://.',
+      'Enter a complete web or app address, such as https://example.com or weather://.',
     )
     expect(fallbackResponse.status).toBe(200)
     expect(fallback).toContain('data-icon-preview-result')

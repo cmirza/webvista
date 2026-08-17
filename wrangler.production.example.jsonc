@@ -1,0 +1,26 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "webvista",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-15",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "webvista",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "assets": {
+    "directory": "./public"
+  },
+  "r2_buckets": [
+    {
+      "binding": "ICONS",
+      "bucket_name": "webvista-icons"
+    }
+  ],
+  "secrets": {
+    "required": ["ADMIN_PASSWORD", "ADMIN_SESSION_SECRET"]
+  }
+}

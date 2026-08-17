@@ -33,7 +33,7 @@ describe('admin dashboard', () => {
     expect(body).toContain('<h1 class="mt-1 text-3xl font-semibold tracking-tight">Admin Panel</h1>')
     expect(body).toContain('aria-label="0 favorites"')
     expect(body).toContain('No favorites yet')
-    expect(body).toContain('Add Site')
+    expect(body).toContain('Add Favorite')
     expect(body).not.toContain('data-admin-favorite-row')
   })
 

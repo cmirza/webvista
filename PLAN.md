@@ -7,9 +7,9 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 ## Status
 
 - Active milestone: **v1.0 — Favorites MVP**
-- Implementation status: **Ready for deployment**
-- Current phase: **Cloudflare deployment**
-- Next task: **Create and bind the production Cloudflare resources**
+- Implementation status: **Deployed**
+- Current phase: **Production validation checkpoint**
+- Next task: **Complete a user-led production portal and admin walkthrough**
 
 ## Core principles
 
@@ -119,7 +119,8 @@ migrations/
   - [x] Add an index supporting enabled/position queries.
 - [x] Implement favorite list, lookup, create, update, delete, and reorder operations.
   - [x] Restrict `icon_mode` to `auto`, `upload`, or `fallback` at the application boundary.
-  - [x] Normalize HTTP/HTTPS URLs and reject duplicate favorite URLs.
+  - [x] Normalize stored addresses and reject duplicate favorite URLs.
+  - [x] Accept safe application URL schemes such as `weather://` while rejecting browser-executable and internal schemes.
   - [x] Require a complete, duplicate-free ID set before persisting a reorder.
 - [x] Use stable text IDs and UTC ISO-8601 timestamps.
 - [x] Assign default positions in increments of 10 and normalize positions after a complete reorder.
@@ -211,7 +212,7 @@ CREATE TABLE favorites (
 - [x] Add a simple header with a WebVista eyebrow, “Admin Panel,” a View Portal link, and logout action.
 - [x] Render favorites as ordered rows with drag handle, icon, name, hostname, edit, and delete actions.
   - [x] Keep controls disabled until their corresponding mutation workflows are implemented.
-- [x] Add a clear Add Site action and sorting instructions.
+- [x] Add a clear Add Favorite action and sorting instructions.
 - [x] Use standard daisyUI components; do not spend custom-design effort intended for the public portal.
 - [x] Keep the admin usable at narrower widths without implementing the v1.3 mobile-specific workflow.
 - [x] Auto-dismiss successful HTMX add, edit, and delete confirmations without requiring a Done action.
@@ -266,7 +267,7 @@ CREATE TABLE favorites (
   - [x] Show the web-address preview only for Automatic mode and keep custom-upload previews inside the Custom upload option.
 - [x] Return field-level errors without discarding valid input.
 - [x] Replace the admin row with HTMX after a successful update and support a normal redirect fallback.
-- [x] Bring the admin workspace into view when Edit or Add Site is selected from lower on the dashboard.
+- [x] Bring the admin workspace into view when Edit or Add Favorite is selected from lower on the dashboard.
 - [x] Test missing favorite, URL change choices, enable/disable, icon-mode changes, and invalid updates.
   - [x] Verify a failed replacement leaves the prior D1 reference and R2 object intact.
 
@@ -338,20 +339,21 @@ GET    /admin/favorites/icon-preview
 
 ### 15. Cloudflare deployment
 
-- [ ] Create the production Worker configuration.
-- [ ] Create and bind the production D1 database.
-- [ ] Create and bind the production R2 bucket used for custom icons.
-- [ ] Apply production D1 migrations.
-- [ ] Configure the admin password and session-signing value as Cloudflare secrets.
-- [ ] Deploy the Worker over HTTPS.
-- [ ] Add a custom domain only if desired; it is not required for v1.0.
-- [ ] Keep logging minimal and ensure logs never contain credentials or session cookies.
-- [ ] Perform a production smoke test of portal, authentication, CRUD, upload, and reorder behavior.
-- [ ] Record deployment instructions without committing account IDs or secrets.
+- [x] Create the production Worker configuration.
+- [x] Create and bind the production D1 database.
+- [x] Create and bind the production R2 bucket used for custom icons.
+- [x] Apply production D1 migrations.
+- [x] Configure the admin password and session-signing value as Cloudflare secrets.
+- [x] Deploy the Worker over HTTPS.
+- [x] Skip a custom domain for v1.0; the production `workers.dev` URL is sufficient.
+- [x] Keep logging minimal and ensure logs never contain credentials or session cookies.
+- [x] Perform a production smoke test of portal, authentication, CRUD, upload, and reorder behavior.
+  - [x] Add a repeatable production smoke script that removes its temporary favorite and uploaded icon.
+- [x] Record deployment instructions without committing account IDs or secrets.
 
 ## v1.0 definition of done
 
-- [ ] Portal is deployed publicly.
+- [x] Portal is deployed publicly.
 - [x] Admin area requires authentication.
 - [x] Google search works.
 - [x] Portal comfortably displays at least 12 favorites.
@@ -481,6 +483,8 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-16 — Storage failure semantics:** Render generic no-store 503 pages without internal error details for unexpected D1 failures, use mutation `RETURNING` results and pre-write counts to avoid ambiguous post-write failures, treat R2 deletion as best-effort cleanup after a successful D1 mutation, and surface persistent warnings when that cleanup fails.
 - **2026-08-16 — Responsive grid:** Keep the automatic wide/narrow/mobile grid, but use four explicit equal columns from 768px through 1280px so typical tablet and split-screen windows retain the intended large, obvious favorite targets.
 - **2026-08-16 — v1.0 scope freeze:** Keep the public introduction neutral and static so it needs neither personalization nor timezone configuration; ship only search, favorites, icon handling, and their authenticated administration in v1.0, with later roadmap integrations remaining documentation-only until usage is evaluated.
+- **2026-08-16 — Production configuration:** Keep account-specific D1 identifiers in an ignored `wrangler.production.jsonc`, commit a placeholder example, and make the production smoke test remove its own D1 and R2 test data so deployment remains repeatable and repository-safe.
+- **2026-08-16 — Application links:** Allow administrator-authored registered app schemes such as `weather://` and `shortcuts://`, preserve meaningful non-web fragments, and block executable, local-file, browser-internal, and credential-bearing addresses before storage or rendering.
 
 ## Deferred ideas
 

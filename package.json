@@ -18,11 +18,12 @@
     "db:seed:local": "wrangler d1 execute webvista --local --file ./scripts/seed-favorites.sql",
     "db:status:local": "wrangler d1 migrations list webvista --local",
     "db:inspect:local": "wrangler d1 execute webvista --local --command \"SELECT name, type FROM sqlite_schema WHERE type IN ('table', 'index') ORDER BY type, name\"",
-    "deploy": "npm run build:assets && wrangler deploy --minify",
+    "deploy": "npm run build:assets && wrangler deploy --config wrangler.production.jsonc --minify",
     "typegen": "wrangler types --env-interface CloudflareBindings",
     "typecheck": "npm run typegen && tsc --noEmit && tsc --noEmit -p test/tsconfig.json",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "smoke:production": "node ./scripts/smoke-production.mjs"
   },
   "dependencies": {
     "hono": "^4.13.2",

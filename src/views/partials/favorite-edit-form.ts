@@ -46,7 +46,7 @@ export async function renderEditFavoriteForm({
       <div class="flex items-start justify-between gap-4">
         <div>
           <p class="brand-eyebrow text-sm font-semibold tracking-[0.16em] uppercase">Favorites</p>
-          <h2 class="mt-1 text-2xl font-semibold tracking-tight">Edit Site</h2>
+          <h2 class="mt-1 text-2xl font-semibold tracking-tight">Edit Favorite</h2>
         </div>
         <a class="btn btn-ghost btn-sm rounded-lg" href="/admin">Cancel</a>
       </div>
@@ -87,7 +87,7 @@ export async function renderEditFavoriteForm({
         </div>
         <div class="form-control">
           <label class="label" for="favorite-url">
-            <span class="label-text font-semibold text-base-content">Web address</span>
+            <span class="label-text font-semibold text-base-content">Web or app address</span>
           </label>
           <input
             class="input input-bordered w-full rounded-xl ${errors.url ? 'input-error' : ''}"
@@ -103,7 +103,7 @@ export async function renderEditFavoriteForm({
           ${errors.url
             ? html`<p class="critical-text mt-2 text-sm" id="favorite-url-error">${errors.url}</p>`
             : html`<p class="mt-2 text-sm text-base-content/75" id="favorite-url-help">
-                If this changes, choose whether to keep or refresh the automatic icon below.
+                Use a website address or an app link such as weather://. If it changes, review the icon choice below.
               </p>`}
         </div>
         <label class="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-base-300 p-4">
@@ -135,7 +135,7 @@ export async function renderEditFavoriteForm({
               <span>
                 <span class="block font-medium">Automatic</span>
                 <span class="mt-1 block text-sm text-base-content/75">
-                  Use an icon supplied by the website.
+                  Use an icon supplied by a website. App links use a generated fallback.
                 </span>
               </span>
             </label>

@@ -43,6 +43,11 @@ describe('WebVista Worker', () => {
       url: 'https://news.example',
       iconMode: 'fallback',
     })
+    const appLink = await createFavorite(env.DB, {
+      title: 'Weather App',
+      url: 'weather://',
+      iconMode: 'fallback',
+    })
 
     const response = await workerExports.default.fetch('https://webvista.test/')
     const body = await response.text()
@@ -54,6 +59,8 @@ describe('WebVista Worker', () => {
     expect(body).toContain('ES')
     expect(body).toContain(`data-favorite-id="${second.id}"`)
     expect(body).toContain('News &amp; Weather')
+    expect(body).toContain(`data-favorite-id="${appLink.id}"`)
+    expect(body).toContain('href="weather://"')
     expect(body).not.toContain(disabled.id)
     expect(body).not.toContain('target="_blank"')
     expect(body.indexOf(first.id)).toBeLessThan(body.indexOf(second.id))

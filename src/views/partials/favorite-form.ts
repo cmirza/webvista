@@ -69,7 +69,7 @@ export async function renderAddFavoriteForm({
       <div class="flex items-start justify-between gap-4">
         <div>
           <p class="brand-eyebrow text-sm font-semibold tracking-[0.16em] uppercase">Favorites</p>
-          <h2 class="mt-1 text-2xl font-semibold tracking-tight">Add Site</h2>
+          <h2 class="mt-1 text-2xl font-semibold tracking-tight">Add Favorite</h2>
         </div>
         <a class="btn btn-ghost btn-sm rounded-lg" href="/admin">Cancel</a>
       </div>
@@ -92,7 +92,7 @@ export async function renderAddFavoriteForm({
         ${await renderTitleInput(values.title, errors.title)}
         <div class="form-control">
           <label class="label" for="favorite-url">
-            <span class="label-text font-semibold text-base-content">Web address</span>
+            <span class="label-text font-semibold text-base-content">Web or app address</span>
           </label>
           <input
             class="input input-bordered w-full rounded-xl ${errors.url ? 'input-error' : ''}"
@@ -101,7 +101,7 @@ export async function renderAddFavoriteForm({
             name="url"
             value="${values.url}"
             maxlength="2048"
-            placeholder="https://example.com"
+            placeholder="https://example.com or weather://"
             autocomplete="url"
             aria-describedby="${errors.url ? 'favorite-url-error' : 'favorite-url-help'}"
             required
@@ -109,7 +109,7 @@ export async function renderAddFavoriteForm({
           ${errors.url
             ? html`<p class="critical-text mt-2 text-sm" id="favorite-url-error">${errors.url}</p>`
             : html`<p class="mt-2 text-sm text-base-content/75" id="favorite-url-help">
-                Include https:// or http://.
+                Use a website address or an app link such as weather://.
               </p>`}
         </div>
         <fieldset class="space-y-3">
@@ -125,7 +125,7 @@ export async function renderAddFavoriteForm({
             <span>
               <span class="block font-medium">Automatic</span>
               <span class="mt-1 block text-sm text-base-content/75">
-                Find the best icon supplied by the website.
+                Find the best icon supplied by a website. App links use a generated fallback.
               </span>
             </span>
           </label>
@@ -183,7 +183,7 @@ export async function renderAddFavoriteForm({
             <div>
               <h3 class="font-semibold">Icon preview</h3>
               <p class="mt-1 text-sm text-base-content/75">
-                Previewing is optional; automatic discovery also runs when you save.
+                Previewing is optional; automatic website discovery also runs when you save.
               </p>
             </div>
             <button
@@ -199,7 +199,7 @@ export async function renderAddFavoriteForm({
             </button>
           </div>
           <div class="mt-4" id="favorite-icon-preview" aria-live="polite">
-            <p class="text-sm text-base-content/75">Enter a web address, then preview its icon.</p>
+            <p class="text-sm text-base-content/75">Enter a website or app address, then preview its icon.</p>
           </div>
           <span class="loading loading-spinner loading-sm htmx-indicator mt-3" id="favorite-preview-loading">
             <span class="sr-only">Loading preview</span>
@@ -224,7 +224,8 @@ function previewTitle(values: AddFavoriteFormValues, metadata: SiteMetadata): st
   }
 
   try {
-    return new URL(values.url).hostname.replace(/^www\./, '')
+    const url = new URL(values.url)
+    return url.hostname.replace(/^www\./, '') || url.protocol.replace(/:$/, '')
   } catch {
     return 'Site'
   }

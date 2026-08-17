@@ -74,7 +74,7 @@ describe('edit favorite', () => {
     const fragment = await fragmentResponse.text()
 
     expect(pageResponse.status).toBe(200)
-    expect(page).toContain('<title>Edit Site · WebVista</title>')
+    expect(page).toContain('<title>Edit Favorite · WebVista</title>')
     expect(page).toContain('data-favorite-form-action="edit"')
     expect(page).toContain(`action="/admin/favorites/${favorite.id}"`)
     expect(page).toContain('value="Existing Site"')
@@ -340,7 +340,7 @@ describe('edit favorite', () => {
 
     expect(response.status).toBe(422)
     expect(await response.text()).toContain(
-      'This web address is already in Favorites.',
+      'This address is already in Favorites.',
     )
     await expect(getFavorite(env.DB, favorite.id)).resolves.toMatchObject({
       url: 'https://upload.example/',
@@ -366,7 +366,7 @@ describe('edit favorite', () => {
     expect(response.status).toBe(422)
     expect(body).toContain('Enter a display name.')
     expect(body).toContain(
-      'Enter a complete web address beginning with http:// or https://.',
+      'Enter a complete web or app address, such as https://example.com or weather://.',
     )
     expect(body).toContain('value="bad url"')
     await expect(getFavorite(env.DB, favorite.id)).resolves.toMatchObject({

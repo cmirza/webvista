@@ -99,6 +99,25 @@ export const normalizeFavoriteTitle = (value: string): string => {
   return title
 }
 
+const BLOCKED_FAVORITE_PROTOCOLS = new Set([
+  'about:',
+  'blob:',
+  'chrome-extension:',
+  'chrome:',
+  'data:',
+  'edge:',
+  'file:',
+  'filesystem:',
+  'javascript:',
+  'moz-extension:',
+  'resource:',
+  'view-source:',
+  'vbscript:',
+])
+
+const favoriteUrlHelp =
+  'Enter a complete web or app address, such as https://example.com or weather://.'
+
 export const normalizeFavoriteUrl = (value: string): string => {
   const input = value.trim()
   let url: URL
@@ -107,28 +126,35 @@ export const normalizeFavoriteUrl = (value: string): string => {
     url = new URL(input)
   } catch {
     throw new FavoriteValidationError({
-      url: 'Enter a complete web address beginning with http:// or https://.',
+      url: favoriteUrlHelp,
     })
   }
 
-  if (!['http:', 'https:'].includes(url.protocol) || !url.hostname) {
+  const isWebUrl = ['http:', 'https:'].includes(url.protocol)
+
+  if (
+    BLOCKED_FAVORITE_PROTOCOLS.has(url.protocol) ||
+    (isWebUrl && !url.hostname)
+  ) {
     throw new FavoriteValidationError({
-      url: 'Enter a complete web address beginning with http:// or https://.',
+      url: favoriteUrlHelp,
     })
   }
 
   if (url.username || url.password) {
     throw new FavoriteValidationError({
-      url: 'Web addresses containing credentials are not supported.',
+      url: 'Addresses containing credentials are not supported.',
     })
   }
 
-  url.hash = ''
+  if (isWebUrl) {
+    url.hash = ''
+  }
   const normalized = url.toString()
 
   if (normalized.length > 2_048) {
     throw new FavoriteValidationError({
-      url: 'Web addresses must be 2,048 characters or fewer.',
+      url: 'Addresses must be 2,048 characters or fewer.',
     })
   }
 
@@ -193,7 +219,7 @@ const ensureUrlAvailable = async (
 
   if (existing) {
     throw new FavoriteValidationError({
-      url: 'This web address is already in Favorites.',
+      url: 'This address is already in Favorites.',
     })
   }
 }

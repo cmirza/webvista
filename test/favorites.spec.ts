@@ -88,9 +88,23 @@ describe('favorites service', () => {
   })
 
   it('validates URLs, titles, icon modes, and duplicate URLs', async () => {
-    expect(() => normalizeFavoriteUrl('javascript:alert(1)')).toThrow(
-      FavoriteValidationError,
+    expect(normalizeFavoriteUrl('weather://')).toBe('weather://')
+    expect(normalizeFavoriteUrl('shortcuts://run-shortcut?name=Morning')).toBe(
+      'shortcuts://run-shortcut?name=Morning',
     )
+    expect(normalizeFavoriteUrl('shortcuts://run-shortcut#Morning')).toBe(
+      'shortcuts://run-shortcut#Morning',
+    )
+    for (const unsafeUrl of [
+      'javascript:alert(1)',
+      'data:text/html,hello',
+      'file:///tmp/private',
+      'about:blank',
+    ]) {
+      expect(() => normalizeFavoriteUrl(unsafeUrl)).toThrow(
+        FavoriteValidationError,
+      )
+    }
     expect(() =>
       normalizeFavoriteUrl('https://user:secret@example.com'),
     ).toThrow(FavoriteValidationError)
@@ -105,11 +119,18 @@ describe('favorites service', () => {
     })
     await expect(
       createFavorite(env.DB, {
+        title: 'Weather',
+        url: 'weather://',
+        iconMode: 'fallback',
+      }),
+    ).resolves.toMatchObject({ url: 'weather://' })
+    await expect(
+      createFavorite(env.DB, {
         title: 'Duplicate',
         url: 'HTTPS://EXAMPLE.COM/#different-fragment',
       }),
     ).rejects.toMatchObject({
-      fieldErrors: { url: 'This web address is already in Favorites.' },
+      fieldErrors: { url: 'This address is already in Favorites.' },
     })
     await expect(
       createFavorite(env.DB, {

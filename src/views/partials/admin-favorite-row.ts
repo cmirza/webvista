@@ -5,7 +5,8 @@ import { renderFavoriteIcon } from './favorite'
 
 function hostnameFor(url: string): string {
   try {
-    return new URL(url).hostname.replace(/^www\./, '')
+    const parsed = new URL(url)
+    return parsed.hostname.replace(/^www\./, '') || parsed.toString()
   } catch {
     return url
   }
