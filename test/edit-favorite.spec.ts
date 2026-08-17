@@ -75,6 +75,7 @@ describe('edit favorite', () => {
 
     expect(pageResponse.status).toBe(200)
     expect(page).toContain('<title>Edit Site · WebVista</title>')
+    expect(page).toContain('data-favorite-form-action="edit"')
     expect(page).toContain(`action="/admin/favorites/${favorite.id}"`)
     expect(page).toContain('value="Existing Site"')
     expect(page).toContain('value="https://existing.example/"')

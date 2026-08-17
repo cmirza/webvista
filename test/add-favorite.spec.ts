@@ -73,6 +73,7 @@ describe('add favorite', () => {
     expect(pageResponse.status).toBe(200)
     expect(page).toContain('<!doctype html>')
     expect(page).toContain('<title>Add Site · WebVista</title>')
+    expect(page).toContain('data-favorite-form-action="add"')
     expect(page).toContain('action="/admin/favorites"')
     expect(page).toContain('name="title"')
     expect(page).toContain('name="url"')

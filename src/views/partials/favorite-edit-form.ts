@@ -55,6 +55,7 @@ export async function renderEditFavoriteForm({
         method="post"
         action="/admin/favorites/${favorite.id}"
         enctype="multipart/form-data"
+        data-favorite-form-action="edit"
         ${enhanced
           ? html`hx-post="/admin/favorites/${favorite.id}"
               hx-encoding="multipart/form-data"

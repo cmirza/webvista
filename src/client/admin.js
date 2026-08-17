@@ -166,11 +166,11 @@ const showUploadPreview = (input) => {
 
   previewUrl = URL.createObjectURL(file)
   const wrapper = document.createElement('div')
-  wrapper.className = 'flex items-center gap-4'
+  wrapper.className = 'flex min-w-0 items-center gap-4'
   wrapper.dataset.iconPreviewResult = ''
 
   const iconShell = document.createElement('span')
-  iconShell.className = 'favorite-icon favorite-icon--admin'
+  iconShell.className = 'favorite-icon favorite-icon--admin shrink-0'
   const image = document.createElement('img')
   image.src = previewUrl
   image.alt = ''
@@ -178,12 +178,17 @@ const showUploadPreview = (input) => {
   iconShell.append(image)
 
   const copy = document.createElement('div')
+  copy.className = 'min-w-0 flex-1'
   const name = document.createElement('p')
-  name.className = 'font-semibold'
+  name.className = 'break-all font-semibold'
   name.textContent = file.name
+  name.title = file.name
   const detail = document.createElement('p')
   detail.className = 'mt-1 text-sm text-base-content/60'
-  detail.textContent = 'This image will be uploaded when you add the favorite.'
+  detail.textContent =
+    input.form?.dataset.favoriteFormAction === 'edit'
+      ? 'This image will replace the current icon when you save changes.'
+      : 'This image will be uploaded when you add the favorite.'
   copy.append(name, detail)
   wrapper.append(iconShell, copy)
   target.append(wrapper)

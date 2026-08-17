@@ -78,6 +78,7 @@ export async function renderAddFavoriteForm({
         method="post"
         action="/admin/favorites"
         enctype="multipart/form-data"
+        data-favorite-form-action="add"
         ${enhanced
           ? html`hx-post="/admin/favorites"
               hx-encoding="multipart/form-data"

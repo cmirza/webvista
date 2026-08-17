@@ -8,8 +8,8 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 
 - Active milestone: **v1.0 — Favorites MVP**
 - Implementation status: **In progress**
-- Current phase: **Drag-and-drop ordering**
-- Next task: **Verify pointer dragging in the local browser checkpoint**
+- Current phase: **End-to-end quality pass**
+- Next task: **Verify portal behavior without JavaScript**
 
 ## Core principles
 
@@ -69,12 +69,12 @@ Planned stack:
   - [x] Pin the supported local Node.js runtime with `.nvmrc`.
   - [x] Add Tailwind CSS, daisyUI, HTMX, and SortableJS.
   - [x] Add `.gitignore` entries for dependencies, generated output, local D1/Wrangler state, secrets, and editor/OS files.
-- [ ] Establish the simple source layout.
+- [x] Establish the simple source layout.
   - [x] Add the Worker entry point and typed Cloudflare bindings.
   - [x] Add portal, admin, and authentication route modules.
   - [x] Add the shared layout and initial portal/admin views.
   - [x] Add the public favorite partial view.
-  - [ ] Add favorite-form and admin-row partial views with their features.
+  - [x] Add favorite-form and admin-row partial views with their features.
   - [x] Add the favorites service module.
   - [x] Add the icon service module.
   - [x] Add authentication middleware.
@@ -244,6 +244,7 @@ CREATE TABLE favorites (
   - [x] Render all three choices and automatic/fallback preview states.
   - [x] Verify the selected custom-file preview through the local browser checkpoint.
   - [x] Clear a stale upload-validation message when a corrected file is selected.
+  - [x] Keep long uploaded filenames inside the preview card and use action-appropriate add/edit copy.
 - [x] Add a Refresh automatic icon action.
 - [x] Preserve the previous icon when an edit or replacement upload fails.
 - [x] Remove unreferenced uploaded objects after successful replacement or favorite deletion.
@@ -281,9 +282,9 @@ CREATE TABLE favorites (
 
 ### 13. Drag-and-drop ordering
 
-- [ ] Initialize SortableJS only on the admin favorites list.
+- [x] Initialize SortableJS only on the admin favorites list.
   - [x] Load the self-hosted SortableJS bundle only on the admin dashboard and bind it to the favorites list.
-  - [ ] Verify pointer dragging in the local browser; the automated browser surface does not expose a drag gesture, so this remains a user checkpoint.
+  - [x] Verify pointer dragging in the local browser; confirmed through the user testing checkpoint.
 - [x] Send the complete ordered favorite ID list to `POST /admin/favorites/reorder`.
 - [x] Validate authentication, JSON shape, duplicate IDs, missing IDs, and unknown IDs.
 - [x] Update all positions transactionally with increments of 10.
@@ -344,8 +345,8 @@ GET    /admin/favorites/icon-preview
 - [ ] Admin can add a favorite.
 - [x] Admin can edit a favorite.
 - [x] Admin can delete a favorite.
-- [ ] Admin can drag favorites into a new order.
-- [ ] Portal reflects that order.
+- [x] Admin can drag favorites into a new order.
+- [x] Portal reflects that order.
 - [ ] Layout reflows cleanly in a split-screen browser window.
 - [ ] Nord Light theme is polished enough for daily use.
 - [ ] A first-time user can use the portal without needing an explanation.
