@@ -1,4 +1,6 @@
-# Copy this file to .dev.vars and replace both example values.
+# Copy this file to .dev.vars and replace the example values.
 # Wrangler loads .dev.vars only during local development.
 ADMIN_PASSWORD="choose-a-local-admin-password"
 ADMIN_SESSION_SECRET="generate-a-long-random-session-signing-secret"
+# Optional until Watch metadata lookup is enabled. Use the TMDb API Read Access Token.
+TMDB_API_TOKEN=""

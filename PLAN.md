@@ -6,10 +6,10 @@ This file is the source of truth for scope and progress. Add newly discovered wo
 
 ## Status
 
-- Active milestone: **v1.0 — Favorites MVP**
-- Implementation status: **Deployed**
-- Current phase: **Production validation checkpoint**
-- Next task: **Complete a user-led production portal and admin walkthrough**
+- Active milestone: **v1.1 — Local date and weather**
+- Implementation status: **Favorites, For You, Watch, date, and weather are deployed and production-verified**
+- Current phase: **Post-deployment usage observation**
+- Next task: **Use the deployed portal normally and record only issues that affect everyday use**
 
 ## Core principles
 
@@ -162,6 +162,7 @@ CREATE TABLE favorites (
   - [x] Provide a large search input, clear focus state, and visible submit button.
   - [x] Add an accessible multicolor visual prompt that disappears during entry.
   - [x] Verify Enter submits and search works without JavaScript.
+  - [x] Clear a previous query when the portal is restored through browser Back navigation.
 - [x] Render enabled favorites ordered by stored position.
 - [x] Make the entire icon/name region a same-tab external link.
 - [x] Keep the portal free of admin controls, admin links, and navigation menus.
@@ -216,6 +217,7 @@ CREATE TABLE favorites (
 - [x] Use standard daisyUI components; do not spend custom-design effort intended for the public portal.
 - [x] Keep the admin usable at narrower widths without implementing the v1.3 mobile-specific workflow.
 - [x] Auto-dismiss successful HTMX add, edit, and delete confirmations without requiring a Done action.
+- [x] Standardize admin workspace dialogs with one header treatment, one footer action row, and consistent spacing/control sizes.
 
 ### 9. Add favorite
 
@@ -315,7 +317,7 @@ GET    /admin/favorites/icon-preview
 
 - [x] Seed or create at least 12 representative favorites for local testing.
 - [x] Verify portal behavior with JavaScript disabled.
-  - [x] Keep the public portal response free of scripts and verify search/favorite navigation uses ordinary HTML.
+  - [x] Keep search and favorite navigation as ordinary HTML; limit portal JavaScript to progressive search reset and carousel controls.
 - [x] Verify add, edit, delete, icon preview/upload, enable/disable, logout, and reorder flows with HTMX enabled.
 - [x] Verify all write routes reject unauthenticated requests.
   - [x] Enumerate logout, add, update, reorder, and both delete routes in unauthorized and cross-origin tests.
@@ -391,21 +393,86 @@ Later milestones remain intentionally high-level until v1.0 usage is validated.
 
 ### v1.1 — Weather
 
-- [ ] Confirm usage justifies continuing development.
-- [ ] Show current temperature and conditions.
-- [ ] Show daily high and low.
-- [ ] Make the location configurable through admin.
-- [ ] Retrieve weather server-side.
-- [ ] Cache weather data within free-tier constraints.
+- [x] Confirm usage justifies continuing development.
+- [x] Show the current local date prominently on the portal.
+  - [x] Include the full weekday, such as `Monday, August 17`.
+  - [x] Keep the full date on one line at full and split-screen desktop widths.
+  - [x] Format the date using the browser's local timezone and locale.
+  - [x] Keep a useful server-rendered fallback when JavaScript is unavailable.
+- [x] Show current temperature and conditions.
+- [x] Show daily high and low.
+- [x] Derive the weather location from the browser when permission is granted.
+  - [x] Request browser geolocation only when needed for weather and explain why it is requested.
+  - [x] Send validated, coarse coordinates to the Worker only for weather retrieval; do not persist precise location in D1.
+  - [x] Reverse-geocode coarse browser coordinates into a city/region label.
+  - [x] Keep provider attribution text out of the compact weather widget.
+  - [x] Version cached weather-fragment requests when the rendered fragment format changes.
+  - [x] Handle denied, unavailable, and timed-out location requests without blocking the rest of the portal.
+  - [x] Fall back to Portland, Oregon whenever browser location is unavailable or declined.
+  - [x] Confirm the granted-permission path in the browser.
+- [x] Retrieve weather server-side from validated coordinates or the fixed Portland fallback.
+- [x] Use Open-Meteo for keyless current conditions and one-day high/low data.
+- [x] Translate provider weather codes into clear, human-readable conditions.
+- [x] Cache weather data by coarse location within free-tier constraints.
+- [x] Verify date and weather behavior at wide, split-screen, and narrow widths.
+- [x] Deploy the date/weather increment and previously verified development features to Workers.dev.
+  - [x] Apply pending production D1 migrations before deploying the matching Worker code.
+  - [x] Run the cleanup-safe production authentication, CRUD, ordering, and R2 smoke test.
+  - [x] Confirm the public production portal renders the date and Portland weather fallback.
+  - [ ] Force production HTTP requests onto HTTPS and verify Safari-safe admin login behavior.
+    - [x] Redirect every non-local HTTP request to the equivalent HTTPS URL.
+    - [x] Send HSTS on production HTTPS responses.
+    - [x] Verify the deployed HTTP redirect and secure login-page headers.
+    - [ ] Confirm login with the rotated production password in Safari.
+- [x] Restrict production traffic to the custom domain.
+  - [x] Disable the production `workers.dev` route in Wrangler so a future deploy cannot restore the fallback origin.
+  - [x] Update deployment and smoke-test documentation to use the custom domain.
 
 ### v1.2 — For You
 
-- [ ] Add a curated For You section.
-- [ ] Allow URLs to be added through admin.
-- [ ] Retrieve Open Graph thumbnail, title, description, and source/site name.
-- [ ] Support manual metadata overrides.
-- [ ] Allow sorting and removal.
-- [ ] Provide a browser bookmarklet that opens an authenticated admin preview before saving.
+- [x] Add a curated For You section.
+  - [x] Render cards in one horizontal row rather than a wrapping grid.
+  - [x] Support touch/trackpad scrolling, scroll snapping, and obvious previous/next controls.
+  - [x] Keep the section visually secondary to Favorites.
+  - [x] Add a persisted admin switch that hides or shows the entire public For You section without deleting links.
+    - [x] Keep the visibility control inside the For You admin card so its scope is unambiguous.
+    - [x] Persist changes immediately from the toggle without a redundant save button.
+- [x] Allow URLs to be added through admin.
+  - [x] Add D1 persistence and an authenticated normal-form workflow.
+  - [x] Keep the first increment usable without HTMX.
+  - [x] Insert newly added links at the top of the admin queue and portal carousel.
+  - [x] Keep the dashboard Add Link and preview workflow fragment-only when enhanced with HTMX.
+- [x] Retrieve Open Graph thumbnail, title, description, and source/site name.
+  - [x] Reuse the bounded public-URL retrieval boundary used by icon discovery.
+  - [x] Stream a bounded HTML prefix so oversized publisher pages can expose head metadata without being fully downloaded.
+  - [x] Read standard preview metadata placed after unusually large publisher preload blocks while retaining a conservative response cap.
+  - [x] Degrade safely when metadata or an image is missing.
+  - [x] Use bounded first-party fallbacks when normal article HTML is blocked or excessively large.
+    - [x] Read YouTube previews through YouTube's official oEmbed endpoint.
+    - [x] Read NYT previews through its official oEmbed endpoint and exact Bloomberg matches through its first-party technology RSS feed.
+    - [x] Retry a conventional first-party AMP page when a publisher blocks the standard article response.
+    - [x] Read matching KGW article metadata from KGW's first-party RSS feed when Akamai blocks the article.
+    - [x] Detect and verify same-origin AMP pages, automatically use the readable address, and disclose the substitution in preview.
+    - [x] Generate an editable title and source from the URL when every server-side retrieval layer is blocked.
+- [x] Support manual metadata overrides.
+  - [x] Keep the For You Preview Link control at the same standard size as Watch Preview Details in admin and bookmarklet flows.
+- [x] Allow saved For You links to be edited.
+  - [x] Edit URL, title, source, image, description, and enabled state through an authenticated form.
+  - [x] Refresh the dashboard row through HTMX while preserving a normal form fallback.
+  - [x] Validate edits without discarding entered values.
+- [x] Allow sorting and removal.
+  - [x] Add a named server-rendered removal confirmation in the first increment.
+  - [x] Add a complete-set server-authoritative reorder operation.
+  - [x] Add keyboard-accessible Move controls and persist their changes.
+  - [x] Add pointer drag ordering through SortableJS.
+  - [x] Confirm pointer drag ordering in the user's browser.
+  - [x] Remove rows through HTMX while preserving the confirmed normal-form fallback.
+- [x] Provide a browser bookmarklet that opens an authenticated admin preview before saving.
+  - [x] Add an authenticated installer with desktop drag and mobile copy instructions.
+  - [x] Capture only the current URL and standard Open Graph/Twitter preview fields from the open page.
+  - [x] Open a server-validated preview that remains editable and does not re-fetch the publisher.
+  - [x] Preserve the bookmarklet preview destination through an expired-session login.
+  - [x] Confirm the installed bookmarklet against a publisher-blocked article in the user's browser.
 
 ### v1.3 — Mobile Admin
 
@@ -418,12 +485,33 @@ The public portal should already resize reasonably before this release.
 
 ### v1.4 — Watch
 
-- [ ] Add a poster-based Watch section.
-- [ ] Support Plex, Netflix, Prime Video, and other direct streaming links.
-- [ ] Accept a direct watch URL and an IMDb or TMDb ID.
-- [ ] Retrieve poster, title, year, and movie/TV type through TMDb.
-- [ ] Show a service badge and preview before saving.
-- [ ] Allow sorting and removal.
+- [x] Add a poster-based Watch section.
+  - [x] Add D1 persistence for manually curated movie and TV titles.
+  - [x] Render enabled titles in one horizontally browsable poster row.
+  - [x] Add an authenticated manual Add Title flow with an editable poster URL.
+  - [x] Verify the first runnable Watch increment at wide, split-screen, and narrow widths.
+  - [x] Place Watch above For You in the public portal hierarchy.
+- [x] Support Plex, Netflix, Prime Video, and other direct streaming links.
+  - [x] Validate direct web and registered application links without restricting titles to a service homepage.
+  - [x] Preserve meaningful hash-routed destinations used by Plex and similar web applications.
+- [x] Accept a direct watch URL and an IMDb or TMDb ID.
+  - [x] Accept IMDb IDs/URLs and typed or numeric TMDb IDs.
+  - [x] Persist the normalized external identifier with the curated title.
+- [x] Retrieve poster, title, year, and movie/TV type through TMDb.
+  - [x] Authenticate server-side with an optional TMDb API read token.
+  - [x] Keep manual entry usable when TMDb is not configured or unavailable.
+  - [x] Verify a live IMDb and TMDb preview with the configured local token.
+  - [x] Configure `TMDB_API_TOKEN` on the production Worker and verify a deployed IMDb preview.
+  - [x] Keep Preview Details updates inside the dashboard workspace without replacing the surrounding admin sections.
+- [x] Show the service and an editable preview before saving.
+  - [x] Show the service beneath the title instead of overlaying poster artwork.
+  - [x] Keep all retrieved fields editable before saving.
+  - [x] Use the standard admin button size for Preview Details instead of oversized lookup text.
+- [x] Allow sorting and removal.
+  - [x] Edit saved metadata, direct link, service, and enabled state.
+  - [x] Remove a title through confirmed HTMX and normal-form flows.
+  - [x] Reorder titles with pointer and keyboard-accessible controls.
+    - [x] Confirm pointer drag, Move-button persistence, and matching public poster order in the local browser.
 
 No Plex API integration is required initially.
 
@@ -471,7 +559,7 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-16 — Favorite data boundary:** Normalize favorite URLs before storage, enforce unique stored URLs, assign UUIDs and UTC timestamps in the service, and accept reorders only when they contain the complete stored ID set.
 - **2026-08-16 — Portal favorite fallback:** Render favorites as ordinary same-tab links in a width-driven grid, using deterministic initial-based icons until automatic icon discovery provides suitable assets.
 - **2026-08-16 — Metadata retrieval boundary:** Fetch metadata with manual redirect validation, a four-second overall timeout, bounded streamed bodies, strict content-type checks, public HTTP/HTTPS targets only, and at most eight verified icon candidates.
-- **2026-08-16 — Admin sessions:** Keep the admin password and session-signing key as separate Worker secrets, issue an eight-hour signed `__Host-` cookie with strict browser attributes, and require same-origin admin writes in addition to authentication.
+- **2026-08-16 — Admin sessions:** Keep the admin password and session-signing key as separate Worker secrets, issue an eight-hour signed `__Host-` cookie with `HttpOnly`, `Secure`, and `SameSite=Lax` so bookmarklet top-level navigations remain signed in, and require same-origin admin writes in addition to authentication.
 - **2026-08-16 — Dashboard controls:** Render the complete favorites-management dashboard shell, but keep Add, Edit, Remove, and ordering controls disabled until each authenticated workflow is implemented so the interface never leads to dead routes.
 - **2026-08-16 — Add favorite flow:** Keep icon previews advisory and re-run bounded discovery on save instead of trusting browser-supplied icon URLs; enhance the normal form with HTMX fragments and out-of-band dashboard updates while preserving full-page validation and redirects without JavaScript.
 - **2026-08-16 — Custom icon storage:** Bind R2 without a committed production bucket name, accept only signature-validated PNG/JPEG/WebP files up to 2 MB, store UUID-based object keys in D1, and serve objects through a constrained immutable `/icons/:fileName` route.
@@ -486,17 +574,39 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-16 — Production configuration:** Keep account-specific D1 identifiers in an ignored `wrangler.production.jsonc`, commit a placeholder example, and make the production smoke test remove its own D1 and R2 test data so deployment remains repeatable and repository-safe.
 - **2026-08-16 — Application links:** Allow administrator-authored registered app schemes such as `weather://` and `shortcuts://`, preserve meaningful non-web fragments, and block executable, local-file, browser-internal, and credential-bearing addresses before storage or rendering.
 - **2026-08-16 — Shared destinations:** Allow multiple favorites to use the same normalized address because independently named and iconed tiles may intentionally target the same service; keep favorite IDs, not URLs, as the identity and ordering boundary.
+- **2026-08-16 — For You priority:** Begin v1.2 before Weather and Watch because curated news, YouTube, and general links are the next validated need; keep skipped milestones deferred rather than treating them as prerequisites.
+- **2026-08-16 — For You carousel:** Render For You as one horizontally browsable, scroll-snapped row with pointer controls and native touch/trackpad scrolling instead of a wrapping card grid.
+- **2026-08-16 — For You metadata fallbacks:** Keep direct bounded Open Graph retrieval as the default, use YouTube's official oEmbed response for YouTube links, retry a publisher's first-party AMP page after blocked HTML, and use KGW's bounded first-party RSS feed for exact matching articles; do not add a third-party scraping proxy.
+- **2026-08-16 — For You readability and visibility:** Prefer a verified same-origin AMP destination when a publisher exposes one, disclose that substitution before saving, and persist the global For You visibility separately from its links so hiding the public row never deletes curated content.
+- **2026-08-16 — Layered link previews:** Read only a capped HTML prefix for oversized pages, prefer official provider metadata endpoints when available, use bounded exact-match first-party feeds for blocked publishers, and retain manual overrides plus the planned bookmarklet as the final fallback instead of depending on a third-party scraping proxy.
+- **2026-08-16 — Generated preview fallback:** When every retrieval layer is blocked, derive an editable title and source from the public URL, disclose that the result needs review, and leave unavailable image/description fields blank rather than fabricating metadata.
+- **2026-08-16 — For You insertion order:** Migrate existing curated links to newest-first once, then transactionally shift stored positions and insert each new link at the front so the admin queue and public carousel agree.
+- **2026-08-16 — Bookmarklet capture:** Generate the bookmarklet for the current WebVista origin, send only the open page URL and standard Open Graph/Twitter preview fields, never send article body or cookies, validate the captured fields on the server without re-fetching the publisher, preserve the destination through login, and require review before saving.
+- **2026-08-16 — For You management:** Reuse the Favorites dashboard interaction pattern for editable For You rows, require each reorder request to contain every stored item exactly once, normalize positions in increments of ten, provide keyboard Move controls alongside SortableJS dragging, and keep edit/removal usable as authenticated normal forms without HTMX.
+- **2026-08-16 — Watch foundation:** Start v1.4 with a complete manual curation loop—direct link, title, year, movie/TV type, service, and optional public poster—before adding TMDb lookup or management controls, so the poster row can be validated independently.
+- **2026-08-17 — Watch poster treatment:** Keep poster art unobstructed; show the streaming service in the card metadata beneath the title rather than as an overlay badge.
+- **2026-08-17 — TMDb lookup:** Accept IMDb IDs/URLs plus typed or media-type-qualified TMDb IDs, call TMDb only from the Worker with a bearer read token, and preserve the fully manual form as a graceful fallback.
+- **2026-08-17 — Declared TMDb secret:** Add `TMDB_API_TOKEN` to Wrangler's declared secret names because Wrangler excludes undeclared `.dev.vars` keys whenever `secrets.required` is present; an empty or unavailable token still leaves manual entry usable locally.
+- **2026-08-17 — Portal content hierarchy:** Place Watch above For You because curated movies and shows are a more durable destination, while the For You feed is secondary and changes more frequently.
+- **2026-08-17 — Watch management:** Reuse the authenticated dashboard workspace for HTMX editing and confirmed removal while preserving full-page normal-form fallbacks; keep hidden titles saved in D1 and visibly labeled in admin.
+- **2026-08-17 — Admin dialog consistency:** Use the same spacious shell, eyebrow and heading scale, explanatory copy, and single bottom action row across Favorites, For You, and Watch forms; reserve large lookup controls for preview-driven fields.
+- **2026-08-17 — Watch hash routes:** Preserve URL fragments for direct Watch destinations because Plex and similar single-page applications encode the actual title route after `#`; retain fragment stripping for ordinary Favorites and curated article links.
+- **2026-08-17 — Watch ordering:** Require every stored Watch ID exactly once, normalize positions in increments of ten, and expose the same server-authoritative drag and keyboard Move controls already validated for Favorites and For You.
+- **2026-08-17 — Late publisher metadata:** Raise the bounded article HTML prefix from 256 KiB to 512 KiB because some publishers place standard Open Graph metadata after large preload blocks; retain a strict cap and the shared parser instead of adding publisher-specific scraping code.
+- **2026-08-17 — Watch preview workspace:** In the enhanced dashboard flow, submit Preview Details through HTMX and replace only the Watch form shell; retain the complete standalone page response for ordinary no-JavaScript form submission.
+- **2026-08-17 — Local date and weather:** Put the full weekday/date on the portal using the browser's locale and timezone, keeping it on one line at desktop widths. Use opt-in browser geolocation as the primary weather location, round and validate coordinates before server-side Open-Meteo and OpenStreetMap Nominatim requests, never persist them in D1, cache coarse weather responses for ten minutes and locality labels for one day, keep provider attribution text out of the compact widget, and always fall back to Portland, Oregon when location access is unavailable.
+- **2026-08-17 — Production feature deployment:** Apply D1 migrations `0004` through `0008` before deploying the matching For You, settings, and Watch code; verify the resulting Workers.dev release with the cleanup-safe production smoke test and a read-only public portal check.
+- **2026-08-18 — Custom domain:** Use `webvista.cc` as the sole public production origin and disable the Workers.dev route in Wrangler so domain-level security controls cannot be bypassed through a fallback hostname; verify HTTPS, authentication, D1 writes, ordering, and R2 storage through the custom hostname.
 
 ## Deferred ideas
 
 - Remote custom icon URLs.
 - Daily or timed background rotation.
-- Custom domain configuration.
-- Any feature listed in v1.1–v1.6 until v1.0 usage has been evaluated.
+- Other later roadmap work until the verified For You and Watch build is deployed.
 
 ## Blockers
 
-- None.
+- The cleanup-safe production smoke test cannot authenticate after the password rotation because ignored local `.dev.vars` still contains the previous password. Update it locally before the next full production smoke run; never commit the file.
 
 ## Post-deployment usage validation
 

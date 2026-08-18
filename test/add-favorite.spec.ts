@@ -77,7 +77,7 @@ describe('add favorite', () => {
     expect(page).toContain('action="/admin/favorites"')
     expect(page).toContain('name="title"')
     expect(page).toContain('name="url"')
-    expect(page).toContain('label-text font-semibold text-base-content')
+    expect(page).toContain('label-text mb-2 block font-semibold')
     expect(page).not.toMatch(/text-base-content\/(45|50|55|60)/)
     expect(page).toContain('value="auto"')
     expect(page).toContain('value="fallback"')
@@ -91,6 +91,11 @@ describe('add favorite', () => {
     expect(fragment).toContain('hx-post="/admin/favorites"')
     expect(fragment).toContain('hx-encoding="multipart/form-data"')
     expect(fragment).toContain('name="presentation" value="dashboard"')
+    expect(fragment).toContain('text-3xl font-semibold tracking-tight')
+    expect(fragment).toContain(
+      'Add a website or app link, then choose how its icon should appear.',
+    )
+    expect(fragment.match(/>Cancel<\/a>/g)).toHaveLength(1)
   })
 
   it('creates a favorite through a normal form submission and redirects', async () => {

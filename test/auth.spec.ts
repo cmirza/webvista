@@ -15,9 +15,16 @@ import {
 
 const origin = 'https://webvista.test'
 
-function loginRequest(password: string, requestOrigin = origin): Request {
+function loginRequest(
+  password: string,
+  requestOrigin = origin,
+  next?: string,
+): Request {
+  const body = new URLSearchParams({ password })
+  if (next) body.set('next', next)
+
   return new Request(`${origin}/admin/login`, {
-    body: new URLSearchParams({ password }),
+    body,
     headers: { Origin: requestOrigin },
     method: 'POST',
     redirect: 'manual',
@@ -71,7 +78,7 @@ describe('admin authentication', () => {
     expect(setCookie).toContain('Path=/')
     expect(setCookie).toContain('HttpOnly')
     expect(setCookie).toContain('Secure')
-    expect(setCookie).toContain('SameSite=Strict')
+    expect(setCookie).toContain('SameSite=Lax')
     expect(setCookie).toContain('Priority=High')
     expect(setCookie).toMatch(/Expires=/)
 
@@ -144,7 +151,48 @@ describe('admin authentication', () => {
     expect(setCookie).toContain('Max-Age=0')
     expect(setCookie).toContain('HttpOnly')
     expect(setCookie).toContain('Secure')
-    expect(setCookie).toContain('SameSite=Strict')
+    expect(setCookie).toContain('SameSite=Lax')
+  })
+
+  it('preserves a safe bookmarklet preview through login', async () => {
+    const destination =
+      '/admin/for-you/preview?capture=browser&url=https%3A%2F%2Fnews.example%2Fstory&title=Captured'
+    const unauthorized = await workerExports.default.fetch(
+      new Request(`${origin}${destination}`, { redirect: 'manual' }),
+    )
+    const loginLocation = unauthorized.headers.get('location') ?? ''
+
+    expect(unauthorized.status).toBe(303)
+    expect(loginLocation).toBe(
+      `/admin/login?next=${encodeURIComponent(destination)}`,
+    )
+
+    const loginPage = await workerExports.default.fetch(
+      new Request(`${origin}${loginLocation}`),
+    )
+    const loginBody = await loginPage.text()
+    expect(loginBody).toContain('name="next"')
+    expect(loginBody).toContain('capture=browser')
+
+    const authenticated = await workerExports.default.fetch(
+      loginRequest(env.ADMIN_PASSWORD, origin, destination),
+    )
+    expect(authenticated.status).toBe(303)
+    expect(authenticated.headers.get('location')).toBe(destination)
+  })
+
+  it('rejects external and recursive login return destinations', async () => {
+    for (const destination of [
+      'https://attacker.example/steal',
+      '//attacker.example/steal',
+      '/admin/login?next=/admin',
+    ]) {
+      const response = await workerExports.default.fetch(
+        loginRequest(env.ADMIN_PASSWORD, origin, destination),
+      )
+      expect(response.status).toBe(303)
+      expect(response.headers.get('location')).toBe('/admin')
+    }
   })
 
   it('rejects every unauthorized and cross-origin admin write', async () => {
@@ -160,6 +208,12 @@ describe('admin authentication', () => {
       { method: 'POST', path: `/admin/favorites/${favorite.id}` },
       { method: 'POST', path: `/admin/favorites/${favorite.id}/delete` },
       { method: 'DELETE', path: `/admin/favorites/${favorite.id}` },
+      { method: 'POST', path: '/admin/for-you' },
+      { method: 'POST', path: '/admin/for-you/visibility' },
+      { method: 'POST', path: '/admin/for-you/reorder' },
+      { method: 'POST', path: '/admin/for-you/missing' },
+      { method: 'POST', path: '/admin/for-you/missing/delete' },
+      { method: 'DELETE', path: '/admin/for-you/missing' },
     ]
 
     for (const { method, path } of writeRoutes) {

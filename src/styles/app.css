@@ -189,14 +189,220 @@
     -webkit-line-clamp: 2;
   }
 
+  .for-you-track {
+    display: grid;
+    grid-auto-columns: min(22rem, calc(100vw - 3rem));
+    grid-auto-flow: column;
+    gap: 1.25rem;
+    overflow-x: auto;
+    padding: 0.25rem 0.25rem 1rem;
+    scroll-padding-inline: 0.25rem;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-inline: contain;
+  }
+
+  .watch-track {
+    display: grid;
+    grid-auto-columns: minmax(9.5rem, 11rem);
+    grid-auto-flow: column;
+    gap: 1.25rem;
+    overflow-x: auto;
+    padding: 0.25rem 0.25rem 1rem;
+    scroll-padding-inline: 0.25rem;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-inline: contain;
+  }
+
+  .watch-track:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 4px;
+    border-radius: 1.5rem;
+  }
+
+  .watch-card {
+    min-width: 0;
+    color: var(--color-base-content);
+    scroll-snap-align: start;
+    text-decoration: none;
+  }
+
+  .watch-poster {
+    position: relative;
+    display: grid;
+    aspect-ratio: 2 / 3;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 1.25rem;
+    background: color-mix(in oklab, var(--color-primary) 17%, var(--color-base-200));
+    box-shadow: 0 0.5rem 1.5rem color-mix(in oklab, var(--color-base-content) 13%, transparent);
+    transition: transform 150ms ease, box-shadow 150ms ease;
+  }
+
+  .watch-card:hover .watch-poster {
+    transform: translateY(-2px);
+    box-shadow: 0 0.8rem 2rem color-mix(in oklab, var(--color-base-content) 17%, transparent);
+  }
+
+  .watch-card:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 4px;
+    border-radius: 1.25rem;
+  }
+
+  .watch-poster img,
+  .admin-watch-poster img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .watch-poster-fallback {
+    font-size: 4rem;
+    font-weight: 700;
+    opacity: 0.4;
+  }
+
+  .watch-title {
+    display: -webkit-box;
+    overflow: hidden;
+    font-weight: 650;
+    line-height: 1.25rem;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .watch-meta {
+    margin-top: 0.3rem;
+    color: color-mix(in oklab, var(--color-base-content) 72%, transparent);
+    font-size: 0.82rem;
+  }
+
+  .admin-watch-poster {
+    position: relative;
+    display: grid;
+    width: 3.5rem;
+    aspect-ratio: 2 / 3;
+    flex: none;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 0.65rem;
+    background: color-mix(in oklab, var(--color-primary) 17%, var(--color-base-200));
+    font-weight: 700;
+  }
+
+  .for-you-track:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 4px;
+    border-radius: 1.5rem;
+  }
+
+  .for-you-card {
+    min-width: 0;
+    overflow: hidden;
+    border-radius: 1.5rem;
+    background: var(--color-base-100);
+    color: var(--color-base-content);
+    scroll-snap-align: start;
+    text-decoration: none;
+    box-shadow: 0 0.5rem 1.5rem color-mix(in oklab, var(--color-base-content) 10%, transparent);
+    transition: transform 150ms ease, box-shadow 150ms ease;
+  }
+
+  .for-you-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.8rem 2rem color-mix(in oklab, var(--color-base-content) 14%, transparent);
+  }
+
+  .for-you-card:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 3px;
+  }
+
+  .for-you-image {
+    position: relative;
+    display: grid;
+    aspect-ratio: 16 / 9;
+    place-items: center;
+    overflow: hidden;
+    background: color-mix(in oklab, var(--color-primary) 16%, var(--color-base-200));
+  }
+
+  .for-you-image img,
+  .admin-for-you-thumbnail img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .for-you-image-fallback {
+    font-size: 3rem;
+    font-weight: 700;
+    opacity: 0.45;
+  }
+
+  .for-you-source {
+    overflow: hidden;
+    color: color-mix(in oklab, var(--color-primary) 55%, var(--color-base-content));
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .for-you-title,
+  .for-you-description {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+  }
+
+  .for-you-title {
+    margin-top: 0.5rem;
+    font-size: 1.125rem;
+    font-weight: 650;
+    line-height: 1.45rem;
+    -webkit-line-clamp: 2;
+  }
+
+  .for-you-description {
+    margin-top: 0.65rem;
+    color: color-mix(in oklab, var(--color-base-content) 72%, transparent);
+    font-size: 0.9rem;
+    line-height: 1.35rem;
+    -webkit-line-clamp: 2;
+  }
+
+  .admin-for-you-thumbnail {
+    position: relative;
+    display: grid;
+    width: 4.5rem;
+    aspect-ratio: 16 / 9;
+    flex: none;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    background: color-mix(in oklab, var(--color-primary) 16%, var(--color-base-200));
+    font-weight: 700;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .favorite-link,
-    .favorite-icon {
+    .favorite-icon,
+    .for-you-card,
+    .watch-poster {
       transition: none;
     }
 
     .favorite-link:hover,
-    .favorite-link:hover .favorite-icon {
+    .favorite-link:hover .favorite-icon,
+    .for-you-card:hover,
+    .watch-card:hover .watch-poster {
       transform: none;
     }
   }

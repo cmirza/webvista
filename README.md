@@ -2,7 +2,7 @@
 
 WebVista is a lightweight personal web portal designed to work as a browser home page. It favors large, obvious controls, minimal navigation, and genuinely useful information without becoming a traditional dashboard.
 
-The first release has one job: determine whether the portal earns a place in everyday browsing. It will provide Google search and a polished, responsive grid of favorite sites, with administration kept behind a separate authenticated interface.
+The first release has one job: determine whether the portal earns a place in everyday browsing. It provides Google search and a polished, responsive grid of favorite sites, with administration kept behind a separate authenticated interface. The current Watch work builds on the completed curated For You row with a poster-based row for directly linked movies and TV shows.
 
 ## Product principles
 
@@ -35,7 +35,7 @@ cp .dev.vars.example .dev.vars
 npm run dev
 ```
 
-Before starting, replace both values in `.dev.vars`: `ADMIN_PASSWORD` is the login password and `ADMIN_SESSION_SECRET` is a separate, long random value used only to sign sessions. Neither `.dev.vars` nor its contents should be committed. The development command applies pending migrations to a local D1 database, then runs Wrangler and the Tailwind watcher together. Browser dependencies are self-hosted from `/assets`; no CDN is required. Local D1 data is kept under `.wrangler/state` and is not committed.
+Before starting, replace the authentication values in `.dev.vars`: `ADMIN_PASSWORD` is the login password and `ADMIN_SESSION_SECRET` is a separate, long random value used only to sign sessions. To enable Watch metadata previews, add a TMDb API Read Access Token as `TMDB_API_TOKEN`; manual Watch entry remains available without it. Neither `.dev.vars` nor its contents should be committed. The development command applies pending migrations to a local D1 database, then runs Wrangler and the Tailwind watcher together. Browser dependencies are self-hosted from `/assets`; no CDN is required. Local D1 data is kept under `.wrangler/state` and is not committed.
 
 Useful checks:
 
@@ -58,7 +58,7 @@ The asset build compiles `src/styles/app.css` with Tailwind CSS and daisyUI, the
 
 ## Production deployment
 
-WebVista is deployed at [webvista.blue-butterfly-4a32.workers.dev](https://webvista.blue-butterfly-4a32.workers.dev).
+WebVista is deployed at [webvista.cc](https://webvista.cc). Its production `workers.dev` route is disabled so the custom domain is the only public production origin.
 
 Production uses an ignored `wrangler.production.jsonc` file so Cloudflare resource identifiers never enter the public repository. To configure another deployment:
 
@@ -66,19 +66,25 @@ Production uses an ignored `wrangler.production.jsonc` file so Cloudflare resour
 2. Create a D1 database and replace the placeholder database ID in the ignored file.
 3. Create the configured R2 bucket.
 4. Apply migrations with `wrangler d1 migrations apply webvista --remote --config wrangler.production.jsonc`.
-5. Store `ADMIN_PASSWORD` and `ADMIN_SESSION_SECRET` with `wrangler secret put`, or upload an ignored dotenv file with `wrangler secret bulk`.
-6. Enable the Worker's production `workers.dev` URL in Cloudflare, then run `npm run deploy`.
+5. Store `ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET`, and `TMDB_API_TOKEN` with `wrangler secret put`, or upload an ignored dotenv file with `wrangler secret bulk`.
+6. Configure the custom domain route, keep `workers_dev` set to `false`, then run `npm run deploy`.
 
 After deployment, run the cleanup-safe production check:
 
 ```sh
-npm run smoke:production -- https://your-worker.your-subdomain.workers.dev
+npm run smoke:production -- https://your-custom-domain.example
 ```
 
 The check reads the admin password from the ignored `.dev.vars`, exercises authentication, CRUD, ordering, and R2 icon storage, then removes its temporary favorite and uploaded icon.
 
 ## Project status
 
-The server-rendered v1.0 portal is deployed with Google search, a responsive D1-backed favorites grid, and a single-password authenticated admin area. Favorites can open websites or registered application links such as `weather://`; browser-executable and internal URL schemes remain blocked. The admin can add, edit, remove, and reorder validated favorites through normal HTML or an HTMX-enhanced dashboard flow, including automatic metadata/icon discovery, generated fallbacks, enabled/hidden state, custom icon uploads backed by R2, and keyboard-accessible ordering controls. See [PLAN.md](PLAN.md) for the active checklist, roadmap, decisions, and definition of done.
+The server-rendered v1.0 portal is deployed with Google search, a responsive D1-backed favorites grid, and a single-password authenticated admin area. Favorites can open websites or registered application links such as `weather://`; browser-executable and internal URL schemes remain blocked. The admin can add, edit, remove, and reorder validated favorites through normal HTML or an HTMX-enhanced dashboard flow, including automatic metadata/icon discovery, generated fallbacks, enabled/hidden state, custom icon uploads backed by R2, and keyboard-accessible ordering controls.
+
+The deployed For You feature supports authenticated link creation with safe Open Graph previews, editable saved metadata and visibility, newest-first insertion, removal, server-authoritative drag/keyboard ordering, a persisted show/hide control, and a one-row scroll-snapped portal carousel. Preview discovery reads a bounded HTML prefix and uses first-party fallbacks for YouTube, NYT, Bloomberg, KGW, and publisher AMP pages when ordinary server retrieval is unavailable; fully blocked pages receive a clearly labeled editable title/source generated from their URL. An authenticated bookmarklet can capture the standard preview fields already visible to the browser and open an editable WebVista preview without re-fetching a blocked publisher.
+
+The deployed Watch feature adds D1 persistence and authenticated Add, Edit, Hide, Remove, and ordering flows, including a direct web or registered application link and an optional IMDb/TMDb identifier. With a server-side TMDb API read token, the form retrieves an editable title, year, movie/TV type, and poster preview before saving; manual entry remains available without the integration. Enabled titles appear in a single horizontally browsable poster row above For You, with the service shown beneath unobstructed poster art. Admin ordering supports pointer dragging and keyboard-accessible Move controls, with D1 authoritative for the portal order. See [PLAN.md](PLAN.md) for the active checklist, roadmap, decisions, and definition of done.
+
+The deployed date/weather increment adds a browser-local weekday/date plus current conditions and the day's high/low from Open-Meteo. Weather uses coarse, validated browser coordinates when permission is granted, labels that area through an OpenStreetMap reverse-geocoding request, does not persist location, caches retrievals, and falls back to Portland, Oregon whenever location is declined or unavailable.
 
 Contributors and coding agents must read [AGENTS.md](AGENTS.md) before changing the project.

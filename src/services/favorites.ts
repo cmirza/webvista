@@ -118,7 +118,10 @@ const BLOCKED_FAVORITE_PROTOCOLS = new Set([
 const favoriteUrlHelp =
   'Enter a complete web or app address, such as https://example.com or weather://.'
 
-export const normalizeFavoriteUrl = (value: string): string => {
+export const normalizeFavoriteUrl = (
+  value: string,
+  options: { preserveWebFragment?: boolean } = {},
+): string => {
   const input = value.trim()
   let url: URL
 
@@ -147,7 +150,7 @@ export const normalizeFavoriteUrl = (value: string): string => {
     })
   }
 
-  if (isWebUrl) {
+  if (isWebUrl && !options.preserveWebFragment) {
     url.hash = ''
   }
   const normalized = url.toString()

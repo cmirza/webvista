@@ -1,6 +1,7 @@
 export const ICON_DISCOVERY_LIMITS = {
-  htmlBytes: 256 * 1024,
+  htmlBytes: 512 * 1024,
   manifestBytes: 64 * 1024,
+  metadataBytes: 128 * 1024,
   iconBytes: 2 * 1024 * 1024,
   redirects: 3,
   timeoutMs: 4_000,
@@ -31,6 +32,17 @@ export interface SiteMetadata {
   failure: IconDiscoveryFailure | null
 }
 
+export interface LinkMetadata {
+  pageUrl: string
+  title: string | null
+  description: string | null
+  imageUrl: string | null
+  sourceName: string | null
+  failure: IconDiscoveryFailure | null
+  alternate?: 'amp'
+  fallback?: 'url'
+}
+
 type Fetcher = (
   input: RequestInfo | URL,
   init?: RequestInit,
@@ -41,6 +53,7 @@ interface DiscoveryOptions {
   htmlBytes?: number
   iconBytes?: number
   manifestBytes?: number
+  metadataBytes?: number
   maxCandidateProbes?: number
   maxRedirects?: number
   timeoutMs?: number
@@ -48,6 +61,10 @@ interface DiscoveryOptions {
 
 interface ParsedPage {
   title: string | null
+  description: string | null
+  imageUrl: string | null
+  sourceName: string | null
+  ampUrl: string | null
   appleIcons: IconCandidate[]
   favicons: IconCandidate[]
   manifests: string[]
@@ -216,6 +233,7 @@ const readBoundedBody = async (
   response: Response,
   maximumBytes: number,
   retainBody = true,
+  allowPrefix = false,
 ): Promise<Uint8Array> => {
   const lengthHeader = response.headers.get('content-length')
   const declaredLength = lengthHeader === null ? null : Number(lengthHeader)
@@ -223,7 +241,8 @@ const readBoundedBody = async (
   if (
     declaredLength !== null &&
     Number.isFinite(declaredLength) &&
-    declaredLength > maximumBytes
+    declaredLength > maximumBytes &&
+    !allowPrefix
   ) {
     await response.body?.cancel()
     throw new IconDiscoveryError('response-too-large')
@@ -245,12 +264,20 @@ const readBoundedBody = async (
         break
       }
 
-      totalBytes += value.byteLength
+      const remainingBytes = maximumBytes - totalBytes
 
-      if (totalBytes > maximumBytes) {
-        throw new IconDiscoveryError('response-too-large')
+      if (value.byteLength > remainingBytes) {
+        if (!allowPrefix) {
+          throw new IconDiscoveryError('response-too-large')
+        }
+        if (retainBody && remainingBytes > 0) {
+          chunks.push(value.subarray(0, remainingBytes))
+        }
+        totalBytes = maximumBytes
+        break
       }
 
+      totalBytes += value.byteLength
       if (retainBody) {
         chunks.push(value)
       }
@@ -276,6 +303,30 @@ const readBoundedBody = async (
 
 const contentTypeIs = (response: Response, expected: RegExp): boolean =>
   expected.test(response.headers.get('content-type')?.toLowerCase() ?? '')
+
+const decodeMarkupText = (value: string): string => {
+  const namedEntities: Record<string, string> = {
+    amp: '&',
+    apos: "'",
+    gt: '>',
+    lt: '<',
+    nbsp: ' ',
+    quot: '"',
+  }
+
+  return value
+    .replace(/&(#x[\da-f]+|#\d+|[a-z]+);/gi, (entity, code: string) => {
+      if (code.startsWith('#x')) {
+        return String.fromCodePoint(Number.parseInt(code.slice(2), 16))
+      }
+      if (code.startsWith('#')) {
+        return String.fromCodePoint(Number.parseInt(code.slice(1), 10))
+      }
+      return namedEntities[code.toLowerCase()] ?? entity
+    })
+    .replace(/\s+/g, ' ')
+    .trim()
+}
 
 const parseLargestSize = (
   sizes: string | null,
@@ -334,9 +385,17 @@ const candidateFromLink = (
 }
 
 const parsePage = async (html: Uint8Array, pageUrl: URL): Promise<ParsedPage> => {
-  const state: ParsedPage & { titleParts: string[] } = {
+  const state: ParsedPage & {
+    titleParts: string[]
+    metadata: Record<string, string>
+  } = {
     title: null,
+    description: null,
+    imageUrl: null,
+    sourceName: null,
+    ampUrl: null,
     titleParts: [],
+    metadata: {},
     appleIcons: [],
     favicons: [],
     manifests: [],
@@ -347,6 +406,18 @@ const parsePage = async (html: Uint8Array, pageUrl: URL): Promise<ParsedPage> =>
       text(text) {
         if (state.titleParts.join('').length < 200) {
           state.titleParts.push(text.text)
+        }
+      },
+    })
+    .on('meta', {
+      element(element) {
+        const key = (
+          element.getAttribute('property') ?? element.getAttribute('name') ?? ''
+        ).toLowerCase()
+        const content = element.getAttribute('content')?.trim()
+
+        if (key && content && !state.metadata[key]) {
+          state.metadata[key] = content
         }
       },
     })
@@ -361,6 +432,16 @@ const parsePage = async (html: Uint8Array, pageUrl: URL): Promise<ParsedPage> =>
             .filter(Boolean) ?? []
 
         if (!href) {
+          return
+        }
+
+        if (rel.includes('amphtml')) {
+          const ampUrl = safeUrl(href, pageUrl)
+
+          if (ampUrl?.origin === pageUrl.origin) {
+            state.ampUrl = ampUrl.toString()
+          }
+
           return
         }
 
@@ -404,8 +485,502 @@ const parsePage = async (html: Uint8Array, pageUrl: URL): Promise<ParsedPage> =>
   await rewriter
     .transform(new Response(html, { headers: { 'Content-Type': 'text/html' } }))
     .arrayBuffer()
-  state.title = state.titleParts.join('').replace(/\s+/g, ' ').trim().slice(0, 200) || null
+  const pageTitle =
+    state.titleParts.join('').replace(/\s+/g, ' ').trim().slice(0, 200) || null
+  state.title = decodeMarkupText(
+    state.metadata['og:title'] ??
+    state.metadata['twitter:title'] ??
+    pageTitle ??
+    '',
+  ).slice(0, 200) || null
+  state.description = decodeMarkupText(
+    state.metadata['og:description'] ??
+    state.metadata['twitter:description'] ??
+    state.metadata.description ??
+    '',
+  ).slice(0, 500) || null
+  state.sourceName = decodeMarkupText(
+    state.metadata['og:site_name'] ?? '',
+  ).slice(0, 100) || null
+  const rawImage =
+    state.metadata['og:image:secure_url'] ??
+    state.metadata['og:image'] ??
+    state.metadata['twitter:image']
+  state.imageUrl = rawImage
+    ? safeUrl(decodeMarkupText(rawImage), pageUrl)?.toString() ?? null
+    : null
   return state
+}
+
+type FetchedLinkMetadata = LinkMetadata & { ampUrl: string | null }
+
+const linkMetadataFromPage = (
+  pageUrl: URL,
+  page: ParsedPage,
+): FetchedLinkMetadata => ({
+  pageUrl: pageUrl.toString(),
+  title: page.title,
+  description: page.description,
+  imageUrl: page.imageUrl,
+  sourceName: page.sourceName,
+  failure: null,
+  ampUrl: page.ampUrl,
+})
+
+const withoutAmpCandidate = (
+  metadata: FetchedLinkMetadata,
+): LinkMetadata => {
+  const { ampUrl: _ampUrl, ...result } = metadata
+  return result
+}
+
+const fetchLinkPage = async (
+  url: URL,
+  fetcher: Fetcher,
+  signal: AbortSignal,
+  options: DiscoveryOptions,
+): Promise<FetchedLinkMetadata> => {
+  const { response, url: pageUrl } = await fetchWithRedirects(
+    url,
+    fetcher,
+    signal,
+    options.maxRedirects ?? ICON_DISCOVERY_LIMITS.redirects,
+    {
+      Accept: 'text/html, application/xhtml+xml;q=0.9',
+      'User-Agent': 'WebVista/1.0 (+https://github.com/cmirza/webvista)',
+    },
+  )
+
+  if (!response.ok) {
+    await response.body?.cancel()
+    throw new IconDiscoveryError('fetch-failed')
+  }
+  if (!contentTypeIs(response, /^(text\/html|application\/xhtml\+xml)\b/)) {
+    await response.body?.cancel()
+    throw new IconDiscoveryError('invalid-content-type')
+  }
+
+  const body = await readBoundedBody(
+    response,
+    options.htmlBytes ?? ICON_DISCOVERY_LIMITS.htmlBytes,
+    true,
+    true,
+  )
+  return linkMetadataFromPage(pageUrl, await parsePage(body, pageUrl))
+}
+
+const youtubeHosts = new Set([
+  'm.youtube.com',
+  'www.youtube.com',
+  'youtube.com',
+  'youtu.be',
+])
+
+const nytHosts = new Set(['nytimes.com', 'www.nytimes.com'])
+const bloombergHosts = new Set(['bloomberg.com', 'www.bloomberg.com'])
+
+const fetchYouTubeMetadata = async (
+  pageUrl: URL,
+  fetcher: Fetcher,
+  signal: AbortSignal,
+  options: DiscoveryOptions,
+): Promise<LinkMetadata> => {
+  const endpoint = new URL('https://www.youtube.com/oembed')
+  endpoint.searchParams.set('url', pageUrl.toString())
+  endpoint.searchParams.set('format', 'json')
+  const { response } = await fetchWithRedirects(
+    endpoint,
+    fetcher,
+    signal,
+    options.maxRedirects ?? ICON_DISCOVERY_LIMITS.redirects,
+    { Accept: 'application/json' },
+  )
+
+  if (!response.ok || !contentTypeIs(response, /^application\/json\b/)) {
+    await response.body?.cancel()
+    throw new IconDiscoveryError('fetch-failed')
+  }
+
+  const body = await readBoundedBody(
+    response,
+    options.metadataBytes ?? ICON_DISCOVERY_LIMITS.metadataBytes,
+  )
+  const data: unknown = JSON.parse(new TextDecoder().decode(body))
+
+  if (typeof data !== 'object' || data === null) {
+    throw new IconDiscoveryError('fetch-failed')
+  }
+
+  const record = data as Record<string, unknown>
+  const title = typeof record.title === 'string' ? record.title.trim() : ''
+  const thumbnail =
+    typeof record.thumbnail_url === 'string'
+      ? safeUrl(record.thumbnail_url)?.toString() ?? null
+      : null
+  const author =
+    typeof record.author_name === 'string' ? record.author_name.trim() : ''
+
+  if (!title) {
+    throw new IconDiscoveryError('fetch-failed')
+  }
+
+  return {
+    pageUrl: pageUrl.toString(),
+    title: title.slice(0, 200),
+    description: author ? `By ${author}`.slice(0, 500) : null,
+    imageUrl: thumbnail,
+    sourceName: 'YouTube',
+    failure: null,
+  }
+}
+
+const fetchNytMetadata = async (
+  pageUrl: URL,
+  fetcher: Fetcher,
+  signal: AbortSignal,
+  options: DiscoveryOptions,
+): Promise<LinkMetadata> => {
+  const endpoint = new URL('https://www.nytimes.com/svc/oembed/json/')
+  endpoint.searchParams.set('url', pageUrl.toString())
+  const { response } = await fetchWithRedirects(
+    endpoint,
+    fetcher,
+    signal,
+    options.maxRedirects ?? ICON_DISCOVERY_LIMITS.redirects,
+    { Accept: 'application/json' },
+  )
+
+  if (!response.ok || !contentTypeIs(response, /^application\/json\b/)) {
+    await response.body?.cancel()
+    throw new IconDiscoveryError('fetch-failed')
+  }
+
+  const body = await readBoundedBody(
+    response,
+    options.metadataBytes ?? ICON_DISCOVERY_LIMITS.metadataBytes,
+  )
+  const data: unknown = JSON.parse(new TextDecoder().decode(body))
+
+  if (typeof data !== 'object' || data === null) {
+    throw new IconDiscoveryError('fetch-failed')
+  }
+
+  const record = data as Record<string, unknown>
+  const title = typeof record.title === 'string' ? record.title.trim() : ''
+  const summary = typeof record.summary === 'string' ? record.summary.trim() : ''
+  const provider =
+    typeof record.provider_name === 'string' ? record.provider_name.trim() : ''
+  const thumbnail =
+    typeof record.thumbnail_url === 'string'
+      ? safeUrl(record.thumbnail_url)?.toString() ?? null
+      : null
+
+  if (!title) {
+    throw new IconDiscoveryError('fetch-failed')
+  }
+
+  return {
+    pageUrl: pageUrl.toString(),
+    title: title.slice(0, 200),
+    description: summary ? summary.slice(0, 500) : null,
+    imageUrl: thumbnail,
+    sourceName: provider || 'The New York Times',
+    failure: null,
+  }
+}
+
+const ampUrlFor = (pageUrl: URL): URL | null => {
+  if (/\/amp\/?$/i.test(pageUrl.pathname)) {
+    return null
+  }
+
+  const ampUrl = new URL(pageUrl)
+  ampUrl.pathname = `${ampUrl.pathname.replace(/\/$/, '')}/amp/`
+  ampUrl.search = ''
+  ampUrl.hash = ''
+  return ampUrl
+}
+
+const generatedLinkMetadata = (
+  pageUrl: URL,
+  failure: IconDiscoveryFailure,
+): LinkMetadata => {
+  const segment = decodeURIComponent(
+    pageUrl.pathname.split('/').filter(Boolean).at(-1) ?? '',
+  )
+    .replace(/\.(?:html?|php)$/i, '')
+    .replace(/-\d{4}-\d{2}-\d{2}$/i, '')
+  const words = segment.replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim()
+  const acronymWords = new Set(['ai', 'ceo', 'eu', 'ipo', 'uk', 'us'])
+  const normalizedWords = words
+    .split(' ')
+    .map((word) => (acronymWords.has(word.toLowerCase()) ? word.toUpperCase() : word))
+    .join(' ')
+  const title = normalizedWords
+    ? `${normalizedWords[0].toUpperCase()}${normalizedWords.slice(1)}`.slice(0, 200)
+    : null
+  const sourcePart = pageUrl.hostname.replace(/^www\./, '').split('.')[0] ?? ''
+  const sourceName = sourcePart
+    ? `${sourcePart[0].toUpperCase()}${sourcePart.slice(1)}`.slice(0, 100)
+    : null
+
+  return {
+    pageUrl: pageUrl.toString(),
+    title,
+    description: null,
+    imageUrl: null,
+    sourceName,
+    failure,
+    fallback: 'url',
+  }
+}
+
+const rssTagText = (item: string, tag: string): string | null => {
+  const match = item.match(
+    new RegExp(`<${tag}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tag}>`, 'i'),
+  )
+  if (!match) {
+    return null
+  }
+  return decodeMarkupText(match[1].replace(/^<!\[CDATA\[|\]\]>$/g, '')) || null
+}
+
+const fetchKgwRssMetadata = async (
+  pageUrl: URL,
+  fetcher: Fetcher,
+  signal: AbortSignal,
+  options: DiscoveryOptions,
+): Promise<LinkMetadata> => {
+  const feedUrl = new URL('/feeds/syndication/rss/news', pageUrl.origin)
+  const { response } = await fetchWithRedirects(
+    feedUrl,
+    fetcher,
+    signal,
+    options.maxRedirects ?? ICON_DISCOVERY_LIMITS.redirects,
+    { Accept: 'application/rss+xml, application/xml;q=0.9' },
+  )
+
+  if (!response.ok || !contentTypeIs(response, /^(application\/rss\+xml|application\/xml|text\/xml)\b/)) {
+    await response.body?.cancel()
+    throw new IconDiscoveryError('fetch-failed')
+  }
+
+  const body = new TextDecoder().decode(
+    await readBoundedBody(
+      response,
+      options.metadataBytes ?? ICON_DISCOVERY_LIMITS.metadataBytes,
+    ),
+  )
+  const target = pageUrl.toString()
+
+  for (const match of body.matchAll(/<item\b[\s\S]*?<\/item>/gi)) {
+    const item = match[0]
+    const link = rssTagText(item, 'link')
+
+    if (!link || safeUrl(link)?.toString() !== target) {
+      continue
+    }
+
+    const enclosure = item.match(/<enclosure\b[^>]*\burl=(?:"([^"]+)"|'([^']+)')[^>]*>/i)
+    const imageValue = enclosure?.[1] ?? enclosure?.[2] ?? ''
+
+    return {
+      pageUrl: target,
+      title: rssTagText(item, 'title')?.slice(0, 200) ?? null,
+      description: rssTagText(item, 'description')?.slice(0, 500) ?? null,
+      imageUrl: imageValue ? safeUrl(decodeMarkupText(imageValue))?.toString() ?? null : null,
+      sourceName: 'KGW',
+      failure: null,
+    }
+  }
+
+  throw new IconDiscoveryError('fetch-failed')
+}
+
+const fetchBloombergRssMetadata = async (
+  pageUrl: URL,
+  fetcher: Fetcher,
+  signal: AbortSignal,
+  options: DiscoveryOptions,
+): Promise<LinkMetadata> => {
+  const feedUrl = new URL('https://www.bloomberg.com/feeds/technology/news.rss')
+  const { response } = await fetchWithRedirects(
+    feedUrl,
+    fetcher,
+    signal,
+    options.maxRedirects ?? ICON_DISCOVERY_LIMITS.redirects,
+    { Accept: 'application/rss+xml, application/xml;q=0.9, text/xml;q=0.8' },
+  )
+
+  if (!response.ok || !contentTypeIs(response, /^(application\/rss\+xml|application\/xml|text\/xml)\b/)) {
+    await response.body?.cancel()
+    throw new IconDiscoveryError('fetch-failed')
+  }
+
+  const body = new TextDecoder().decode(
+    await readBoundedBody(
+      response,
+      options.metadataBytes ?? ICON_DISCOVERY_LIMITS.metadataBytes,
+    ),
+  )
+  const target = pageUrl.toString()
+
+  for (const match of body.matchAll(/<item\b[\s\S]*?<\/item>/gi)) {
+    const item = match[0]
+    const link = rssTagText(item, 'link')
+
+    if (!link || safeUrl(link)?.toString() !== target) {
+      continue
+    }
+
+    return {
+      pageUrl: target,
+      title: rssTagText(item, 'title')?.slice(0, 200) ?? null,
+      description: rssTagText(item, 'description')?.slice(0, 500) ?? null,
+      imageUrl: null,
+      sourceName: 'Bloomberg',
+      failure: null,
+    }
+  }
+
+  throw new IconDiscoveryError('fetch-failed')
+}
+
+export const discoverLinkMetadata = async (
+  value: string,
+  options: DiscoveryOptions = {},
+): Promise<LinkMetadata> => {
+  const initialUrl = safeUrl(value)
+
+  if (!initialUrl) {
+    return {
+      pageUrl: value,
+      title: null,
+      description: null,
+      imageUrl: null,
+      sourceName: null,
+      failure: 'unsafe-url',
+    }
+  }
+
+  const fetcher = options.fetcher ?? fetch
+  const controller = new AbortController()
+  const timeout = setTimeout(
+    () => controller.abort(),
+    options.timeoutMs ?? ICON_DISCOVERY_LIMITS.timeoutMs,
+  )
+
+  try {
+    if (youtubeHosts.has(initialUrl.hostname.toLowerCase())) {
+      try {
+        return await fetchYouTubeMetadata(
+          initialUrl,
+          fetcher,
+          controller.signal,
+          options,
+        )
+      } catch {
+        // Fall through to the normal bounded page request.
+      }
+    }
+
+    if (nytHosts.has(initialUrl.hostname.toLowerCase())) {
+      try {
+        return await fetchNytMetadata(
+          initialUrl,
+          fetcher,
+          controller.signal,
+          options,
+        )
+      } catch {
+        // Fall through to the normal bounded page request.
+      }
+    }
+
+    try {
+      const metadata = await fetchLinkPage(
+        initialUrl,
+        fetcher,
+        controller.signal,
+        options,
+      )
+      const ampUrl = metadata.ampUrl ? safeUrl(metadata.ampUrl) : null
+
+      if (ampUrl) {
+        try {
+          const verifiedAmp = await fetchLinkPage(
+            ampUrl,
+            fetcher,
+            controller.signal,
+            options,
+          )
+          return {
+            ...withoutAmpCandidate(metadata),
+            pageUrl: verifiedAmp.pageUrl,
+            alternate: 'amp',
+          }
+        } catch {
+          // Keep the original page when its declared AMP address is unavailable.
+        }
+      }
+
+      return withoutAmpCandidate(metadata)
+    } catch (primaryError) {
+      if (bloombergHosts.has(initialUrl.hostname.toLowerCase())) {
+        try {
+          return await fetchBloombergRssMetadata(
+            initialUrl,
+            fetcher,
+            controller.signal,
+            options,
+          )
+        } catch {
+          // Continue to the conventional first-party AMP fallback.
+        }
+      }
+
+      const ampUrl = ampUrlFor(initialUrl)
+
+      if (ampUrl) {
+        try {
+          const metadata = await fetchLinkPage(
+            ampUrl,
+            fetcher,
+            controller.signal,
+            options,
+          )
+          return {
+            ...withoutAmpCandidate(metadata),
+            alternate: 'amp',
+          }
+        } catch {
+          // Continue to a known first-party feed fallback when available.
+        }
+      }
+
+      if (['kgw.com', 'www.kgw.com'].includes(initialUrl.hostname.toLowerCase())) {
+        try {
+          return await fetchKgwRssMetadata(
+            initialUrl,
+            fetcher,
+            controller.signal,
+            options,
+          )
+        } catch {
+          // Return the original page failure below.
+        }
+      }
+
+      throw primaryError
+    }
+  } catch (error) {
+    return generatedLinkMetadata(
+      initialUrl,
+      error instanceof IconDiscoveryError ? error.code : 'fetch-failed',
+    )
+  } finally {
+    clearTimeout(timeout)
+  }
 }
 
 const parseManifest = (

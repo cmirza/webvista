@@ -9,12 +9,12 @@ export async function renderDeleteFavoriteConfirmation(
 ): Promise<HtmlEscapedString> {
   return html`
     <section
-      class="rounded-3xl bg-base-100 p-5 shadow-sm sm:p-7"
+      class="rounded-3xl bg-base-100 p-6 shadow-sm sm:p-8"
       id="favorite-delete-shell"
       data-favorite-delete-shell
     >
-      <p class="critical-text text-sm font-semibold tracking-[0.16em] uppercase">Favorites</p>
-      <h2 class="mt-1 text-2xl font-semibold tracking-tight">Remove Favorite?</h2>
+      <p class="brand-eyebrow text-sm font-semibold tracking-[0.16em] uppercase">Favorites</p>
+      <h2 class="mt-1 text-3xl font-semibold tracking-tight">Remove Favorite?</h2>
       <div class="mt-6 flex items-center gap-4 rounded-2xl bg-base-200 p-4">
         ${await renderFavoriteIcon(favorite, 'admin')}
         <div class="min-w-0">
@@ -22,7 +22,7 @@ export async function renderDeleteFavoriteConfirmation(
           <p class="mt-1 truncate text-sm text-base-content/75">${favorite.url}</p>
         </div>
       </div>
-      <p class="mt-5 text-base-content/75">
+      <p class="mt-5 text-lg">
         Remove <strong>${favorite.title}</strong> from Favorites? This cannot be undone.
       </p>
       <form

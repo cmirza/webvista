@@ -86,7 +86,10 @@ export async function startAdminSession(context: AppContext): Promise<void> {
       maxAge: SESSION_TTL_SECONDS,
       prefix: 'host',
       priority: 'high',
-      sameSite: 'Strict',
+      // Bookmarklets open WebVista as a top-level cross-site GET. Lax keeps
+      // that safe navigation signed in while same-origin checks still protect
+      // every state-changing admin request.
+      sameSite: 'Lax',
     },
   )
 }
@@ -96,7 +99,7 @@ export function endAdminSession(context: AppContext): void {
     httpOnly: true,
     prefix: 'host',
     priority: 'high',
-    sameSite: 'Strict',
+    sameSite: 'Lax',
   })
 }
 
@@ -111,7 +114,14 @@ export const requireAdmin = createMiddleware<{
   }
 
   if (context.req.method === 'GET' || context.req.method === 'HEAD') {
-    return context.redirect('/admin/login', 303)
+    const requested = new URL(context.req.url)
+    const destination = `${requested.pathname}${requested.search}`
+    return context.redirect(
+      destination === '/admin'
+        ? '/admin/login'
+        : `/admin/login?next=${encodeURIComponent(destination)}`,
+      303,
+    )
   }
 
   return context.text('Unauthorized', 401)

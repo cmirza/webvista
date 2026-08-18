@@ -1,20 +1,65 @@
 import { html } from 'hono/html'
 import type { HtmlEscapedString } from 'hono/utils/html'
 import type { Favorite } from '../services/favorites'
+import type { ForYouItem } from '../services/for-you'
+import type { WatchItem } from '../services/watch'
 import { renderLayout } from './layout'
 import { renderFavorite } from './partials/favorite'
+import { renderForYouCard } from './partials/for-you-card'
+import { renderWatchCard } from './partials/watch-card'
 
 export async function renderPortal(
   favorites: Favorite[],
+  forYouItems: ForYouItem[],
+  watchItems: WatchItem[] = [],
 ): Promise<HtmlEscapedString> {
+  const forYouCards = await Promise.all(forYouItems.map(renderForYouCard))
+  const watchCards = await Promise.all(watchItems.map(renderWatchCard))
+  const now = new Date()
+  const serverDate = new Intl.DateTimeFormat('en-US', {
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'UTC',
+    weekday: 'long',
+  }).format(now)
   const content = await html`
     <main class="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-6 py-10 sm:px-10 sm:py-14 lg:px-12">
-      <header class="mb-10 sm:mb-14">
-        <p class="brand-eyebrow mb-3 text-sm font-semibold tracking-[0.18em] uppercase">WebVista</p>
-        <h1 class="text-4xl font-semibold tracking-tight sm:text-5xl">Start here.</h1>
-        <p class="mt-4 max-w-2xl text-lg leading-8 text-base-content/75">
-          Search the web or choose a favorite.
-        </p>
+      <header class="mb-10 grid items-end gap-8 sm:mb-14 lg:grid-cols-[minmax(0,1fr)_minmax(30rem,38rem)]">
+        <div>
+          <p class="brand-eyebrow mb-3 text-sm font-semibold tracking-[0.18em] uppercase">WebVista</p>
+          <h1 class="text-4xl font-semibold tracking-tight sm:text-5xl">Start here.</h1>
+          <p class="mt-4 max-w-2xl text-lg leading-8 text-base-content/75">
+            Search the web or choose a favorite.
+          </p>
+        </div>
+
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(14rem,0.9fr)_minmax(0,1.3fr)]">
+          <section class="rounded-3xl bg-base-100 p-5 shadow-sm" aria-labelledby="date-heading">
+            <p class="text-xs font-semibold tracking-[0.16em] text-base-content/75 uppercase" id="date-heading">
+              Today
+            </p>
+            <time
+              class="mt-2 block text-xl font-semibold leading-tight tracking-tight lg:whitespace-nowrap"
+              datetime="${now.toISOString().slice(0, 10)}"
+              data-local-date
+            >${serverDate}</time>
+          </section>
+
+          <section
+            class="rounded-3xl bg-base-100 p-5 shadow-sm"
+            aria-labelledby="weather-heading"
+            aria-live="polite"
+            data-weather-panel
+          >
+            <p class="sr-only" id="weather-heading">Weather</p>
+            <div data-weather-content>
+              <p class="font-semibold">Finding local weather…</p>
+              <p class="mt-1 text-sm text-base-content/75">
+                Allow location access for nearby conditions. Portland is used otherwise.
+              </p>
+            </div>
+          </section>
+        </div>
       </header>
 
       <section aria-labelledby="search-heading" class="mb-12 sm:mb-16">
@@ -77,12 +122,57 @@ export async function renderPortal(
               </div>
             `}
       </section>
+
+      ${watchItems.length > 0
+        ? html`
+            <section class="mt-14 sm:mt-18" aria-labelledby="watch-heading" data-horizontal-carousel>
+              <div class="mb-6 flex items-end justify-between gap-4">
+                <div>
+                  <p class="mb-1 text-xs font-semibold tracking-[0.16em] text-base-content/75 uppercase">
+                    Movies and shows
+                  </p>
+                  <h2 id="watch-heading" class="text-2xl font-semibold tracking-tight">Watch</h2>
+                </div>
+                <div class="flex gap-2" aria-label="Browse Watch titles">
+                  <button class="btn btn-circle btn-outline" type="button" data-carousel-control="previous" aria-controls="watch-track" aria-label="Previous titles">←</button>
+                  <button class="btn btn-circle btn-outline" type="button" data-carousel-control="next" aria-controls="watch-track" aria-label="Next titles">→</button>
+                </div>
+              </div>
+              <div class="watch-track" id="watch-track" tabindex="0" data-horizontal-carousel-track>
+                ${watchCards}
+              </div>
+            </section>
+          `
+        : ''}
+
+      ${forYouItems.length > 0
+        ? html`
+            <section class="mt-14 sm:mt-18" aria-labelledby="for-you-heading" data-for-you-carousel data-horizontal-carousel>
+              <div class="mb-6 flex items-end justify-between gap-4">
+                <div>
+                  <p class="mb-1 text-xs font-semibold tracking-[0.16em] text-base-content/75 uppercase">
+                    Selected links
+                  </p>
+                  <h2 id="for-you-heading" class="text-2xl font-semibold tracking-tight">For You</h2>
+                </div>
+                <div class="flex gap-2" aria-label="Browse For You links">
+                  <button class="btn btn-circle btn-outline" type="button" data-carousel-control="previous" aria-controls="for-you-track" aria-label="Previous links">←</button>
+                  <button class="btn btn-circle btn-outline" type="button" data-carousel-control="next" aria-controls="for-you-track" aria-label="Next links">→</button>
+                </div>
+              </div>
+              <div class="for-you-track" id="for-you-track" tabindex="0" data-horizontal-carousel-track>
+                ${forYouCards}
+              </div>
+            </section>
+          `
+        : ''}
     </main>
   `
 
   return renderLayout({
     children: content,
     description: 'A simple, friendly browser home page.',
+    scripts: ['/assets/portal.js'],
     title: 'WebVista',
   })
 }

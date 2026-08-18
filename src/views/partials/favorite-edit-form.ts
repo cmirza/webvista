@@ -39,19 +39,17 @@ export async function renderEditFavoriteForm({
 
   return html`
     <section
-      class="rounded-3xl bg-base-100 p-5 shadow-sm sm:p-7"
+      class="rounded-3xl bg-base-100 p-6 shadow-sm sm:p-8"
       id="favorite-form-shell"
       data-favorite-form-shell
     >
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <p class="brand-eyebrow text-sm font-semibold tracking-[0.16em] uppercase">Favorites</p>
-          <h2 class="mt-1 text-2xl font-semibold tracking-tight">Edit Favorite</h2>
-        </div>
-        <a class="btn btn-ghost btn-sm rounded-lg" href="/admin">Cancel</a>
-      </div>
+      <p class="brand-eyebrow text-sm font-semibold tracking-[0.16em] uppercase">Favorites</p>
+      <h2 class="mt-1 text-3xl font-semibold tracking-tight">Edit Favorite</h2>
+      <p class="mt-3 text-base-content/75">
+        Update where this favorite opens and how it appears on the portal.
+      </p>
       <form
-        class="mt-6 space-y-5"
+        class="mt-7 space-y-6"
         method="post"
         action="/admin/favorites/${favorite.id}"
         enctype="multipart/form-data"
@@ -66,10 +64,8 @@ export async function renderEditFavoriteForm({
         ${enhanced
           ? html`<input type="hidden" name="presentation" value="dashboard" />`
           : ''}
-        <div class="form-control">
-          <label class="label" for="favorite-title">
-            <span class="label-text font-semibold text-base-content">Display name</span>
-          </label>
+        <label class="form-control block">
+          <span class="label-text mb-2 block font-semibold">Display name</span>
           <input
             class="input input-bordered w-full rounded-xl ${errors.title ? 'input-error' : ''}"
             id="favorite-title"
@@ -84,11 +80,9 @@ export async function renderEditFavoriteForm({
           ${errors.title
             ? html`<p class="critical-text mt-2 text-sm" id="favorite-title-error">${errors.title}</p>`
             : ''}
-        </div>
-        <div class="form-control">
-          <label class="label" for="favorite-url">
-            <span class="label-text font-semibold text-base-content">Web or app address</span>
-          </label>
+        </label>
+        <label class="form-control block">
+          <span class="label-text mb-2 block font-semibold">Web or app address</span>
           <input
             class="input input-bordered w-full rounded-xl ${errors.url ? 'input-error' : ''}"
             id="favorite-url"
@@ -105,7 +99,7 @@ export async function renderEditFavoriteForm({
             : html`<p class="mt-2 text-sm text-base-content/75" id="favorite-url-help">
                 Use a website address or an app link such as weather://. If it changes, review the icon choice below.
               </p>`}
-        </div>
+        </label>
         <label class="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-base-300 p-4">
           <span>
             <span class="block font-medium">Show on portal</span>

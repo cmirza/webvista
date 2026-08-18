@@ -141,6 +141,248 @@ document.addEventListener('click', (event) => {
 
 document.addEventListener('htmx:afterSettle', () => refreshMoveButtons())
 
+const forYouList = document.querySelector('[data-admin-for-you-list]')
+const forYouOrderStatus = document.querySelector('#for-you-order-status')
+let forYouOrderStatusTimer
+let forYouSortable
+
+const forYouRows = () =>
+  forYouList
+    ? [...forYouList.querySelectorAll('[data-admin-for-you-row]')]
+    : []
+
+const orderedForYouIds = () =>
+  forYouRows()
+    .map((row) => row.getAttribute('data-for-you-id'))
+    .filter(Boolean)
+
+const refreshForYouMoveButtons = (disabled = false) => {
+  const rows = forYouRows()
+
+  rows.forEach((row, index) => {
+    const up = row.querySelector('[data-move-for-you="up"]')
+    const down = row.querySelector('[data-move-for-you="down"]')
+
+    if (up instanceof HTMLButtonElement) up.disabled = disabled || index === 0
+    if (down instanceof HTMLButtonElement) {
+      down.disabled = disabled || index === rows.length - 1
+    }
+  })
+}
+
+const showForYouOrderStatus = (message, tone = 'neutral') => {
+  if (!forYouOrderStatus) return
+
+  window.clearTimeout(forYouOrderStatusTimer)
+  forYouOrderStatus.textContent = message
+  forYouOrderStatus.classList.remove(
+    'text-base-content/75',
+    'text-success',
+    'critical-text',
+  )
+  forYouOrderStatus.classList.add(
+    tone === 'success'
+      ? 'text-success'
+      : tone === 'error'
+        ? 'critical-text'
+        : 'text-base-content/75',
+  )
+
+  if (tone === 'success') {
+    forYouOrderStatusTimer = window.setTimeout(() => {
+      showForYouOrderStatus(
+        'Drag a row or use its Move buttons to change the carousel order.',
+      )
+    }, 3500)
+  }
+}
+
+const persistForYouOrder = async () => {
+  forYouSortable?.option('disabled', true)
+  refreshForYouMoveButtons(true)
+  showForYouOrderStatus('Saving order…')
+
+  try {
+    const response = await fetch('/admin/for-you/reorder', {
+      body: JSON.stringify({ ids: orderedForYouIds() }),
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+    })
+
+    if (!response.ok) throw new Error('For You order could not be saved.')
+
+    showForYouOrderStatus('Order saved.', 'success')
+    forYouSortable?.option('disabled', false)
+    refreshForYouMoveButtons()
+  } catch {
+    showForYouOrderStatus(
+      'Could not save the order. Restoring the saved order…',
+      'error',
+    )
+    window.setTimeout(() => window.location.reload(), 1200)
+  }
+}
+
+if (forYouList && typeof Sortable !== 'undefined') {
+  forYouSortable = new Sortable(forYouList, {
+    animation: 150,
+    draggable: '[data-admin-for-you-row]',
+    ghostClass: 'admin-sortable-ghost',
+    handle: '.admin-drag-handle',
+    onEnd: (event) => {
+      if (event.oldIndex !== event.newIndex) void persistForYouOrder()
+    },
+  })
+
+  refreshForYouMoveButtons()
+}
+
+document.addEventListener('click', (event) => {
+  if (!(event.target instanceof Element) || !forYouList) return
+
+  const button = event.target.closest('[data-move-for-you]')
+  const row = button?.closest('[data-admin-for-you-row]')
+  if (!(button instanceof HTMLButtonElement) || !row) return
+
+  const direction = button.getAttribute('data-move-for-you')
+  const neighbor =
+    direction === 'up' ? row.previousElementSibling : row.nextElementSibling
+  if (!neighbor?.matches('[data-admin-for-you-row]')) return
+
+  if (direction === 'up') {
+    forYouList.insertBefore(row, neighbor)
+  } else {
+    forYouList.insertBefore(neighbor, row)
+  }
+
+  button.focus()
+  void persistForYouOrder()
+})
+
+document.addEventListener('htmx:afterSettle', () => refreshForYouMoveButtons())
+
+const watchList = document.querySelector('[data-admin-watch-list]')
+const watchOrderStatus = document.querySelector('#watch-order-status')
+let watchOrderStatusTimer
+let watchSortable
+
+const watchRows = () =>
+  watchList
+    ? [...watchList.querySelectorAll('[data-admin-watch-row]')]
+    : []
+
+const orderedWatchIds = () =>
+  watchRows()
+    .map((row) => row.getAttribute('data-watch-id'))
+    .filter(Boolean)
+
+const refreshWatchMoveButtons = (disabled = false) => {
+  const rows = watchRows()
+
+  rows.forEach((row, index) => {
+    const up = row.querySelector('[data-move-watch="up"]')
+    const down = row.querySelector('[data-move-watch="down"]')
+
+    if (up instanceof HTMLButtonElement) up.disabled = disabled || index === 0
+    if (down instanceof HTMLButtonElement) {
+      down.disabled = disabled || index === rows.length - 1
+    }
+  })
+}
+
+const showWatchOrderStatus = (message, tone = 'neutral') => {
+  if (!watchOrderStatus) return
+
+  window.clearTimeout(watchOrderStatusTimer)
+  watchOrderStatus.textContent = message
+  watchOrderStatus.classList.remove(
+    'text-base-content/75',
+    'text-success',
+    'critical-text',
+  )
+  watchOrderStatus.classList.add(
+    tone === 'success'
+      ? 'text-success'
+      : tone === 'error'
+        ? 'critical-text'
+        : 'text-base-content/75',
+  )
+
+  if (tone === 'success') {
+    watchOrderStatusTimer = window.setTimeout(() => {
+      showWatchOrderStatus(
+        'Drag a row or use its Move buttons to change the poster order.',
+      )
+    }, 3500)
+  }
+}
+
+const persistWatchOrder = async () => {
+  watchSortable?.option('disabled', true)
+  refreshWatchMoveButtons(true)
+  showWatchOrderStatus('Saving order…')
+
+  try {
+    const response = await fetch('/admin/watch/reorder', {
+      body: JSON.stringify({ ids: orderedWatchIds() }),
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+    })
+
+    if (!response.ok) throw new Error('Watch order could not be saved.')
+
+    showWatchOrderStatus('Order saved.', 'success')
+    watchSortable?.option('disabled', false)
+    refreshWatchMoveButtons()
+  } catch {
+    showWatchOrderStatus(
+      'Could not save the order. Restoring the saved order…',
+      'error',
+    )
+    window.setTimeout(() => window.location.reload(), 1200)
+  }
+}
+
+if (watchList && typeof Sortable !== 'undefined') {
+  watchSortable = new Sortable(watchList, {
+    animation: 150,
+    draggable: '[data-admin-watch-row]',
+    ghostClass: 'admin-sortable-ghost',
+    handle: '.admin-drag-handle',
+    onEnd: (event) => {
+      if (event.oldIndex !== event.newIndex) void persistWatchOrder()
+    },
+  })
+
+  refreshWatchMoveButtons()
+}
+
+document.addEventListener('click', (event) => {
+  if (!(event.target instanceof Element) || !watchList) return
+
+  const button = event.target.closest('[data-move-watch]')
+  const row = button?.closest('[data-admin-watch-row]')
+  if (!(button instanceof HTMLButtonElement) || !row) return
+
+  const direction = button.getAttribute('data-move-watch')
+  const neighbor =
+    direction === 'up' ? row.previousElementSibling : row.nextElementSibling
+  if (!neighbor?.matches('[data-admin-watch-row]')) return
+
+  if (direction === 'up') {
+    watchList.insertBefore(row, neighbor)
+  } else {
+    watchList.insertBefore(neighbor, row)
+  }
+
+  button.focus()
+  void persistWatchOrder()
+})
+
+document.addEventListener('htmx:afterSettle', () => refreshWatchMoveButtons())
+
 const syncEditIconPreviews = () => {
   document
     .querySelectorAll('form[data-favorite-form-action="edit"]')
@@ -238,5 +480,26 @@ document.addEventListener('change', (event) => {
     if (uploadMode instanceof HTMLInputElement) uploadMode.checked = true
     showUploadPreview(event.target)
     syncEditIconPreviews()
+  }
+})
+
+document.addEventListener('click', async (event) => {
+  if (!(event.target instanceof Element)) return
+  const button = event.target.closest('[data-copy-bookmarklet]')
+  if (!(button instanceof HTMLButtonElement)) return
+
+  const code = document.querySelector('#bookmarklet-code')
+  const status = document.querySelector('[data-bookmarklet-copy-status]')
+  if (!(code instanceof HTMLTextAreaElement) || !(status instanceof HTMLElement)) return
+
+  try {
+    await navigator.clipboard.writeText(code.value)
+    status.textContent = 'Bookmarklet code copied.'
+  } catch {
+    const details = code.closest('details')
+    if (details instanceof HTMLDetailsElement) details.open = true
+    code.focus()
+    code.select()
+    status.textContent = 'Select Copy, then paste this code into the bookmark address.'
   }
 })

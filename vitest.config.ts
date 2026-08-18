@@ -18,6 +18,7 @@ export default defineConfig(async () => {
             ADMIN_PASSWORD: 'webvista-test-password',
             ADMIN_SESSION_SECRET:
               'webvista-test-session-secret-with-at-least-32-characters',
+            TMDB_API_TOKEN: 'webvista-test-tmdb-token',
           },
         },
       }),

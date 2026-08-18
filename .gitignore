@@ -19,6 +19,7 @@ wrangler.production.jsonc
 .env
 .env.*
 !.env.example
+PRIVATE-OPERATIONS.md
 
 # Local data and uploaded test assets
 .local/

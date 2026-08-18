@@ -110,3 +110,76 @@ describe('favorites database migration', () => {
     ).rejects.toThrow()
   })
 })
+
+describe('For You database migration', () => {
+  it('creates the content schema and ordering index', async () => {
+    const columns = await env.DB.prepare('PRAGMA table_info(for_you_items)').all<{
+      name: string
+    }>()
+    const indexes = await env.DB.prepare('PRAGMA index_list(for_you_items)').all<{
+      name: string
+    }>()
+
+    expect(columns.results.map(({ name }) => name)).toEqual([
+      'id',
+      'url',
+      'title',
+      'description',
+      'image_url',
+      'source_name',
+      'position',
+      'enabled',
+      'created_at',
+      'updated_at',
+    ])
+    expect(indexes.results.map(({ name }) => name)).toContain(
+      'for_you_enabled_position_idx',
+    )
+  })
+
+  it('creates the persisted portal settings schema and default', async () => {
+    const columns = await env.DB.prepare('PRAGMA table_info(portal_settings)').all<{
+      name: string
+    }>()
+    const setting = await env.DB
+      .prepare("SELECT value FROM portal_settings WHERE key = 'for_you_enabled'")
+      .first<{ value: string }>()
+
+    expect(columns.results.map(({ name }) => name)).toEqual([
+      'key',
+      'value',
+      'updated_at',
+    ])
+    expect(setting?.value).toBe('1')
+  })
+})
+
+describe('Watch database migration', () => {
+  it('creates the Watch schema and ordering index', async () => {
+    const columns = await env.DB.prepare('PRAGMA table_info(watch_items)').all<{
+      name: string
+    }>()
+    const indexes = await env.DB.prepare('PRAGMA index_list(watch_items)').all<{
+      name: string
+    }>()
+
+    expect(columns.results.map(({ name }) => name)).toEqual([
+      'id',
+      'title',
+      'year',
+      'media_type',
+      'poster_url',
+      'service_name',
+      'watch_url',
+      'position',
+      'enabled',
+      'created_at',
+      'updated_at',
+      'tmdb_id',
+      'imdb_id',
+    ])
+    expect(indexes.results.map(({ name }) => name)).toContain(
+      'watch_enabled_position_idx',
+    )
+  })
+})

@@ -15,6 +15,10 @@ const vendorAssets = [
     source: new URL('../src/client/admin.js', import.meta.url),
     destination: new URL('admin.js', assetsDirectory),
   },
+  {
+    source: new URL('../src/client/portal.js', import.meta.url),
+    destination: new URL('portal.js', assetsDirectory),
+  },
 ]
 
 await mkdir(assetsDirectory, { recursive: true })

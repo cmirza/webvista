@@ -28,14 +28,12 @@ async function renderTitleInput(
   error?: string,
   oob = false,
 ): Promise<HtmlEscapedString> {
-  return html`<div
-    class="form-control"
+  return html`<label
+    class="form-control block"
     id="favorite-title-field"
     ${oob ? html`hx-swap-oob="outerHTML"` : ''}
   >
-    <label class="label" for="favorite-title">
-      <span class="label-text font-semibold text-base-content">Display name</span>
-    </label>
+    <span class="label-text mb-2 block font-semibold">Display name</span>
     <input
       class="input input-bordered w-full rounded-xl ${error ? 'input-error' : ''}"
       id="favorite-title"
@@ -50,7 +48,7 @@ async function renderTitleInput(
     ${error
       ? html`<p class="critical-text mt-2 text-sm" id="favorite-title-error">${error}</p>`
       : ''}
-  </div>`
+  </label>`
 }
 
 export async function renderAddFavoriteForm({
@@ -62,19 +60,17 @@ export async function renderAddFavoriteForm({
 
   return html`
     <section
-      class="rounded-3xl bg-base-100 p-5 shadow-sm sm:p-7"
+      class="rounded-3xl bg-base-100 p-6 shadow-sm sm:p-8"
       id="favorite-form-shell"
       data-favorite-form-shell
     >
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <p class="brand-eyebrow text-sm font-semibold tracking-[0.16em] uppercase">Favorites</p>
-          <h2 class="mt-1 text-2xl font-semibold tracking-tight">Add Favorite</h2>
-        </div>
-        <a class="btn btn-ghost btn-sm rounded-lg" href="/admin">Cancel</a>
-      </div>
+      <p class="brand-eyebrow text-sm font-semibold tracking-[0.16em] uppercase">Favorites</p>
+      <h2 class="mt-1 text-3xl font-semibold tracking-tight">Add Favorite</h2>
+      <p class="mt-3 text-base-content/75">
+        Add a website or app link, then choose how its icon should appear.
+      </p>
       <form
-        class="mt-6 space-y-5"
+        class="mt-7 space-y-6"
         method="post"
         action="/admin/favorites"
         enctype="multipart/form-data"
@@ -90,10 +86,8 @@ export async function renderAddFavoriteForm({
           ? html`<input type="hidden" name="presentation" value="dashboard" />`
           : ''}
         ${await renderTitleInput(values.title, errors.title)}
-        <div class="form-control">
-          <label class="label" for="favorite-url">
-            <span class="label-text font-semibold text-base-content">Web or app address</span>
-          </label>
+        <label class="form-control block">
+          <span class="label-text mb-2 block font-semibold">Web or app address</span>
           <input
             class="input input-bordered w-full rounded-xl ${errors.url ? 'input-error' : ''}"
             id="favorite-url"
@@ -111,7 +105,7 @@ export async function renderAddFavoriteForm({
             : html`<p class="mt-2 text-sm text-base-content/75" id="favorite-url-help">
                 Use a website address or an app link such as weather://.
               </p>`}
-        </div>
+        </label>
         <fieldset class="space-y-3">
           <legend class="font-semibold">Icon</legend>
           <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-base-300 p-4">

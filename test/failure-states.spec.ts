@@ -18,6 +18,7 @@ const bindings = (
 ): CloudflareBindings => ({
   ADMIN_PASSWORD: env.ADMIN_PASSWORD,
   ADMIN_SESSION_SECRET: env.ADMIN_SESSION_SECRET,
+  TMDB_API_TOKEN: env.TMDB_API_TOKEN,
   DB: env.DB,
   ICONS: env.ICONS,
   ...overrides,

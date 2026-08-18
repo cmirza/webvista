@@ -3,6 +3,23 @@ import { describe, expect, it } from 'vitest'
 import { createFavorite } from '../src/services/favorites'
 
 describe('WebVista Worker', () => {
+  it('redirects production HTTP requests to HTTPS and advertises HSTS', async () => {
+    const insecure = await workerExports.default.fetch(
+      new Request('http://webvista.test/admin', { redirect: 'manual' }),
+    )
+    expect(insecure.status).toBe(308)
+    expect(insecure.headers.get('location')).toBe('https://webvista.test/admin')
+
+    const secure = await workerExports.default.fetch('https://webvista.test/')
+    expect(secure.headers.get('strict-transport-security')).toBe(
+      'max-age=31536000; includeSubDomains',
+    )
+
+    const local = await workerExports.default.fetch('http://localhost/')
+    expect(local.status).toBe(200)
+    expect(local.headers.get('strict-transport-security')).toBeNull()
+  })
+
   it('serves the server-rendered portal', async () => {
     const response = await workerExports.default.fetch('https://webvista.test/')
     const body = await response.text()
@@ -16,14 +33,20 @@ describe('WebVista Worker', () => {
     expect(body).toContain('type="submit"')
     expect(body).toContain('placeholder="Search Google..."')
     expect(body).toContain('data-search-prompt')
+    expect(body).toContain('data-local-date')
+    expect(body).toContain('Finding local weather')
+    expect(body).toContain('data-weather-panel')
+    expect(body).toContain('Portland is used otherwise.')
     expect(body).toContain('brand-eyebrow')
     expect(body).toContain('text-base-content/75')
     expect(body).not.toMatch(/text-base-content\/(45|50|55|60)/)
     expect(body).toContain('href="/assets/app.css"')
-    expect(body).not.toContain('<script')
+    expect(body).toContain('<script src="/assets/portal.js" defer></script>')
+    expect(body).not.toContain('htmx.min.js')
     expect(body).not.toContain('hx-')
     expect(body).toContain('Your favorites will appear here.')
     expect(body).not.toContain('/admin')
+    expect(body).not.toContain('data-for-you-carousel')
   })
 
   it('renders only enabled favorites in stored order as same-tab links', async () => {
@@ -95,6 +118,8 @@ describe('WebVista Worker', () => {
     )
 
     expect(response.status).toBe(303)
-    expect(response.headers.get('location')).toBe('/admin/login')
+    expect(response.headers.get('location')).toBe(
+      '/admin/login?next=%2Fadmin%2Ffavorites%2Fnew',
+    )
   })
 })

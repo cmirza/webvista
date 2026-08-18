@@ -11,6 +11,25 @@ import {
 
 const app = new Hono<{ Bindings: CloudflareBindings }>()
 
+app.use('*', async (context, next) => {
+  const url = new URL(context.req.url)
+  const localHost = ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)
+
+  if (url.protocol === 'http:' && !localHost) {
+    url.protocol = 'https:'
+    return context.redirect(url.toString(), 308)
+  }
+
+  await next()
+
+  if (url.protocol === 'https:' && !localHost) {
+    context.header(
+      'Strict-Transport-Security',
+      'max-age=31536000; includeSubDomains',
+    )
+  }
+})
+
 app.route('/', portalRoutes)
 app.route('/icons', iconRoutes)
 app.route('/admin', authRoutes)

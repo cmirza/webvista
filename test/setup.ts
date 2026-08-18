@@ -4,6 +4,13 @@ import { beforeEach, inject } from 'vitest'
 
 beforeEach(async () => {
   await applyD1Migrations(env.DB, inject('migrations'))
+  await env.DB
+    .prepare(
+      "UPDATE portal_settings SET value = '1' WHERE key = 'for_you_enabled'",
+    )
+    .run()
+  await env.DB.prepare('DELETE FROM for_you_items').run()
+  await env.DB.prepare('DELETE FROM watch_items').run()
   await env.DB.prepare('DELETE FROM favorites').run()
   let cursor: string | undefined
 
