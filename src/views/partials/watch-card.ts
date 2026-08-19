@@ -20,7 +20,7 @@ export async function renderWatchCard(
             />`
           : ''}
       </div>
-      <div class="min-w-0 px-1 pt-3">
+      <div class="watch-body min-w-0 px-1 pt-3">
         <h3 class="watch-title">${item.title}</h3>
         <p class="watch-meta">
           ${item.serviceName}${item.year ? ` · ${item.year}` : ''} · ${item.mediaType === 'movie' ? 'Movie' : 'TV Show'}

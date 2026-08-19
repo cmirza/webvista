@@ -23,18 +23,15 @@ export async function renderPortal(
     weekday: 'long',
   }).format(now)
   const content = await html`
-    <main class="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-6 py-10 sm:px-10 sm:py-14 lg:px-12">
-      <header class="mb-10 grid items-end gap-8 sm:mb-14 lg:grid-cols-[minmax(0,1fr)_minmax(30rem,38rem)]">
+    <main class="portal-shell mx-auto flex min-h-screen w-full max-w-7xl flex-col px-6 py-10 sm:px-10 sm:py-14 lg:px-12">
+      <header class="portal-header mb-10 grid items-end gap-8 sm:mb-14 lg:grid-cols-[minmax(0,1fr)_minmax(30rem,38rem)]">
         <div>
           <p class="brand-eyebrow mb-3 text-sm font-semibold tracking-[0.18em] uppercase">WebVista</p>
-          <h1 class="text-4xl font-semibold tracking-tight sm:text-5xl">Start here.</h1>
-          <p class="mt-4 max-w-2xl text-lg leading-8 text-base-content/75">
-            Search the web or choose a favorite.
-          </p>
+          <h1 class="portal-title text-4xl font-semibold tracking-tight sm:text-5xl">Start here.</h1>
         </div>
 
-        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(14rem,0.9fr)_minmax(0,1.3fr)]">
-          <section class="rounded-3xl bg-base-100 p-5 shadow-sm" aria-labelledby="date-heading">
+        <div class="portal-status-grid grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(14rem,0.9fr)_minmax(0,1.3fr)]">
+          <section class="portal-status-card rounded-3xl bg-base-100 p-5 shadow-sm" aria-labelledby="date-heading">
             <p class="text-xs font-semibold tracking-[0.16em] text-base-content/75 uppercase" id="date-heading">
               Today
             </p>
@@ -46,23 +43,23 @@ export async function renderPortal(
           </section>
 
           <section
-            class="rounded-3xl bg-base-100 p-5 shadow-sm"
+            class="portal-status-card rounded-3xl bg-base-100 p-5 shadow-sm"
             aria-labelledby="weather-heading"
             aria-live="polite"
             data-weather-panel
           >
             <p class="sr-only" id="weather-heading">Weather</p>
             <div data-weather-content>
-              <p class="font-semibold">Finding local weather…</p>
+              <p class="font-semibold">Loading Portland weather…</p>
               <p class="mt-1 text-sm text-base-content/75">
-                Allow location access for nearby conditions. Portland is used otherwise.
+                Forecast for the 97209 area.
               </p>
             </div>
           </section>
         </div>
       </header>
 
-      <section aria-labelledby="search-heading" class="mb-12 sm:mb-16">
+      <section aria-labelledby="search-heading" class="portal-search mb-12 sm:mb-16">
         <h2 id="search-heading" class="sr-only">Search Google</h2>
         <form
           action="https://www.google.com/search"
@@ -73,7 +70,7 @@ export async function renderPortal(
             <label class="sr-only" for="google-search">Search Google</label>
             <input
               id="google-search"
-              class="peer input input-lg h-16 w-full rounded-2xl border-base-300 bg-base-100 px-6 text-lg shadow-sm outline-none placeholder:text-transparent focus:border-primary focus:ring-4 focus:ring-primary/15"
+              class="portal-search-input peer input input-lg h-16 w-full rounded-2xl border-base-300 bg-base-100 px-6 text-lg shadow-sm outline-none placeholder:text-transparent focus:border-primary focus:ring-4 focus:ring-primary/15"
               type="search"
               name="q"
               placeholder="Search Google..."
@@ -91,14 +88,14 @@ export async function renderPortal(
               <span class="text-base-content/75">...</span>
             </div>
           </div>
-          <button class="btn btn-primary h-16 rounded-2xl px-8 text-lg shadow-sm" type="submit">
+          <button class="portal-search-button btn btn-primary h-16 rounded-2xl px-8 text-lg shadow-sm" type="submit">
             Search
           </button>
         </form>
       </section>
 
       <section aria-labelledby="favorites-heading">
-        <div class="mb-6 flex items-end justify-between gap-4">
+        <div class="portal-section-header mb-6 flex items-end justify-between gap-4">
           <div>
             <p class="mb-1 text-xs font-semibold tracking-[0.16em] text-base-content/75 uppercase">
               Quick access
@@ -125,8 +122,8 @@ export async function renderPortal(
 
       ${watchItems.length > 0
         ? html`
-            <section class="mt-14 sm:mt-18" aria-labelledby="watch-heading" data-horizontal-carousel>
-              <div class="mb-6 flex items-end justify-between gap-4">
+            <section class="portal-carousel-section mt-14 sm:mt-18" aria-labelledby="watch-heading" data-horizontal-carousel>
+              <div class="portal-section-header mb-6 flex items-end justify-between gap-4">
                 <div>
                   <p class="mb-1 text-xs font-semibold tracking-[0.16em] text-base-content/75 uppercase">
                     Movies and shows
@@ -147,8 +144,8 @@ export async function renderPortal(
 
       ${forYouItems.length > 0
         ? html`
-            <section class="mt-14 sm:mt-18" aria-labelledby="for-you-heading" data-for-you-carousel data-horizontal-carousel>
-              <div class="mb-6 flex items-end justify-between gap-4">
+            <section class="portal-carousel-section mt-14 sm:mt-18" aria-labelledby="for-you-heading" data-for-you-carousel data-horizontal-carousel>
+              <div class="portal-section-header mb-6 flex items-end justify-between gap-4">
                 <div>
                   <p class="mb-1 text-xs font-semibold tracking-[0.16em] text-base-content/75 uppercase">
                     Selected links

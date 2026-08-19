@@ -157,6 +157,7 @@ CREATE TABLE favorites (
 
 - [x] Implement `GET /` as server-rendered HTML.
 - [x] Use a friendly, neutral static introduction without personalized or timezone-dependent copy.
+  - [x] Keep the masthead concise by removing redundant supporting copy beneath “Start here.”
 - [x] Add prominent Google search above Favorites.
   - [x] Submit with `GET https://www.google.com/search` and a `q` field.
   - [x] Provide a large search input, clear focus state, and visible submit button.
@@ -401,20 +402,21 @@ Later milestones remain intentionally high-level until v1.0 usage is validated.
   - [x] Keep a useful server-rendered fallback when JavaScript is unavailable.
 - [x] Show current temperature and conditions.
 - [x] Show daily high and low.
-- [x] Derive the weather location from the browser when permission is granted.
-  - [x] Request browser geolocation only when needed for weather and explain why it is requested.
-  - [x] Send validated, coarse coordinates to the Worker only for weather retrieval; do not persist precise location in D1.
-  - [x] Reverse-geocode coarse browser coordinates into a city/region label.
+- [x] Use a fixed Portland 97209-area weather location.
+  - [x] Never request browser geolocation, avoiding Safari's permission prompt.
+  - [x] Keep the location out of D1 because it is a source-controlled constant.
   - [x] Keep provider attribution text out of the compact weather widget.
   - [x] Version cached weather-fragment requests when the rendered fragment format changes.
-  - [x] Handle denied, unavailable, and timed-out location requests without blocking the rest of the portal.
-  - [x] Fall back to Portland, Oregon whenever browser location is unavailable or declined.
-  - [x] Confirm the granted-permission path in the browser.
-- [x] Retrieve weather server-side from validated coordinates or the fixed Portland fallback.
+  - [x] Handle unavailable and timed-out weather requests without blocking the rest of the portal.
+- [x] Retrieve weather server-side for the fixed Portland location.
 - [x] Use Open-Meteo for keyless current conditions and one-day high/low data.
 - [x] Translate provider weather codes into clear, human-readable conditions.
-- [x] Cache weather data by coarse location within free-tier constraints.
+- [x] Cache weather data within free-tier constraints.
 - [x] Verify date and weather behavior at wide, split-screen, and narrow widths.
+- [x] Keep Watch and For You discoverable on a full-screen 27-inch display using scaled resolution.
+  - [x] Add a height-aware compact desktop layout with six Favorites columns and modestly smaller elements without changing narrow layouts.
+  - [x] Verify the compact layout at the screenshot's effective 1288×1340 viewport and recheck narrow behavior without horizontal overflow.
+  - [x] Distribute unused vertical space between the masthead, Search, Favorites, Watch, and For You instead of leaving it below the content.
 - [x] Deploy the date/weather increment and previously verified development features to Workers.dev.
   - [x] Apply pending production D1 migrations before deploying the matching Worker code.
   - [x] Run the cleanup-safe production authentication, CRUD, ordering, and R2 smoke test.
@@ -597,6 +599,8 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-17 — Local date and weather:** Put the full weekday/date on the portal using the browser's locale and timezone, keeping it on one line at desktop widths. Use opt-in browser geolocation as the primary weather location, round and validate coordinates before server-side Open-Meteo and OpenStreetMap Nominatim requests, never persist them in D1, cache coarse weather responses for ten minutes and locality labels for one day, keep provider attribution text out of the compact widget, and always fall back to Portland, Oregon when location access is unavailable.
 - **2026-08-17 — Production feature deployment:** Apply D1 migrations `0004` through `0008` before deploying the matching For You, settings, and Watch code; verify the resulting Workers.dev release with the cleanup-safe production smoke test and a read-only public portal check.
 - **2026-08-18 — Custom domain:** Use `webvista.cc` as the sole public production origin and disable the Workers.dev route in Wrangler so domain-level security controls cannot be bypassed through a fallback hostname; verify HTTPS, authentication, D1 writes, ordering, and R2 storage through the custom hostname.
+- **2026-08-18 — Fixed weather location:** Supersede browser-derived weather with a fixed Portland 97209-area forecast so Safari never displays a location-permission prompt.
+- **2026-08-18 — Scaled-display layout:** At wide viewports up to 1440 CSS pixels tall, use six Favorites columns and modestly reduce vertical sizing so Favorites, Watch, and For You all remain visible; retain the existing four-column, large-target treatment for narrower layouts.
 
 ## Deferred ideas
 

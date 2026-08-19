@@ -2,7 +2,7 @@ const searchInput = document.querySelector('#google-search')
 const localDate = document.querySelector('[data-local-date]')
 const weatherPanel = document.querySelector('[data-weather-panel]')
 const weatherContent = weatherPanel?.querySelector('[data-weather-content]')
-const weatherFragmentVersion = '3'
+const weatherFragmentVersion = '4'
 
 const updateLocalDate = () => {
   if (!(localDate instanceof HTMLTimeElement)) return
@@ -32,15 +32,11 @@ const showWeatherUnavailable = () => {
   `
 }
 
-const loadWeather = async (latitude, longitude) => {
+const loadWeather = async () => {
   if (!(weatherContent instanceof HTMLElement)) return
 
   const url = new URL('/weather', window.location.origin)
   url.searchParams.set('v', weatherFragmentVersion)
-  if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
-    url.searchParams.set('latitude', (Math.round(latitude * 100) / 100).toString())
-    url.searchParams.set('longitude', (Math.round(longitude * 100) / 100).toString())
-  }
 
   try {
     const response = await fetch(url, {
@@ -57,24 +53,9 @@ const requestWeather = () => {
   if (!(weatherContent instanceof HTMLElement)) return
 
   weatherContent.innerHTML = `
-    <p class="font-semibold">Finding local weather…</p>
-    <p class="mt-1 text-sm text-base-content/75">Portland is used if location is unavailable.</p>
+    <p class="font-semibold">Loading Portland weather…</p>
   `
-
-  if (!('geolocation' in navigator)) {
-    void loadWeather()
-    return
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    ({ coords }) => void loadWeather(coords.latitude, coords.longitude),
-    () => void loadWeather(),
-    {
-      enableHighAccuracy: false,
-      maximumAge: 30 * 60 * 1000,
-      timeout: 5_000,
-    },
-  )
+  void loadWeather()
 }
 
 window.addEventListener('pageshow', () => {

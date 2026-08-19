@@ -24,7 +24,7 @@ export async function renderForYouCard(
             />`
           : ''}
       </div>
-      <div class="min-w-0 p-5">
+      <div class="for-you-body min-w-0 p-5">
         <p class="for-you-source">${item.sourceName}</p>
         <h3 class="for-you-title">${item.title}</h3>
         ${item.description

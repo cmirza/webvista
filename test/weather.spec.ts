@@ -4,11 +4,9 @@ import {
   describeWeatherCode,
   fetchWeather,
   fetchWeatherPlace,
-  locationApiUrl,
-  PORTLAND_WEATHER_LOCATION,
+  PORTLAND_97209_WEATHER_LOCATION,
   WeatherError,
   weatherApiUrl,
-  weatherLocationFromSearch,
 } from '../src/services/weather'
 
 const weatherResponse = () =>
@@ -26,54 +24,20 @@ const weatherResponse = () =>
     { headers: { 'Content-Type': 'application/json; charset=utf-8' } },
   )
 
-const locationResponse = () =>
-  new Response(
-    JSON.stringify({
-      address: {
-        city: 'Portland',
-        state: 'Oregon',
-        country: 'United States',
-      },
-    }),
-    { headers: { 'Content-Type': 'application/json; charset=utf-8' } },
-  )
-
 afterEach(() => vi.restoreAllMocks())
 
 describe('weather', () => {
-  it('uses Portland when browser coordinates are absent', () => {
-    expect(weatherLocationFromSearch(new URLSearchParams())).toEqual({
-      ...PORTLAND_WEATHER_LOCATION,
-      source: 'portland',
+  it('uses the fixed Portland 97209-area location', () => {
+    expect(PORTLAND_97209_WEATHER_LOCATION).toEqual({
+      latitude: 45.53,
+      longitude: -122.68,
     })
-  })
-
-  it('validates and rounds browser coordinates to a coarse location', () => {
-    expect(
-      weatherLocationFromSearch(
-        new URLSearchParams({
-          latitude: '45.52345',
-          longitude: '-122.67621',
-        }),
-      ),
-    ).toEqual({ latitude: 45.52, longitude: -122.68, source: 'browser' })
-
-    for (const query of [
-      [['latitude', '91'], ['longitude', '0']],
-      [['latitude', '45']],
-      [['latitude', 'not-a-number'], ['longitude', '-122']],
-    ]) {
-      expect(() =>
-        weatherLocationFromSearch(new URLSearchParams(query)),
-      ).toThrowError(WeatherError)
-    }
   })
 
   it('requests current conditions and one-day Fahrenheit high and low', () => {
     const url = weatherApiUrl({
-      latitude: 45.52,
+      latitude: 45.53,
       longitude: -122.68,
-      source: 'portland',
     })
 
     expect(url.origin).toBe('https://api.open-meteo.com')
@@ -86,44 +50,10 @@ describe('weather', () => {
     expect(url.searchParams.get('forecast_days')).toBe('1')
   })
 
-  it('reverse-geocodes coarse browser coordinates into a locality label', async () => {
-    const location = {
-      latitude: 45.52,
-      longitude: -122.68,
-      source: 'browser' as const,
-    }
-    const url = locationApiUrl(location)
-    const fetcher = vi.fn(async () => locationResponse())
-
-    expect(url.origin).toBe('https://nominatim.openstreetmap.org')
-    expect(url.searchParams.get('lat')).toBe('45.52')
-    expect(url.searchParams.get('lon')).toBe('-122.68')
-    expect(url.searchParams.get('zoom')).toBe('10')
-    await expect(fetchWeatherPlace(location, { fetcher })).resolves.toEqual({
+  it('uses the fixed Portland label without reverse geocoding', async () => {
+    await expect(fetchWeatherPlace()).resolves.toEqual({
       label: 'Portland, Oregon',
     })
-    expect(fetcher).toHaveBeenCalledWith(
-      expect.any(URL),
-      expect.objectContaining({
-        cf: { cacheEverything: true, cacheTtl: 86400 },
-        headers: expect.objectContaining({
-          'User-Agent': expect.stringContaining('WebVista'),
-        }),
-      }),
-    )
-  })
-
-  it('uses the fixed Portland label without a reverse-geocoding request', async () => {
-    const fetcher = vi.fn()
-    await expect(
-      fetchWeatherPlace(
-        { ...PORTLAND_WEATHER_LOCATION, source: 'portland' },
-        { fetcher },
-      ),
-    ).resolves.toEqual({
-      label: 'Portland, Oregon',
-    })
-    expect(fetcher).not.toHaveBeenCalled()
   })
 
   it('returns a compact, human-readable weather snapshot', async () => {
@@ -131,7 +61,7 @@ describe('weather', () => {
 
     await expect(
       fetchWeather(
-        { latitude: 45.52, longitude: -122.68, source: 'portland' },
+        PORTLAND_97209_WEATHER_LOCATION,
         { fetcher },
       ),
     ).resolves.toEqual({
@@ -143,7 +73,7 @@ describe('weather', () => {
     })
     expect(fetcher).toHaveBeenCalledWith(
       expect.objectContaining({
-        href: expect.stringContaining('latitude=45.52'),
+        href: expect.stringContaining('latitude=45.53'),
       }),
       expect.objectContaining({
         cf: { cacheEverything: true, cacheTtl: 600 },
@@ -163,7 +93,7 @@ describe('weather', () => {
   it('rejects malformed or oversized provider responses', async () => {
     await expect(
       fetchWeather(
-        { latitude: 45.52, longitude: -122.68, source: 'portland' },
+        PORTLAND_97209_WEATHER_LOCATION,
         {
           fetcher: async () =>
             new Response('{}', { headers: { 'Content-Type': 'application/json' } }),
@@ -173,7 +103,7 @@ describe('weather', () => {
 
     await expect(
       fetchWeather(
-        { latitude: 45.52, longitude: -122.68, source: 'portland' },
+        PORTLAND_97209_WEATHER_LOCATION,
         {
           fetcher: async () =>
             new Response('{}', {
@@ -187,15 +117,13 @@ describe('weather', () => {
     ).rejects.toMatchObject({ code: 'invalid-response' })
   })
 
-  it('serves the weather fragment and identifies its location source', async () => {
-    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) =>
-      String(input).includes('nominatim.openstreetmap.org')
-        ? locationResponse()
-        : weatherResponse(),
+  it('serves fixed 97209-area weather regardless of query parameters', async () => {
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(async () =>
+      weatherResponse(),
     )
 
     const local = await workerExports.default.fetch(
-      'https://webvista.test/weather?latitude=45.523&longitude=-122.676',
+      'https://webvista.test/weather?latitude=40.71&longitude=-74.00',
     )
     const localBody = await local.text()
     expect(local.status).toBe(200)
@@ -205,21 +133,9 @@ describe('weather', () => {
     expect(localBody).not.toContain('© OpenStreetMap')
     expect(localBody).not.toContain('Your location')
     expect(localBody).not.toContain('<html')
-
-    const portland = await workerExports.default.fetch(
-      'https://webvista.test/weather',
+    expect(fetcher).toHaveBeenCalledWith(
+      expect.objectContaining({ href: expect.stringContaining('latitude=45.53') }),
+      expect.any(Object),
     )
-    expect(await portland.text()).toContain('Portland, Oregon')
-  })
-
-  it('rejects invalid public weather coordinates without calling the provider', async () => {
-    const fetcher = vi.spyOn(globalThis, 'fetch')
-    const response = await workerExports.default.fetch(
-      'https://webvista.test/weather?latitude=200&longitude=0',
-    )
-
-    expect(response.status).toBe(400)
-    expect(response.headers.get('cache-control')).toBe('no-store')
-    expect(fetcher).not.toHaveBeenCalled()
   })
 })
