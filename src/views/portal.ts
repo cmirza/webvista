@@ -26,8 +26,7 @@ export async function renderPortal(
     <main class="portal-shell mx-auto flex min-h-screen w-full max-w-7xl flex-col px-6 py-10 sm:px-10 sm:py-14 lg:px-12">
       <header class="portal-header mb-10 grid items-end gap-8 sm:mb-14 lg:grid-cols-[minmax(0,1fr)_minmax(30rem,38rem)]">
         <div>
-          <p class="brand-eyebrow mb-3 text-sm font-semibold tracking-[0.18em] uppercase">WebVista</p>
-          <h1 class="portal-title text-4xl font-semibold tracking-tight sm:text-5xl">Start here.</h1>
+          <h1 class="brand-eyebrow text-sm font-semibold tracking-[0.18em] uppercase">WebVista</h1>
         </div>
 
         <div class="portal-status-grid grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(14rem,0.9fr)_minmax(0,1.3fr)]">
@@ -94,7 +93,7 @@ export async function renderPortal(
         </form>
       </section>
 
-      <section aria-labelledby="favorites-heading">
+      <section class="favorites-section" aria-labelledby="favorites-heading" data-horizontal-carousel>
         <div class="portal-section-header mb-6 flex items-end justify-between gap-4">
           <div>
             <p class="mb-1 text-xs font-semibold tracking-[0.16em] text-base-content/75 uppercase">
@@ -102,11 +101,19 @@ export async function renderPortal(
             </p>
             <h2 id="favorites-heading" class="text-2xl font-semibold tracking-tight">Favorites</h2>
           </div>
+          ${favorites.length > 0
+            ? html`
+                <div class="favorites-carousel-controls flex gap-2" aria-label="Browse Favorites">
+                  <button class="btn btn-circle btn-outline" type="button" data-carousel-control="previous" aria-controls="favorites-track" aria-label="Previous favorites">←</button>
+                  <button class="btn btn-circle btn-outline" type="button" data-carousel-control="next" aria-controls="favorites-track" aria-label="Next favorites">→</button>
+                </div>
+              `
+            : ''}
         </div>
 
         ${favorites.length > 0
           ? html`
-              <div class="favorites-grid" data-favorites-grid>
+              <div class="favorites-grid" id="favorites-track" tabindex="0" data-favorites-grid data-horizontal-carousel-track>
                 ${favorites.map(renderFavorite)}
               </div>
             `

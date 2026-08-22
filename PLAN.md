@@ -157,7 +157,7 @@ CREATE TABLE favorites (
 
 - [x] Implement `GET /` as server-rendered HTML.
 - [x] Use a friendly, neutral static introduction without personalized or timezone-dependent copy.
-  - [x] Keep the masthead concise by removing redundant supporting copy beneath “Start here.”
+  - [x] Keep the masthead concise by using the WebVista wordmark alone without a redundant heading or supporting copy.
 - [x] Add prominent Google search above Favorites.
   - [x] Submit with `GET https://www.google.com/search` and a `q` field.
   - [x] Provide a large search input, clear focus state, and visible submit button.
@@ -178,6 +178,10 @@ CREATE TABLE favorites (
   - [x] Provide an idempotent local-only seed dataset with 12 representative favorites.
 - [x] Clamp long titles to two lines without allowing one item to distort the grid.
 - [x] Verify wide monitor, half-screen desktop, narrow desktop, tablet, and basic mobile fallback layouts.
+- [x] Keep lower portal rows discoverable on tablet-sized viewports.
+  - [x] Render Favorites as one horizontally browsable, scroll-snapped row at portrait tablet widths and wider, short landscape viewports.
+  - [x] Provide visible previous/next controls while retaining native touch scrolling.
+  - [x] Verify iPad portrait and landscape layouts without changing the desktop grid.
 
 ### 6. Automatic and fallback icons
 
@@ -601,6 +605,9 @@ Add new implementation work beneath the closest existing checklist item. Use thi
 - **2026-08-18 — Custom domain:** Use `webvista.cc` as the sole public production origin and disable the Workers.dev route in Wrangler so domain-level security controls cannot be bypassed through a fallback hostname; verify HTTPS, authentication, D1 writes, ordering, and R2 storage through the custom hostname.
 - **2026-08-18 — Fixed weather location:** Supersede browser-derived weather with a fixed Portland 97209-area forecast so Safari never displays a location-permission prompt.
 - **2026-08-18 — Scaled-display layout:** At wide viewports up to 1440 CSS pixels tall, use six Favorites columns and modestly reduce vertical sizing so Favorites, Watch, and For You all remain visible; retain the existing four-column, large-target treatment for narrower layouts.
+- **2026-08-21 — Tablet Favorites carousel:** At portrait tablet widths and at wider landscape viewports no taller than 1024px, render Favorites as one horizontally scrollable row with native touch scrolling and visible browse controls so Watch and For You remain discoverable in both orientations. Keep portrait targets larger, use a compact landscape treatment, and preserve the desktop grid on taller displays.
+- **2026-08-21 — Portal masthead:** Use the WebVista wordmark as the page heading and remove “Start here.” because it adds no navigational meaning and consumes valuable vertical space on tablet displays.
+- **2026-08-21 — Tablet card treatment:** Let For You artwork fill each tablet card with centered cover cropping and place its source/title over a readability gradient; enlarge Watch posters only in portrait, retaining compact landscape sizing.
 
 ## Deferred ideas
 

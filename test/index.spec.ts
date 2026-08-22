@@ -39,6 +39,8 @@ describe('WebVista Worker', () => {
     expect(body).toContain('data-weather-panel')
     expect(body).not.toContain('location access')
     expect(body).toContain('brand-eyebrow')
+    expect(body).toContain('>WebVista</h1>')
+    expect(body).not.toContain('Start here.')
     expect(body).toContain('text-base-content/75')
     expect(body).not.toMatch(/text-base-content\/(45|50|55|60)/)
     expect(body).toContain('href="/assets/app.css"')
@@ -78,6 +80,9 @@ describe('WebVista Worker', () => {
 
     expect(response.status).toBe(200)
     expect(body).toContain('data-favorites-grid')
+    expect(body).toContain('data-horizontal-carousel-track')
+    expect(body).toContain('aria-label="Browse Favorites"')
+    expect(body).toContain('aria-controls="favorites-track"')
     expect(body).toContain(`data-favorite-id="${first.id}"`)
     expect(body).toContain(`href="${first.url}"`)
     expect(body).toContain('ES')
